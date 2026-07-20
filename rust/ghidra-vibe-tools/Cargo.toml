@@ -1,0 +1,28 @@
+[package]
+name = "ghidra-vibe-tools"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "JSpace RAG, DSC index, and MCP bridges for GhidraVibe (Rust — no Python)"
+
+[[bin]]
+name = "ghidra-vibe-jspace"
+path = "src/bin/jspace.rs"
+
+[[bin]]
+name = "ghidra-vibe-dsc-index"
+path = "src/bin/dsc_index.rs"
+
+[[bin]]
+name = "ghidra-vibe-rag-mcp"
+path = "src/bin/rag_mcp.rs"
+
+[dependencies]
+anyhow = "1"
+blake2 = "0.10"
+clap = { version = "4", features = ["derive", "env"] }
+hex = "0.4"
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ureq = { version = "2", default-features = true, features = ["json"] }

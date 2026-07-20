@@ -1,67 +1,19 @@
-# Nix
 result
 result-*
-
-# Ghidra
-.ghidra/
-ghidra_*/
-*.gpr
-*.rep/
-*.lock
-
-# Java
-*.class
-*.jar
-*.war
-*.ear
-target/
-build/
-.gradle/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# macOS
 .DS_Store
-.AppleDouble
-.LSOverride
-Icon
-._*
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-
-# dyld cache and extracted frameworks
-dyld-cache/
-extracted-frameworks/
-*.dyldextractor/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Logs
+dyld-extracted/
+macos/GhidraVibe/.build/
+gui-tests/artifacts/
+gui-tests/a11y-id-catalog.txt
+.ghidra-vibe-projects/
+ghidra-vibe-projects/
+.ghidra-vibe-jspace/
 *.log
+.idea/
+.vscode/
+*~
+__pycache__/
 
-# Temporary files
-tmp/
-temp/
-
-# MCP
-GhidraMCP/
+# Rust build artifacts
+rust/target/
+engine/inprocess/build/

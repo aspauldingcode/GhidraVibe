@@ -1,0 +1,8 @@
+# Scaffold — run on Linux with agent-device AT-SPI when available.
+context platform=linux timeout=60000
+env APP_TARGET="${APP_TARGET}"
+open "${APP_TARGET}"
+wait "id=\"ghidra.vibe.sidebar.projects\" || label=Projects" 20000
+is exists "id=\"ghidra.vibe.sidebar.projects\""
+snapshot -i
+close

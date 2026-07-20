@@ -1,0 +1,877 @@
+{
+  "version": 2,
+  "tool": "Emulator",
+  "stock": true,
+  "generated_by": "scripts/extract-stock-inventory.py",
+  "count": 54,
+  "counts": {
+    "wired": 54,
+    "disabled_honest": 0
+  },
+  "entries": [
+    {
+      "id": "ghidra.vibe.emulator.provider.bookmarks",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Bookmarks",
+      "hint": "Show Bookmarks",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.breakpoints",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Breakpoints",
+      "hint": "Show Breakpoints",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.bundle_manager",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Bundle Manager",
+      "hint": "Show Bundle Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.bytes",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Bytes",
+      "hint": "Show Bytes",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.checksum",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Checksum Generator",
+      "hint": "Show Checksum Generator",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.comments",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Comments",
+      "hint": "Show Comments",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.console",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Debug Console",
+      "hint": "Show Debug Console",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.console",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Console",
+      "hint": "Show Console",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.data_types",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Data Type Manager",
+      "hint": "Show Data Type Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.datatype_preview",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Data Type Preview",
+      "hint": "Show Data Type Preview",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.decompiler",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Decompile",
+      "hint": "Show Decompile",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.defined_data",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Defined Data",
+      "hint": "Show Defined Data",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.disassembled_view",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Disassembled View",
+      "hint": "Show Disassembled View",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.equates",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Equates Table",
+      "hint": "Show Equates Table",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.external_programs",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "External Programs",
+      "hint": "Show External Programs",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_call_graph",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Function Call Graph",
+      "hint": "Show Function Call Graph",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_call_trees",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Function Call Trees",
+      "hint": "Show Function Call Trees",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_graph",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Function Graph",
+      "hint": "Show Function Graph",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_tags",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Function Tags",
+      "hint": "Show Function Tags",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.functions",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Functions",
+      "hint": "Show Functions",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.listing",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Dynamic",
+      "hint": "Show Dynamic",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.listing",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Listing",
+      "hint": "Show Listing",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memory",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Memory",
+      "hint": "Show Memory",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memory_map",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Memory Map",
+      "hint": "Show Memory Map",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memory_range_mappings",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Memory Range Mappings",
+      "hint": "Show Memory Range Mappings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memview",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Memview",
+      "hint": "Show Memview",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.model",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Model",
+      "hint": "Show Model",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.modules",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Modules",
+      "hint": "Show Modules",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.objects",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Objects",
+      "hint": "Show Objects",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.pcode_stepper",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Pcode Stepper",
+      "hint": "Show Pcode Stepper",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.program_tree",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Program Trees",
+      "hint": "Show Program Trees",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.python",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Interpreter",
+      "hint": "Show Interpreter",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.python",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Python",
+      "hint": "Show Python",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.python",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Jython",
+      "hint": "Show Jython",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.regions",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Regions",
+      "hint": "Show Regions",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.registers",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Registers",
+      "hint": "Show Registers",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.registers",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Register Manager",
+      "hint": "Show Register Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.relocations",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Relocation Table",
+      "hint": "Show Relocation Table",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.script_manager",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Script Manager",
+      "hint": "Show Script Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.stack",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Stack",
+      "hint": "Show Stack",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.static_mappings",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Static Mappings",
+      "hint": "Show Static Mappings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.strings",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Defined Strings",
+      "hint": "Show Defined Strings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.symbol_references",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Symbol References",
+      "hint": "Show Symbol References",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.symbol_table",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Symbol Table",
+      "hint": "Show Symbol Table",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.symbol_tree",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Symbol Tree",
+      "hint": "Show Symbol Tree",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.threads",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Threads",
+      "hint": "Show Threads",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.time",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Time",
+      "hint": "Show Time",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.watches",
+      "surface": "provider_body",
+      "owner": "Emulator",
+      "label": "Watches",
+      "hint": "Show Watches",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.emulate",
+      "surface": "main_toolbar",
+      "owner": "Emulator",
+      "label": "Emulate",
+      "hint": "Emulate",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.finish",
+      "surface": "main_toolbar",
+      "owner": "Emulator",
+      "label": "Finish",
+      "hint": "Finish",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.interrupt",
+      "surface": "main_toolbar",
+      "owner": "Emulator",
+      "label": "Interrupt",
+      "hint": "Interrupt",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.save",
+      "surface": "main_toolbar",
+      "owner": "Emulator",
+      "label": "Save",
+      "hint": "Save",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.skip",
+      "surface": "main_toolbar",
+      "owner": "Emulator",
+      "label": "Skip",
+      "hint": "Skip",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.step",
+      "surface": "main_toolbar",
+      "owner": "Emulator",
+      "label": "Step",
+      "hint": "Step",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    }
+  ]
+}

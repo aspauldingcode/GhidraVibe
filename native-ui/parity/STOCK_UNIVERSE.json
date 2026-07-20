@@ -1,0 +1,1409 @@
+{
+  "version": 1,
+  "generated_by": "scripts/extract-stock-universe.py",
+  "ghidra_install": "/nix/store/cxi75fczl92930hmkfbj9l1js3g2cxjm-ghidra-vibe-12.1.2+native-5.14.2/lib/ghidra",
+  "parity_bar": "1:1 stock Ghidra features/functionality/UX \u2014 no permanent omissions",
+  "modules": {
+    "Features": [
+      "BSim",
+      "BSimFeatureVisualizer",
+      "Base",
+      "BytePatterns",
+      "ByteViewer",
+      "CodeCompare",
+      "DataGraph",
+      "DebugUtils",
+      "Decompiler",
+      "DecompilerDependent",
+      "FileFormats",
+      "FunctionGraph",
+      "FunctionGraphDecompilerExtension",
+      "FunctionID",
+      "GhidraGo",
+      "GhidraServer",
+      "GnuDemangler",
+      "GraphFunctionCalls",
+      "GraphServices",
+      "MicrosoftCodeAnalyzer",
+      "MicrosoftDemangler",
+      "MicrosoftDmang",
+      "PDB",
+      "ProgramDiff",
+      "ProgramGraph",
+      "PyGhidra",
+      "Recognizers",
+      "Sarif",
+      "SourceCodeLookup",
+      "SwiftDemangler",
+      "SystemEmulation",
+      "VersionTracking",
+      "VersionTrackingBSim",
+      "WildcardAssembler"
+    ],
+    "Debug": [
+      "AnnotationValidator",
+      "Debugger",
+      "Debugger-agent-dbgeng",
+      "Debugger-agent-drgn",
+      "Debugger-agent-gdb",
+      "Debugger-agent-lldb",
+      "Debugger-agent-x64dbg",
+      "Debugger-api",
+      "Debugger-importers",
+      "Debugger-isf",
+      "Debugger-jpda",
+      "Debugger-rmi-trace",
+      "Framework-TraceModeling",
+      "ProposedUtils",
+      "TaintAnalysis"
+    ],
+    "Framework": [
+      "DB",
+      "Docking",
+      "Emulation",
+      "FileSystem",
+      "Generic",
+      "Graph",
+      "Gui",
+      "Help",
+      "Project",
+      "Pty",
+      "SoftwareModeling",
+      "Utility"
+    ],
+    "Processors": [
+      "6502",
+      "68000",
+      "8048",
+      "8051",
+      "8085",
+      "AARCH64",
+      "ARM",
+      "Atmel",
+      "BPF",
+      "CP1600",
+      "CR16",
+      "DATA",
+      "Dalvik",
+      "HCS08",
+      "HCS12",
+      "Hexagon",
+      "JVM",
+      "Loongarch",
+      "M16C",
+      "M8C",
+      "MC6800",
+      "MCS96",
+      "MIPS",
+      "NDS32",
+      "PA-RISC",
+      "PIC",
+      "PowerPC",
+      "RISCV",
+      "Sparc",
+      "SuperH",
+      "SuperH4",
+      "TI_MSP430",
+      "Toy",
+      "V850",
+      "Xtensa",
+      "Z80",
+      "eBPF",
+      "tricore",
+      "x86"
+    ],
+    "Configurations": [
+      "Public_Release"
+    ]
+  },
+  "tools": [
+    {
+      "id": "CodeBrowser",
+      "slug": "codebrowser",
+      "stock": true,
+      "tool_name_attr": "CodeBrowser",
+      "providers": [
+        {
+          "title": "Entropy",
+          "name": "Entropy",
+          "owner": "EntropyPlugin",
+          "active_default": false,
+          "group": "Header",
+          "stock": true
+        },
+        {
+          "title": "Overview",
+          "name": "Overview",
+          "owner": "OverviewPlugin",
+          "active_default": false,
+          "group": "Header",
+          "stock": true
+        },
+        {
+          "title": "Program Trees",
+          "name": "Program Tree",
+          "owner": "ProgramTreePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Symbol Tree",
+          "name": "Symbol Tree",
+          "owner": "SymbolTreePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Data Type Manager",
+          "name": "DataTypes Provider",
+          "owner": "DataTypeManagerPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Listing:",
+          "name": "Listing",
+          "owner": "CodeBrowserPlugin",
+          "active_default": true,
+          "group": "Core",
+          "stock": true
+        },
+        {
+          "title": "Decompile",
+          "name": "Decompiler",
+          "owner": "DecompilePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Bytes : No Program",
+          "name": "Bytes",
+          "owner": "ByteViewerPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Defined Data",
+          "name": "Data Window",
+          "owner": "DataWindowPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Defined Strings",
+          "name": "Defined Strings",
+          "owner": "ViewStringsPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Equates Table",
+          "name": "Equates Table",
+          "owner": "EquateTablePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "External Programs",
+          "name": "External Programs",
+          "owner": "ReferencesPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Functions",
+          "name": "Functions Window",
+          "owner": "FunctionWindowPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Relocation Table",
+          "name": "Relocation Table",
+          "owner": "RelocationTablePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Data Type Preview",
+          "name": "Data Type Preview",
+          "owner": "DataTypePreviewPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Disassembled View",
+          "name": "Virtual Disassembler - Current Instruction",
+          "owner": "DisassembledViewPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Console",
+          "name": "Console",
+          "owner": "ConsolePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Bookmarks",
+          "name": "Bookmarks",
+          "owner": "BookmarkPlugin",
+          "active_default": false,
+          "group": "Core.Bookmarks",
+          "stock": true
+        },
+        {
+          "title": "Script Manager",
+          "name": "Script Manager",
+          "owner": "GhidraScriptMgrPlugin",
+          "active_default": false,
+          "group": "Script Group",
+          "stock": true
+        },
+        {
+          "title": "Memory Map",
+          "name": "Memory Map",
+          "owner": "MemoryMapPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Function Graph",
+          "name": "Function Graph",
+          "owner": "FunctionGraphPlugin",
+          "active_default": false,
+          "group": "Function Graph",
+          "stock": true
+        },
+        {
+          "title": "Register Manager",
+          "name": "Register Manager",
+          "owner": "RegisterPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Symbol Table",
+          "name": "Symbol Table",
+          "owner": "SymbolTablePlugin",
+          "active_default": false,
+          "group": "symbolTable",
+          "stock": true
+        },
+        {
+          "title": "Symbol References",
+          "name": "Symbol References",
+          "owner": "SymbolTablePlugin",
+          "active_default": false,
+          "group": "symbolTable",
+          "stock": true
+        },
+        {
+          "title": "Checksum Generator",
+          "name": "Checksum Generator",
+          "owner": "ComputeChecksumsPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Function Tags",
+          "name": "Function Tags",
+          "owner": "FunctionTagPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Comments",
+          "name": "Comment Window",
+          "owner": "CommentWindowPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Python",
+          "name": "Python",
+          "owner": "InterpreterPanelPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        }
+      ],
+      "include_plugins": [
+        "ghidra.app.plugin.core.editor.TextEditorManagerPlugin",
+        "ghidra.app.plugin.core.interpreter.InterpreterPanelPlugin"
+      ],
+      "packages": [
+        "BSim",
+        "Ghidra Core"
+      ],
+      "source_jar": "Ghidra/Configurations/Public_Release/lib/Public_Release.jar",
+      "source_entry": "defaultTools/CodeBrowser.tool",
+      "provider_count": 28,
+      "contract_coverage": {
+        "chrome_stock_titles": [
+          "Bookmarks",
+          "Bytes",
+          "Checksum Generator",
+          "Comments",
+          "Console",
+          "Data Type Manager",
+          "Data Type Preview",
+          "Decompile",
+          "Defined Data",
+          "Defined Strings",
+          "Disassembled View",
+          "Entropy",
+          "Equates Table",
+          "External Programs",
+          "Function Graph",
+          "Function Tags",
+          "Functions",
+          "Listing",
+          "Memory Map",
+          "Overview",
+          "Program Trees",
+          "Python",
+          "Register Manager",
+          "Relocation Table",
+          "Script Manager",
+          "Symbol References",
+          "Symbol Table",
+          "Symbol Tree"
+        ],
+        "vibe_extra_titles": [
+          "Agent",
+          "Apple Bundle / IPA",
+          "Code Editor",
+          "MCP",
+          "RAG / JSpace",
+          "Rules",
+          "Shared Cache",
+          "Swift Classes"
+        ],
+        "stock_providers_not_in_chrome": [],
+        "stock_provider_count": 28
+      }
+    },
+    {
+      "id": "Debugger",
+      "slug": "debugger",
+      "stock": true,
+      "tool_name_attr": "Debugger",
+      "providers": [
+        {
+          "title": "Connections",
+          "name": "Connections",
+          "owner": "TraceRmiConnectionManagerPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Debug Console",
+          "name": "Debug Console",
+          "owner": "DebuggerConsolePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Model",
+          "name": "Model",
+          "owner": "DebuggerModelPlugin",
+          "active_default": true,
+          "group": "Debugger.Core",
+          "stock": true
+        },
+        {
+          "title": "Program Trees",
+          "name": "Program Tree",
+          "owner": "ProgramTreePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Dynamic",
+          "name": "Listing",
+          "owner": "DebuggerListingPlugin",
+          "active_default": true,
+          "group": "Core",
+          "stock": true
+        },
+        {
+          "title": "Listing:",
+          "name": "Listing",
+          "owner": "CodeBrowserPlugin",
+          "active_default": true,
+          "group": "Core",
+          "stock": true
+        },
+        {
+          "title": "Decompile",
+          "name": "Decompiler",
+          "owner": "DecompilePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Bytes: No Program",
+          "name": "Bytes",
+          "owner": "ByteViewerPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Defined Data",
+          "name": "Data Window",
+          "owner": "DataWindowPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Defined Strings",
+          "name": "Defined Strings",
+          "owner": "ViewStringsPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Equates Table",
+          "name": "Equates Table",
+          "owner": "EquateTablePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "External Programs",
+          "name": "External Programs",
+          "owner": "ReferencesPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Functions",
+          "name": "Functions Window",
+          "owner": "FunctionWindowPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Relocation Table",
+          "name": "Relocation Table",
+          "owner": "RelocationTablePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Modules",
+          "name": "Modules",
+          "owner": "DebuggerModulesPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Registers",
+          "name": "Registers",
+          "owner": "DebuggerRegistersPlugin",
+          "active_default": true,
+          "group": "Debugger.Core",
+          "stock": true
+        },
+        {
+          "title": "Script Manager",
+          "name": "Script Manager",
+          "owner": "GhidraScriptMgrPlugin",
+          "active_default": false,
+          "group": "Script Group",
+          "stock": true
+        },
+        {
+          "title": "[Dynamic]",
+          "name": "Listing",
+          "owner": "DebuggerListingPlugin",
+          "active_default": false,
+          "group": "Core",
+          "stock": true
+        },
+        {
+          "title": "Memory",
+          "name": "Memory",
+          "owner": "DebuggerMemoryBytesPlugin",
+          "active_default": true,
+          "group": "disconnected",
+          "stock": true
+        },
+        {
+          "title": "Breakpoints",
+          "name": "Breakpoints",
+          "owner": "DebuggerBreakpointsPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Data Type Preview",
+          "name": "Data Type Preview",
+          "owner": "DataTypePreviewPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Disassembled View",
+          "name": "Virtual Disassembler - Current Instruction",
+          "owner": "DisassembledViewPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Bookmarks",
+          "name": "Bookmarks",
+          "owner": "BookmarkPlugin",
+          "active_default": false,
+          "group": "Core.Bookmarks",
+          "stock": true
+        },
+        {
+          "title": "Function Call Trees",
+          "name": "Function Call Trees",
+          "owner": "CallTreePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Regions",
+          "name": "Regions",
+          "owner": "DebuggerRegionsPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Stack",
+          "name": "Stack",
+          "owner": "DebuggerStackPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Console",
+          "name": "Console",
+          "owner": "ConsolePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Watches",
+          "name": "Watches",
+          "owner": "DebuggerWatchesPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Symbol Tree",
+          "name": "Symbol Tree",
+          "owner": "SymbolTreePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Data Type Manager",
+          "name": "DataTypes Provider",
+          "owner": "DataTypeManagerPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Time",
+          "name": "Time",
+          "owner": "DebuggerTimePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Pcode Stepper",
+          "name": "Pcode Stepper",
+          "owner": "DebuggerPcodeStepperPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Static Mappings",
+          "name": "Static Mappings",
+          "owner": "DebuggerStaticMappingPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Instruction Info",
+          "name": "Instruction Info",
+          "owner": "ShowInstructionInfoPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Threads",
+          "name": "Threads",
+          "owner": "DebuggerThreadsPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Terminal",
+          "name": "Terminal",
+          "owner": "TerminalPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Diff Details",
+          "name": "Diff Location Details",
+          "owner": "ProgramDiffPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Diff Apply Settings",
+          "name": "Diff Apply Settings",
+          "owner": "ProgramDiffPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Memory Map",
+          "name": "Memory Map",
+          "owner": "MemoryMapPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Function Graph",
+          "name": "Function Graph",
+          "owner": "FunctionGraphPlugin",
+          "active_default": false,
+          "group": "Function Graph",
+          "stock": true
+        },
+        {
+          "title": "Register Manager",
+          "name": "Register Manager",
+          "owner": "RegisterPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Symbol Table",
+          "name": "Symbol Table",
+          "owner": "SymbolTablePlugin",
+          "active_default": false,
+          "group": "symbolTable",
+          "stock": true
+        },
+        {
+          "title": "Symbol References",
+          "name": "Symbol References",
+          "owner": "SymbolTablePlugin",
+          "active_default": false,
+          "group": "symbolTable",
+          "stock": true
+        },
+        {
+          "title": "Checksum Generator",
+          "name": "Checksum Generator",
+          "owner": "ComputeChecksumsPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Function Tags",
+          "name": "Function Tags",
+          "owner": "FunctionTagPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Comments",
+          "name": "Comment Window",
+          "owner": "CommentWindowPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Python",
+          "name": "Python",
+          "owner": "InterpreterPanelPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Function Call Graph",
+          "name": "Function Call Graph",
+          "owner": "FunctionCallGraphPlugin",
+          "active_default": false,
+          "group": "Function Call Graph",
+          "stock": true
+        },
+        {
+          "title": "Memory Range Mappings",
+          "name": "Memory Range Mappings",
+          "owner": "DebuggerStaticMappingPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Bundle Manager",
+          "name": "BundleManager",
+          "owner": "GhidraScriptMgrPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Memview",
+          "name": "Memview",
+          "owner": "DebuggerMemviewPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        }
+      ],
+      "include_plugins": [
+        "ghidra.app.plugin.core.editor.TextEditorManagerPlugin",
+        "ghidra.app.plugin.core.interpreter.InterpreterPanelPlugin",
+        "ghidra.app.plugin.core.terminal.TerminalPlugin"
+      ],
+      "packages": [
+        "Debugger",
+        "Ghidra Core"
+      ],
+      "source_jar": "Ghidra/Debug/Debugger/lib/Debugger.jar",
+      "source_entry": "defaultTools/Debugger.tool",
+      "provider_count": 51,
+      "contract_coverage": {
+        "chrome_path": "native-ui/parity/Debugger.chrome.json",
+        "chrome_exists": true,
+        "stock_providers_not_in_chrome": [
+          "Bytes: No Program",
+          "[Dynamic]"
+        ],
+        "stock_provider_count": 51
+      }
+    },
+    {
+      "id": "Emulator",
+      "slug": "emulator",
+      "stock": true,
+      "tool_name_attr": "Emulator",
+      "providers": [
+        {
+          "title": "Data Type Manager",
+          "name": "DataTypes Provider",
+          "owner": "DataTypeManagerPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Program Trees",
+          "name": "Program Tree",
+          "owner": "ProgramTreePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Symbol Tree",
+          "name": "Symbol Tree",
+          "owner": "SymbolTreePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Debug Console",
+          "name": "Debug Console",
+          "owner": "DebuggerConsolePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Model",
+          "name": "Model",
+          "owner": "DebuggerModelPlugin",
+          "active_default": true,
+          "group": "Debugger.Core",
+          "stock": true
+        },
+        {
+          "title": "Dynamic",
+          "name": "Listing",
+          "owner": "DebuggerListingPlugin",
+          "active_default": true,
+          "group": "Core",
+          "stock": true
+        },
+        {
+          "title": "Listing:",
+          "name": "Listing",
+          "owner": "CodeBrowserPlugin",
+          "active_default": true,
+          "group": "Core",
+          "stock": true
+        },
+        {
+          "title": "Decompile",
+          "name": "Decompiler",
+          "owner": "DecompilePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Bytes: No Program",
+          "name": "Bytes",
+          "owner": "ByteViewerPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Defined Data",
+          "name": "Data Window",
+          "owner": "DataWindowPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Defined Strings",
+          "name": "Defined Strings",
+          "owner": "ViewStringsPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Equates Table",
+          "name": "Equates Table",
+          "owner": "EquateTablePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "External Programs",
+          "name": "External Programs",
+          "owner": "ReferencesPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Functions",
+          "name": "Functions Window",
+          "owner": "FunctionWindowPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Relocation Table",
+          "name": "Relocation Table",
+          "owner": "RelocationTablePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Modules",
+          "name": "Modules",
+          "owner": "DebuggerModulesPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Registers",
+          "name": "Registers",
+          "owner": "DebuggerRegistersPlugin",
+          "active_default": true,
+          "group": "Debugger.Core",
+          "stock": true
+        },
+        {
+          "title": "Breakpoints",
+          "name": "Breakpoints",
+          "owner": "DebuggerBreakpointsPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Interpreter",
+          "name": "DebuggerInterpreterPlugin",
+          "owner": "InterpreterPanelPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Data Type Preview",
+          "name": "Data Type Preview",
+          "owner": "DataTypePreviewPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Disassembled View",
+          "name": "Virtual Disassembler - Current Instruction",
+          "owner": "DisassembledViewPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Bookmarks",
+          "name": "Bookmarks",
+          "owner": "BookmarkPlugin",
+          "active_default": false,
+          "group": "Core.Bookmarks",
+          "stock": true
+        },
+        {
+          "title": "Function Call Trees",
+          "name": "Function Call Trees",
+          "owner": "CallTreePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Regions",
+          "name": "Regions",
+          "owner": "DebuggerRegionsPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Stack",
+          "name": "Stack",
+          "owner": "DebuggerStackPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Console",
+          "name": "Console",
+          "owner": "ConsolePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Watches",
+          "name": "Watches",
+          "owner": "DebuggerWatchesPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Threads",
+          "name": "Threads",
+          "owner": "DebuggerThreadsPlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Time",
+          "name": "Time",
+          "owner": "DebuggerTimePlugin",
+          "active_default": true,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Pcode Stepper",
+          "name": "Pcode Stepper",
+          "owner": "DebuggerPcodeStepperPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Script Manager",
+          "name": "Script Manager",
+          "owner": "GhidraScriptMgrPlugin",
+          "active_default": false,
+          "group": "Script Group",
+          "stock": true
+        },
+        {
+          "title": "Memory Map",
+          "name": "Memory Map",
+          "owner": "MemoryMapPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Function Graph",
+          "name": "Function Graph",
+          "owner": "FunctionGraphPlugin",
+          "active_default": false,
+          "group": "Function Graph",
+          "stock": true
+        },
+        {
+          "title": "Register Manager",
+          "name": "Register Manager",
+          "owner": "RegisterPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Symbol Table",
+          "name": "Symbol Table",
+          "owner": "SymbolTablePlugin",
+          "active_default": false,
+          "group": "symbolTable",
+          "stock": true
+        },
+        {
+          "title": "Symbol References",
+          "name": "Symbol References",
+          "owner": "SymbolTablePlugin",
+          "active_default": false,
+          "group": "symbolTable",
+          "stock": true
+        },
+        {
+          "title": "Checksum Generator",
+          "name": "Checksum Generator",
+          "owner": "ComputeChecksumsPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Function Tags",
+          "name": "Function Tags",
+          "owner": "FunctionTagPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Comments",
+          "name": "Comment Window",
+          "owner": "CommentWindowPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Python",
+          "name": "Python",
+          "owner": "InterpreterPanelPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Function Call Graph",
+          "name": "Function Call Graph",
+          "owner": "FunctionCallGraphPlugin",
+          "active_default": false,
+          "group": "Function Call Graph",
+          "stock": true
+        },
+        {
+          "title": "Memory Range Mappings",
+          "name": "Memory Range Mappings",
+          "owner": "DebuggerStaticMappingPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Bundle Manager",
+          "name": "BundleManager",
+          "owner": "GhidraScriptMgrPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Objects",
+          "name": "Objects",
+          "owner": "DebuggerTimelinePlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Static Mappings",
+          "name": "Static Mappings",
+          "owner": "DebuggerStaticMappingPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Memview",
+          "name": "Memview",
+          "owner": "DebuggerMemviewPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        },
+        {
+          "title": "Memory",
+          "name": "Memory",
+          "owner": "DebuggerMemoryBytesPlugin",
+          "active_default": false,
+          "group": "disconnected",
+          "stock": true
+        },
+        {
+          "title": "Jython",
+          "name": "Jython",
+          "owner": "InterpreterPanelPlugin",
+          "active_default": false,
+          "group": "Default",
+          "stock": true
+        }
+      ],
+      "include_plugins": [
+        "ghidra.app.plugin.core.interpreter.InterpreterPanelPlugin"
+      ],
+      "packages": [
+        "Debugger",
+        "Ghidra Core"
+      ],
+      "source_jar": "Ghidra/Debug/Debugger/lib/Debugger.jar",
+      "source_entry": "defaultTools/Emulator.tool",
+      "provider_count": 48,
+      "contract_coverage": {
+        "chrome_path": "native-ui/parity/Emulator.chrome.json",
+        "chrome_exists": true,
+        "stock_providers_not_in_chrome": [
+          "Bytes: No Program"
+        ],
+        "stock_provider_count": 48
+      }
+    },
+    {
+      "id": "Version Tracking",
+      "slug": "version_tracking",
+      "stock": true,
+      "tool_name_attr": "Version Tracking",
+      "providers": [
+        {
+          "title": "Version Tracking Matches",
+          "name": "Version Tracking Matches",
+          "owner": "VTPlugin",
+          "active_default": true,
+          "group": "VTResults.MatchesTable",
+          "stock": true
+        },
+        {
+          "title": "Version Tracking Markup Items",
+          "name": "Version Tracking Markup Items",
+          "owner": "VTPlugin",
+          "active_default": true,
+          "group": "VTResults",
+          "stock": true
+        },
+        {
+          "title": "Version Tracking Implied Matches",
+          "name": "Version Tracking Implied Matches",
+          "owner": "VTPlugin",
+          "active_default": true,
+          "group": "VTResults",
+          "stock": true
+        }
+      ],
+      "include_plugins": [
+        "ghidra.feature.vt.gui.plugin.VTPlugin"
+      ],
+      "packages": [
+        "Version Tracking"
+      ],
+      "source_jar": "Ghidra/Features/VersionTracking/lib/VersionTracking.jar",
+      "source_entry": "defaultTools/VersionTracking.tool",
+      "provider_count": 3,
+      "contract_coverage": {
+        "chrome_path": "native-ui/parity/VersionTracking.chrome.json",
+        "chrome_exists": true,
+        "stock_providers_not_in_chrome": [],
+        "stock_provider_count": 3
+      }
+    }
+  ],
+  "summary": {
+    "tool_count": 4,
+    "provider_counts": {
+      "CodeBrowser": 28,
+      "Debugger": 51,
+      "Emulator": 48,
+      "Version Tracking": 3
+    },
+    "feature_modules": 34,
+    "debug_modules": 15,
+    "processors": 39
+  },
+  "front_end": {
+    "default_tools": [
+      "CodeBrowser",
+      "Debugger",
+      "Emulator",
+      "Version Tracking"
+    ],
+    "chrome_tools": [
+      "CodeBrowser",
+      "Debugger",
+      "Emulator",
+      "Version Tracking"
+    ],
+    "tools_missing_from_chrome": []
+  },
+  "menu_actions_in_contract": [
+    "about",
+    "auto_analyze",
+    "bsim_overview",
+    "bsim_search",
+    "clear_selection",
+    "close_program",
+    "edit_copy",
+    "edit_cut",
+    "edit_paste",
+    "goto",
+    "headless_help",
+    "import_apple",
+    "import_file",
+    "mcp_health",
+    "nav_back",
+    "nav_fwd",
+    "new_project",
+    "open_app_bundle",
+    "open_project",
+    "open_shared_cache",
+    "redo",
+    "save_program",
+    "search_functions",
+    "search_memory",
+    "search_strings",
+    "show_agent",
+    "show_apple",
+    "show_bookmarks",
+    "show_bytes",
+    "show_checksum",
+    "show_code_editor",
+    "show_codebrowser",
+    "show_comments",
+    "show_console",
+    "show_data_types",
+    "show_datatype_preview",
+    "show_decompiler",
+    "show_defined_data",
+    "show_disassembled_view",
+    "show_dsc",
+    "show_entropy",
+    "show_equates",
+    "show_external_programs",
+    "show_function_graph",
+    "show_function_tags",
+    "show_functions",
+    "show_help",
+    "show_listing",
+    "show_mcp",
+    "show_memory_map",
+    "show_overview",
+    "show_program_tree",
+    "show_project",
+    "show_python",
+    "show_rag",
+    "show_registers",
+    "show_relocations",
+    "show_rules",
+    "show_script_manager",
+    "show_strings",
+    "show_swift_classes",
+    "show_symbol_references",
+    "show_symbol_table",
+    "show_symbol_tree",
+    "show_workspace",
+    "start_mcp",
+    "tip_of_the_day",
+    "undo"
+  ],
+  "vibe_extras": [
+    "Agent",
+    "Apple Bundle / IPA",
+    "Code Editor",
+    "MCP",
+    "RAG / JSpace",
+    "Rules",
+    "Shared Cache",
+    "Swift Classes"
+  ]
+}

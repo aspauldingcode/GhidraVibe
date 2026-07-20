@@ -1,0 +1,48 @@
+{
+  "tool": "Version Tracking",
+  "stock": true,
+  "menuBar": [
+    "File",
+    "Edit",
+    "Match",
+    "Apply",
+    "Window",
+    "Help"
+  ],
+  "defaultActiveProviders": [
+    "Version Tracking Matches",
+    "Version Tracking Markup Items",
+    "Version Tracking Implied Matches"
+  ],
+  "windowMenuProviders": [],
+  "providers": [
+    {
+      "title": "Version Tracking Matches",
+      "owner": "VTPlugin",
+      "name": "Version Tracking Matches",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Version Tracking Markup Items",
+      "owner": "VTPlugin",
+      "name": "Version Tracking Markup Items",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Version Tracking Implied Matches",
+      "owner": "VTPlugin",
+      "name": "Version Tracking Implied Matches",
+      "active_default": true,
+      "stock": true
+    }
+  ],
+  "source": "defaultTools/VersionTracking.tool",
+  "toolbarGroups": [
+    "Create Session",
+    "Run Correlators",
+    "Apply Markup",
+    "Save Session"
+  ]
+}

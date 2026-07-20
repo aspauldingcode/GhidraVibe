@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=GhidraVibe
+Comment=Native Ghidra UI with MCP, RAG, and Agent
+Exec=ghidra-vibe
+Icon=ghidra
+Terminal=false
+Categories=Development;Debugger;
+StartupWMClass=ghidra-vibe

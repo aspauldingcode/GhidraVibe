@@ -1,0 +1,26 @@
+# GhidraVibe accessibility smoke — Project Window then CodeBrowser chrome.
+# Selectors use stable ids from native-ui/a11y/catalog.json
+# run-smoke.sh sets GHIDRA_VIBE_START_MODE=project + agreement defaults.
+context platform=macos timeout=120000
+env APP_TARGET="${APP_TARGET}"
+open "${APP_TARGET}" --relaunch
+wait "id=\"ghidra.vibe.project\" || label=\"Tool Chest\"" 25000
+snapshot -i
+is exists "id=\"ghidra.vibe.project\" || label=\"Tool Chest\""
+is exists "id=\"ghidra.vibe.toolbar.mcp_health\" || label=\"Engine Status\""
+is exists "id=\"ghidra.vibe.toolbar.start_mcp\" || id=\"ghidra.vibe.project.start_mcp\" || label=\"Restart Engine\""
+is exists "id=\"ghidra.vibe.project.new\" || label=\"New Project\""
+is exists "id=\"ghidra.vibe.project.tool.codebrowser\" || label=\"CodeBrowser\""
+is exists "id=\"ghidra.vibe.status.message\" || label=\"Status message\""
+is exists "id=\"ghidra.vibe.status.mcp\" || label=\"Engine status\""
+click "id=\"ghidra.vibe.toolbar.mcp_health\" || label=\"Engine Status\""
+wait "id=\"ghidra.vibe.status.message\" || label=\"Status message\"" 5000
+click "id=\"ghidra.vibe.project.tool.codebrowser\" || label=\"CodeBrowser tool\" || label=\"CodeBrowser\""
+wait "id=\"ghidra.vibe.codebrowser\" || id=\"ghidra.vibe.provider.listing\" || label=Listing || label=Decompile" 20000
+is exists "id=\"ghidra.vibe.provider.listing\" || id=\"ghidra.vibe.codebrowser\" || label=Listing"
+is exists "id=\"ghidra.vibe.provider.decompiler\" || label=Decompile"
+is exists "id=\"ghidra.vibe.provider.console\" || label=Console"
+is exists "id=\"ghidra.vibe.toolbar.dsc\" || label=\"Shared Cache\""
+is exists "id=\"ghidra.vibe.toolbar.save\" || label=\"Save Program\""
+snapshot -i
+close

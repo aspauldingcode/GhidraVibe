@@ -1,0 +1,737 @@
+{
+  "toolName": "CodeBrowser",
+  "version": 1,
+  "layout": {
+    "type": "root",
+    "x": 409,
+    "y": 179,
+    "width": 1637,
+    "height": 931,
+    "focusedOwner": "CodeBrowserPlugin",
+    "focusedName": "Listing",
+    "children": [
+      {
+        "type": "split",
+        "orientation": "vertical",
+        "divider": 148.0,
+        "width": 1621,
+        "height": 816,
+        "children": [
+          {
+            "type": "stack",
+            "components": [
+              {
+                "name": "Entropy",
+                "owner": "EntropyPlugin",
+                "title": "Entropy",
+                "active": false,
+                "group": "Header",
+                "instanceId": "3207819926581772885"
+              },
+              {
+                "name": "Overview",
+                "owner": "OverviewPlugin",
+                "title": "Overview",
+                "active": false,
+                "group": "Header",
+                "instanceId": "3207819926581772883"
+              }
+            ]
+          },
+          {
+            "type": "split",
+            "orientation": "horizontal",
+            "divider": 143.0,
+            "width": 1637,
+            "height": 822,
+            "children": [
+              {
+                "type": "split",
+                "orientation": "vertical",
+                "divider": 640.0,
+                "width": 234,
+                "height": 822,
+                "children": [
+                  {
+                    "type": "split",
+                    "orientation": "vertical",
+                    "divider": 502.0,
+                    "width": 234,
+                    "height": 524,
+                    "children": [
+                      {
+                        "type": "stack",
+                        "components": [
+                          {
+                            "name": "Program Tree",
+                            "owner": "ProgramTreePlugin",
+                            "title": "Program Trees",
+                            "active": true,
+                            "group": "Default",
+                            "instanceId": "3207819926581772895"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "stack",
+                        "components": [
+                          {
+                            "name": "Symbol Tree",
+                            "owner": "SymbolTreePlugin",
+                            "title": "Symbol Tree",
+                            "active": true,
+                            "group": "Default",
+                            "instanceId": "3207819977680978496"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "stack",
+                    "components": [
+                      {
+                        "name": "DataTypes Provider",
+                        "owner": "DataTypeManagerPlugin",
+                        "title": "Data Type Manager",
+                        "active": true,
+                        "group": "Default",
+                        "instanceId": "3207819978370941521"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "split",
+                "orientation": "vertical",
+                "divider": 785.0,
+                "width": 1399,
+                "height": 822,
+                "children": [
+                  {
+                    "type": "split",
+                    "orientation": "vertical",
+                    "divider": 705.0,
+                    "width": 1386,
+                    "height": 638,
+                    "children": [
+                      {
+                        "type": "split",
+                        "orientation": "horizontal",
+                        "divider": 679.0,
+                        "width": 1399,
+                        "height": 642,
+                        "children": [
+                          {
+                            "type": "stack",
+                            "components": [
+                              {
+                                "name": "Listing",
+                                "owner": "CodeBrowserPlugin",
+                                "title": "Listing: ",
+                                "active": true,
+                                "group": "Core",
+                                "instanceId": "3207819926581772881"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "stack",
+                            "components": [
+                              {
+                                "name": "Decompiler",
+                                "owner": "DecompilePlugin",
+                                "title": "Decompile",
+                                "active": true,
+                                "group": "Default",
+                                "instanceId": "3207819926581772879"
+                              },
+                              {
+                                "name": "Bytes",
+                                "owner": "ByteViewerPlugin",
+                                "title": "Bytes : No Program",
+                                "active": false,
+                                "group": "Default",
+                                "instanceId": "3207819977680978498"
+                              },
+                              {
+                                "name": "Data Window",
+                                "owner": "DataWindowPlugin",
+                                "title": "Defined Data",
+                                "active": false,
+                                "group": "Default",
+                                "instanceId": "3207819980101091908"
+                              },
+                              {
+                                "name": "Defined Strings",
+                                "owner": "ViewStringsPlugin",
+                                "title": "Defined Strings",
+                                "active": false,
+                                "group": "Default",
+                                "instanceId": "3207819980101091905"
+                              },
+                              {
+                                "name": "Equates Table",
+                                "owner": "EquateTablePlugin",
+                                "title": "Equates Table",
+                                "active": false,
+                                "group": "Default",
+                                "instanceId": "3207819977680978499"
+                              },
+                              {
+                                "name": "External Programs",
+                                "owner": "ReferencesPlugin",
+                                "title": "External Programs",
+                                "active": false,
+                                "group": "Default",
+                                "instanceId": "3207819977680978497"
+                              },
+                              {
+                                "name": "Functions Window",
+                                "owner": "FunctionWindowPlugin",
+                                "title": "Functions",
+                                "active": false,
+                                "group": "Default",
+                                "instanceId": "3207819980101091906"
+                              },
+                              {
+                                "name": "Relocation Table",
+                                "owner": "RelocationTablePlugin",
+                                "title": "Relocation Table",
+                                "active": false,
+                                "group": "Default",
+                                "instanceId": "3207819978370941532"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "split",
+                        "orientation": "horizontal",
+                        "divider": 495.0,
+                        "width": 1386,
+                        "height": 189,
+                        "children": [
+                          {
+                            "type": "stack",
+                            "components": [
+                              {
+                                "name": "Data Type Preview",
+                                "owner": "DataTypePreviewPlugin",
+                                "title": "Data Type Preview",
+                                "active": false,
+                                "group": "Default",
+                                "instanceId": "3207819978314318403"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "stack",
+                            "components": [
+                              {
+                                "name": "Virtual Disassembler - Current Instruction",
+                                "owner": "DisassembledViewPlugin",
+                                "title": "Disassembled View",
+                                "active": false,
+                                "group": "Default",
+                                "instanceId": "3207819926581772893"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "stack",
+                    "components": [
+                      {
+                        "name": "Console",
+                        "owner": "ConsolePlugin",
+                        "title": "Console",
+                        "active": true,
+                        "group": "Default",
+                        "instanceId": "3207819926581772894"
+                      },
+                      {
+                        "name": "Bookmarks",
+                        "owner": "BookmarkPlugin",
+                        "title": "Bookmarks",
+                        "active": false,
+                        "group": "Core.Bookmarks",
+                        "instanceId": "3207819977680978500"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "title": "Window",
+        "children": [
+          {
+            "type": "stack",
+            "components": [
+              {
+                "name": "Script Manager",
+                "owner": "GhidraScriptMgrPlugin",
+                "title": "Script Manager",
+                "active": false,
+                "group": "Script Group",
+                "instanceId": "3207819926581772884"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "title": "Window",
+        "children": [
+          {
+            "type": "stack",
+            "components": [
+              {
+                "name": "Memory Map",
+                "owner": "MemoryMapPlugin",
+                "title": "Memory Map",
+                "active": false,
+                "group": "Default",
+                "instanceId": "3207819977680978502"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "title": "Window",
+        "children": [
+          {
+            "type": "stack",
+            "components": [
+              {
+                "name": "Function Graph",
+                "owner": "FunctionGraphPlugin",
+                "title": "Function Graph",
+                "active": false,
+                "group": "Function Graph",
+                "instanceId": "3207819980101091907"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "title": "Window",
+        "children": [
+          {
+            "type": "stack",
+            "components": [
+              {
+                "name": "Register Manager",
+                "owner": "RegisterPlugin",
+                "title": "Register Manager",
+                "active": false,
+                "group": "Default",
+                "instanceId": "3207819980101091904"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "title": "Window",
+        "children": [
+          {
+            "type": "split",
+            "orientation": "horizontal",
+            "divider": 573.0,
+            "width": 1408,
+            "height": 559,
+            "children": [
+              {
+                "type": "stack",
+                "components": [
+                  {
+                    "name": "Symbol Table",
+                    "owner": "SymbolTablePlugin",
+                    "title": "Symbol Table",
+                    "active": false,
+                    "group": "symbolTable",
+                    "instanceId": "3207819978370941533"
+                  }
+                ]
+              },
+              {
+                "type": "stack",
+                "components": [
+                  {
+                    "name": "Symbol References",
+                    "owner": "SymbolTablePlugin",
+                    "title": "Symbol References",
+                    "active": false,
+                    "group": "symbolTable",
+                    "instanceId": "3207819978370941534"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "title": "Window",
+        "children": [
+          {
+            "type": "stack",
+            "components": [
+              {
+                "name": "Checksum Generator",
+                "owner": "ComputeChecksumsPlugin",
+                "title": "Checksum Generator",
+                "active": false,
+                "group": "Default",
+                "instanceId": "3207819926581772880"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "title": "Window",
+        "children": [
+          {
+            "type": "stack",
+            "components": [
+              {
+                "name": "Function Tags",
+                "owner": "FunctionTagPlugin",
+                "title": "Function Tags",
+                "active": false,
+                "group": "Default",
+                "instanceId": "3207819926581772878"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "title": "Window",
+        "children": [
+          {
+            "type": "stack",
+            "components": [
+              {
+                "name": "Comment Window",
+                "owner": "CommentWindowPlugin",
+                "title": "Comments",
+                "active": false,
+                "group": "Default",
+                "instanceId": "3207819978370941535"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "window",
+        "title": "Window",
+        "children": [
+          {
+            "type": "stack",
+            "components": [
+              {
+                "name": "Python",
+                "owner": "InterpreterPanelPlugin",
+                "title": "Python",
+                "active": false,
+                "group": "Default",
+                "instanceId": "3207819978370941531"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Entropy",
+      "owner": "EntropyPlugin",
+      "title": "Entropy",
+      "active": false,
+      "group": "Header",
+      "instanceId": "3207819926581772885"
+    },
+    {
+      "name": "Overview",
+      "owner": "OverviewPlugin",
+      "title": "Overview",
+      "active": false,
+      "group": "Header",
+      "instanceId": "3207819926581772883"
+    },
+    {
+      "name": "Program Tree",
+      "owner": "ProgramTreePlugin",
+      "title": "Program Trees",
+      "active": true,
+      "group": "Default",
+      "instanceId": "3207819926581772895"
+    },
+    {
+      "name": "Symbol Tree",
+      "owner": "SymbolTreePlugin",
+      "title": "Symbol Tree",
+      "active": true,
+      "group": "Default",
+      "instanceId": "3207819977680978496"
+    },
+    {
+      "name": "DataTypes Provider",
+      "owner": "DataTypeManagerPlugin",
+      "title": "Data Type Manager",
+      "active": true,
+      "group": "Default",
+      "instanceId": "3207819978370941521"
+    },
+    {
+      "name": "Listing",
+      "owner": "CodeBrowserPlugin",
+      "title": "Listing: ",
+      "active": true,
+      "group": "Core",
+      "instanceId": "3207819926581772881"
+    },
+    {
+      "name": "Decompiler",
+      "owner": "DecompilePlugin",
+      "title": "Decompile",
+      "active": true,
+      "group": "Default",
+      "instanceId": "3207819926581772879"
+    },
+    {
+      "name": "Bytes",
+      "owner": "ByteViewerPlugin",
+      "title": "Bytes : No Program",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819977680978498"
+    },
+    {
+      "name": "Data Window",
+      "owner": "DataWindowPlugin",
+      "title": "Defined Data",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819980101091908"
+    },
+    {
+      "name": "Defined Strings",
+      "owner": "ViewStringsPlugin",
+      "title": "Defined Strings",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819980101091905"
+    },
+    {
+      "name": "Equates Table",
+      "owner": "EquateTablePlugin",
+      "title": "Equates Table",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819977680978499"
+    },
+    {
+      "name": "External Programs",
+      "owner": "ReferencesPlugin",
+      "title": "External Programs",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819977680978497"
+    },
+    {
+      "name": "Functions Window",
+      "owner": "FunctionWindowPlugin",
+      "title": "Functions",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819980101091906"
+    },
+    {
+      "name": "Relocation Table",
+      "owner": "RelocationTablePlugin",
+      "title": "Relocation Table",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819978370941532"
+    },
+    {
+      "name": "Data Type Preview",
+      "owner": "DataTypePreviewPlugin",
+      "title": "Data Type Preview",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819978314318403"
+    },
+    {
+      "name": "Virtual Disassembler - Current Instruction",
+      "owner": "DisassembledViewPlugin",
+      "title": "Disassembled View",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819926581772893"
+    },
+    {
+      "name": "Console",
+      "owner": "ConsolePlugin",
+      "title": "Console",
+      "active": true,
+      "group": "Default",
+      "instanceId": "3207819926581772894"
+    },
+    {
+      "name": "Bookmarks",
+      "owner": "BookmarkPlugin",
+      "title": "Bookmarks",
+      "active": false,
+      "group": "Core.Bookmarks",
+      "instanceId": "3207819977680978500"
+    },
+    {
+      "name": "Script Manager",
+      "owner": "GhidraScriptMgrPlugin",
+      "title": "Script Manager",
+      "active": false,
+      "group": "Script Group",
+      "instanceId": "3207819926581772884"
+    },
+    {
+      "name": "Memory Map",
+      "owner": "MemoryMapPlugin",
+      "title": "Memory Map",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819977680978502"
+    },
+    {
+      "name": "Function Graph",
+      "owner": "FunctionGraphPlugin",
+      "title": "Function Graph",
+      "active": false,
+      "group": "Function Graph",
+      "instanceId": "3207819980101091907"
+    },
+    {
+      "name": "Register Manager",
+      "owner": "RegisterPlugin",
+      "title": "Register Manager",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819980101091904"
+    },
+    {
+      "name": "Symbol Table",
+      "owner": "SymbolTablePlugin",
+      "title": "Symbol Table",
+      "active": false,
+      "group": "symbolTable",
+      "instanceId": "3207819978370941533"
+    },
+    {
+      "name": "Symbol References",
+      "owner": "SymbolTablePlugin",
+      "title": "Symbol References",
+      "active": false,
+      "group": "symbolTable",
+      "instanceId": "3207819978370941534"
+    },
+    {
+      "name": "Checksum Generator",
+      "owner": "ComputeChecksumsPlugin",
+      "title": "Checksum Generator",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819926581772880"
+    },
+    {
+      "name": "Function Tags",
+      "owner": "FunctionTagPlugin",
+      "title": "Function Tags",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819926581772878"
+    },
+    {
+      "name": "Comment Window",
+      "owner": "CommentWindowPlugin",
+      "title": "Comments",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819978370941535"
+    },
+    {
+      "name": "Python",
+      "owner": "InterpreterPanelPlugin",
+      "title": "Python",
+      "active": false,
+      "group": "Default",
+      "instanceId": "3207819978370941531"
+    }
+  ],
+  "vibeComponents": [
+    {
+      "name": "MCP",
+      "owner": "VibeMCP",
+      "title": "MCP",
+      "active": false,
+      "group": "Vibe",
+      "instanceId": "vibe-mcp"
+    },
+    {
+      "name": "Agent",
+      "owner": "VibeAgent",
+      "title": "Agent",
+      "active": false,
+      "group": "Vibe",
+      "instanceId": "vibe-agent"
+    },
+    {
+      "name": "RAG",
+      "owner": "VibeRAG",
+      "title": "RAG / JSpace",
+      "active": false,
+      "group": "Vibe",
+      "instanceId": "vibe-rag"
+    },
+    {
+      "name": "Rules",
+      "owner": "VibeRules",
+      "title": "Rules",
+      "active": false,
+      "group": "Vibe",
+      "instanceId": "vibe-rules"
+    },
+    {
+      "name": "Shared Cache",
+      "owner": "VibeDSC",
+      "title": "Shared Cache",
+      "active": false,
+      "group": "Vibe",
+      "instanceId": "vibe-dsc"
+    }
+  ]
+}

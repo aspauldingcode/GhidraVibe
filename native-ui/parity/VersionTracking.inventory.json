@@ -1,0 +1,125 @@
+{
+  "version": 2,
+  "tool": "Version Tracking",
+  "stock": true,
+  "generated_by": "scripts/extract-stock-inventory.py",
+  "count": 7,
+  "counts": {
+    "wired": 7,
+    "disabled_honest": 0
+  },
+  "entries": [
+    {
+      "id": "ghidra.vibe.version_tracking.provider.version_tracking_implied_matches",
+      "surface": "provider_body",
+      "owner": "Version Tracking",
+      "label": "Version Tracking Implied Matches",
+      "hint": "Show Version Tracking Implied Matches",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.provider.version_tracking_markup_items",
+      "surface": "provider_body",
+      "owner": "Version Tracking",
+      "label": "Version Tracking Markup Items",
+      "hint": "Show Version Tracking Markup Items",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.provider.version_tracking_matches",
+      "surface": "provider_body",
+      "owner": "Version Tracking",
+      "label": "Version Tracking Matches",
+      "hint": "Show Version Tracking Matches",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.apply_markup",
+      "surface": "main_toolbar",
+      "owner": "Version Tracking",
+      "label": "Apply Markup",
+      "hint": "Apply Markup",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.create_session",
+      "surface": "main_toolbar",
+      "owner": "Version Tracking",
+      "label": "Create Session",
+      "hint": "Create Session",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.run_correlators",
+      "surface": "main_toolbar",
+      "owner": "Version Tracking",
+      "label": "Run Correlators",
+      "hint": "Run Correlators",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.save_session",
+      "surface": "main_toolbar",
+      "owner": "Version Tracking",
+      "label": "Save Session",
+      "hint": "Save Session",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    }
+  ]
+}

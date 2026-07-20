@@ -1,0 +1,314 @@
+#!/usr/bin/env bash
+# IDA-like dyld shared cache workflow (on-device, no ipsw extract by default).
+#
+#   find-cache  → locate system DSC
+#   list        → DSC Index (all install paths; fast header parse)
+#   resolve     → short name / substring → full image path
+#   open        → alias for list (cache is always "open" on-device)
+#   import      → Ghidra DyldCacheFileSystem → AutoImporter (local Apple symbols)
+#   accept-appkit-skylight → north-star gate
+#
+# Extract via ipsw is NOT used unless GHIDRA_VIBE_ALLOW_IPSW=1 (discouraged).
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Nix packages this script as a lone store file → ROOT becomes /nix (wrong).
+# Prefer an explicit env path, then layouts that actually contain ImportDyldCacheImage.java.
+resolve_ghidra_scripts() {
+  local c
+  for c in \
+    "${GHIDRA_VIBE_SCRIPT_PATH:-}" \
+    "$ROOT/ghidra_scripts" \
+    "$SCRIPT_DIR/ghidra_scripts" \
+    "$SCRIPT_DIR/../ghidra_scripts" \
+    "$SCRIPT_DIR/../share/ghidra-vibe/ghidra_scripts" \
+    "$ROOT/share/ghidra-vibe/ghidra_scripts"; do
+    if [[ -n "$c" && -f "$c/ImportDyldCacheImage.java" ]]; then
+      echo "$c"
+      return 0
+    fi
+  done
+  return 1
+}
+
+GHIDRA_SCRIPTS="$(resolve_ghidra_scripts || true)"
+
+log_has() {
+  # Avoid ripgrep — GUI/nix PATH often lacks `rg`.
+  grep -E -q "$1" "$2" 2>/dev/null
+}
+
+resolve_dsc_index() {
+  if [[ -n "${GHIDRA_VIBE_DSC_INDEX:-}" && -x "${GHIDRA_VIBE_DSC_INDEX}" ]]; then
+    echo "${GHIDRA_VIBE_DSC_INDEX}"
+    return
+  fi
+  local c
+  for c in \
+    "$ROOT/rust/target/release/ghidra-vibe-dsc-index" \
+    "$ROOT/rust/target/debug/ghidra-vibe-dsc-index" \
+    "$(command -v ghidra-vibe-dsc-index 2>/dev/null || true)"; do
+    if [[ -n "$c" && -x "$c" ]]; then
+      echo "$c"
+      return
+    fi
+  done
+  return 1
+}
+
+INDEX_BIN="$(resolve_dsc_index || true)"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ghidra-vibe-dyld find-cache
+  ghidra-vibe-dyld list [--cache PATH] [--query SUBSTR]
+  ghidra-vibe-dyld resolve --image NAME [--cache PATH]
+  ghidra-vibe-dyld open [--cache PATH] [--query SUBSTR]
+  ghidra-vibe-dyld import --image NAME [--cache PATH]
+                           [--project DIR] [--project-name NAME] [--program NAME]
+                           [--analyze 0|1 | --no-analyze]
+  ghidra-vibe-dyld accept-appkit-skylight [--project DIR]
+
+IDA-like flow:
+  1) find-cache / open   — use on-device dyld_shared_cache_* (always present on macOS)
+  2) list / filter       — DSC Index of every framework/dylib
+  3) import --image …    — load selected module via Ghidra DyldCacheFileSystem
+  4) Apple symbols ON    — DSC local symbols + DWARF/ObjC analyzers (default)
+
+Environment:
+  GHIDRA_VIBE_HEADLESS         ghidra-analyzeHeadless
+  GHIDRA_VIBE_APPLE_SYMBOLS=1  enable DWARF/ObjC/demangler (default on)
+  GHIDRA_VIBE_ANALYZE=1        run auto-analysis after import (default on)
+  GHIDRA_VIBE_NOANALYSIS=1     skip analysis (sets ANALYZE=0)
+  GHIDRA_VIBE_ALLOW_IPSW=1     last-resort extract (NOT the default path)
+  GHIDRA_VIBE_MAXMEM / MAXMEM  JVM heap (auto from RAM unless set; slide fixups are large)
+EOF
+}
+
+need_index() {
+  if [[ -z "${INDEX_BIN:-}" || ! -x "$INDEX_BIN" ]]; then
+    echo "ghidra-vibe-dsc-index missing — build rust/ (nix build .#ghidra-vibe-tools)" >&2
+    exit 1
+  fi
+}
+
+find_headless() {
+  # Prefer our wrapper — stock nix analyzeHeadless hardcodes MAXMEM=2G.
+  local vibe_ah="${GHIDRA_VIBE_HEADLESS:-}"
+  if [[ -n "$vibe_ah" && -x "$vibe_ah" ]]; then
+    echo "$vibe_ah"
+    return 0
+  fi
+  if [[ -x "$SCRIPT_DIR/ghidra-vibe-analyzeHeadless" ]]; then
+    echo "$SCRIPT_DIR/ghidra-vibe-analyzeHeadless"
+    return 0
+  fi
+  if command -v ghidra-analyzeHeadless >/dev/null 2>&1; then
+    command -v ghidra-analyzeHeadless
+    return 0
+  fi
+  echo "GHIDRA_VIBE_HEADLESS / ghidra-vibe-analyzeHeadless not found" >&2
+  return 1
+}
+
+cmd_find_cache() {
+  need_index
+  "$INDEX_BIN" find-cache
+}
+
+cmd_list() {
+  need_index
+  local cache="" query=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --cache) cache="$2"; shift 2 ;;
+      --query) query="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  local args=(list)
+  [[ -n "$cache" ]] && args+=(--cache "$cache")
+  [[ -n "$query" ]] && args+=(--query "$query")
+  "$INDEX_BIN" "${args[@]}"
+}
+
+cmd_resolve() {
+  need_index
+  local cache="" image=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --cache) cache="$2"; shift 2 ;;
+      --image) image="$2"; shift 2 ;;
+      --query) image="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  [[ -n "$image" ]] || {
+    echo "--image required" >&2
+    exit 1
+  }
+  local args=(resolve --image "$image")
+  [[ -n "$cache" ]] && args+=(--cache "$cache")
+  "$INDEX_BIN" "${args[@]}"
+}
+
+cmd_import() {
+  need_index
+  # Ghidra forbids path elements starting with '.' (ProjectLocator).
+  # Never default to $PWD — GUI apps often have cwd=/ (read-only).
+  local cache="" image="" project="${HOME}/Documents/GhidraVibe/projects/dsc" prog="" proj_name="VibeDSC"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --cache) cache="$2"; shift 2 ;;
+      --image) image="$2"; shift 2 ;;
+      --project) project="$2"; shift 2 ;;
+      --project-name) proj_name="$2"; shift 2 ;;
+      --program|--name) prog="$2"; shift 2 ;;
+      --analyze)
+        export GHIDRA_VIBE_ANALYZE="$2"
+        shift 2
+        ;;
+      --no-analyze)
+        export GHIDRA_VIBE_ANALYZE=0
+        shift
+        ;;
+      *) shift ;;
+    esac
+  done
+  [[ -n "$image" ]] || {
+    echo "--image required" >&2
+    exit 1
+  }
+  # UI may pass a .gpr path — headless wants the parent directory + project name.
+  if [[ "$project" == *.gpr ]]; then
+    proj_name="$(basename "$project" .gpr)"
+    project="$(dirname "$project")"
+  fi
+  # Reject unusable roots (GUI launch cwd=/ → //ghidra-vibe-projects).
+  if [[ -z "$project" || "$project" == "/" || "$project" == "//"* ]]; then
+    project="${HOME}/Documents/GhidraVibe/projects/dsc"
+    proj_name="VibeDSC"
+  fi
+  [[ -z "$cache" ]] && cache="$(cmd_find_cache)"
+  local resolved
+  resolved="$(cmd_resolve --cache "$cache" --image "$image")"
+  [[ -z "$prog" ]] && prog="$(basename "$resolved" | tr -cd 'A-Za-z0-9._-')"
+  proj_name="$(printf '%s' "$proj_name" | tr -cd 'A-Za-z0-9._-')"
+  [[ -n "$proj_name" ]] || proj_name="VibeDSC"
+
+  # Discouraged fallback — only if explicitly requested AND user insists.
+  if [[ "${GHIDRA_VIBE_ALLOW_IPSW:-0}" == "1" && "${GHIDRA_VIBE_FORCE_EXTRACT:-0}" == "1" ]]; then
+    echo "WARN: ipsw extract path is discouraged; prefer DyldCacheFileSystem import" >&2
+  fi
+
+  # Re-resolve in case the wrapper exported GHIDRA_VIBE_SCRIPT_PATH after parse.
+  GHIDRA_SCRIPTS="$(resolve_ghidra_scripts || true)"
+  if [[ -z "${GHIDRA_SCRIPTS:-}" || ! -f "$GHIDRA_SCRIPTS/ImportDyldCacheImage.java" ]]; then
+    echo "FAIL: ImportDyldCacheImage.java not found. Set GHIDRA_VIBE_SCRIPT_PATH to ghidra_scripts/" >&2
+    exit 1
+  fi
+
+  local headless
+  headless="$(find_headless)"
+  mkdir -p "$project"
+
+  if [[ "${GHIDRA_VIBE_NOANALYSIS:-0}" == "1" ]]; then
+    export GHIDRA_VIBE_ANALYZE=0
+  fi
+  export GHIDRA_VIBE_APPLE_SYMBOLS="${GHIDRA_VIBE_APPLE_SYMBOLS:-1}"
+  # Default off for IDA-like snappy module load (UI / MCP); CLI opt-in via --analyze 1.
+  export GHIDRA_VIBE_ANALYZE="${GHIDRA_VIBE_ANALYZE:-0}"
+
+  echo "DSC open: $cache"
+  echo "Select image: $resolved"
+  echo "Import via DyldCacheFileSystem → project=$project/$proj_name program=$prog"
+  echo "scriptPath: $GHIDRA_SCRIPTS"
+  echo "Apple symbols: $GHIDRA_VIBE_APPLE_SYMBOLS  analyze: $GHIDRA_VIBE_ANALYZE"
+
+  # Heap: honor override, else let analyzeHeadless auto-detect from RAM.
+  if [[ -n "${GHIDRA_VIBE_MAXMEM:-${MAXMEM:-}}" ]]; then
+    export GHIDRA_VIBE_MAXMEM="${GHIDRA_VIBE_MAXMEM:-$MAXMEM}"
+    export MAXMEM="$GHIDRA_VIBE_MAXMEM"
+    echo "MAXMEM=$MAXMEM (explicit)"
+  else
+    echo "MAXMEM=auto (detect-maxmem.sh via ghidra-vibe-analyzeHeadless)"
+  fi
+
+  local log
+  log="$(mktemp)"
+  # Headless: create/open project, run ImportDyldCacheImage (no whole-cache -import).
+  set +e
+  "$headless" "$project" "$proj_name" \
+    -scriptPath "$GHIDRA_SCRIPTS" \
+    -preScript ImportDyldCacheImage.java "$cache" "$resolved" "$prog" \
+    -overwrite \
+    -max-cpu "${GHIDRA_VIBE_MAX_CPU:-2}" \
+    2>&1 | tee "$log"
+  local rc=${PIPESTATUS[0]}
+  set -e
+
+  if ! log_has 'OK: imported' "$log"; then
+    echo "FAIL: DyldCacheFileSystem import did not complete (rc=$rc). See log." >&2
+    if log_has 'Java heap space|OutOfMemoryError' "$log"; then
+      echo "Hint: raise heap — MAXMEM=24G or GHIDRA_VIBE_MAXMEM=24G" >&2
+    fi
+    if log_has 'Script not found|Invalid script' "$log"; then
+      echo "Hint: GHIDRA_VIBE_SCRIPT_PATH must point at ghidra_scripts/ (got: $GHIDRA_SCRIPTS)" >&2
+    fi
+    rm -f "$log"
+    exit 1
+  fi
+  rm -f "$log"
+  echo "OK: project=$project project_name=$proj_name project_gpr=$project/${proj_name}.gpr program=$prog image=$resolved cache=$cache"
+}
+
+cmd_accept() {
+  local project="${PWD}/ghidra-vibe-projects/acceptance"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  local cache
+  cache="$(cmd_find_cache)"
+  echo "cache=$cache"
+  local appkit skylight
+  appkit="$(cmd_resolve --cache "$cache" --image AppKit)"
+  skylight="$(cmd_resolve --cache "$cache" --image SkyLight)"
+  echo "appkit=$appkit"
+  echo "skylight=$skylight"
+  echo "ACCEPT_RESOLVE_OK (on-device DSC index)"
+
+  # Default: import via DyldCacheFileSystem (IDA-like). Analysis optional (slow on AppKit).
+  if [[ "${GHIDRA_VIBE_ACCEPT_HEADLESS:-1}" == "1" ]]; then
+    export GHIDRA_VIBE_APPLE_SYMBOLS="${GHIDRA_VIBE_APPLE_SYMBOLS:-1}"
+    export GHIDRA_VIBE_ANALYZE="${GHIDRA_VIBE_ANALYZE:-0}"
+    cmd_import --cache "$cache" --image "$appkit" --project "$project" --program AppKit
+    cmd_import --cache "$cache" --image "$skylight" --project "$project" --program SkyLight
+  else
+    echo "ACCEPT_IMPORT_SKIPPED (set GHIDRA_VIBE_ACCEPT_HEADLESS=1 to import via DyldCacheFileSystem)"
+  fi
+  echo "ACCEPT_IMPORT_OK project=$project"
+}
+
+CMD="${1:-}"
+shift || true
+
+case "$CMD" in
+  find-cache) cmd_find_cache ;;
+  list) cmd_list "$@" ;;
+  resolve) cmd_resolve "$@" ;;
+  open) cmd_list "$@" ;;
+  import) cmd_import "$@" ;;
+  accept-appkit-skylight) cmd_accept "$@" ;;
+  -h|--help|help|"") usage ;;
+  *)
+    echo "Unknown command: $CMD" >&2
+    usage
+    exit 1
+    ;;
+esac

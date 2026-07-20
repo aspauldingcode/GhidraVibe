@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "description": "Every native UI action/provider maps to analysis MCP (:8089) and/or vibe MCP (:8092).",
+  "servers": {
+    "analysis": {
+      "env": "GHIDRA_MCP_URL",
+      "default": "http://127.0.0.1:8089"
+    },
+    "vibe": {
+      "env": "GHIDRA_VIBE_MCP_EXT_URL",
+      "default": "http://127.0.0.1:8092"
+    },
+    "gui": {
+      "env": "GHIDRA_VIBE_GUI_URL",
+      "default": "http://127.0.0.1:8091"
+    },
+    "debugger": {
+      "env": "GHIDRA_MCP_DEBUGGER_URL",
+      "default": "http://127.0.0.1:8099"
+    }
+  },
+  "actions": {
+    "auto_analyze": {
+      "server": "analysis",
+      "tool": "run_analysis"
+    },
+    "goto": {
+      "server": "analysis",
+      "tool": "disassemble_function"
+    },
+    "undo": {
+      "server": "vibe",
+      "tool": "vibe_undo"
+    },
+    "redo": {
+      "server": "vibe",
+      "tool": "vibe_redo"
+    },
+    "nav_back": {
+      "server": "vibe",
+      "tool": "vibe_nav_back"
+    },
+    "nav_fwd": {
+      "server": "vibe",
+      "tool": "vibe_nav_forward"
+    },
+    "clear_selection": {
+      "server": "vibe",
+      "tool": "vibe_clear_selection"
+    },
+    "start_mcp": {
+      "server": "analysis",
+      "tool": "check_connection"
+    },
+    "mcp_health": {
+      "server": "analysis",
+      "tool": "check_connection"
+    },
+    "fetch_functions": {
+      "server": "analysis",
+      "tool": "list_functions"
+    },
+    "decompile": {
+      "server": "analysis",
+      "tool": "decompile_function"
+    },
+    "rag_index": {
+      "server": "vibe",
+      "tool": "rag_index"
+    },
+    "import_apple": {
+      "server": "vibe",
+      "tool": "malimite_analyze"
+    },
+    "dyld_open": {
+      "server": "vibe",
+      "tool": "dyld_list_images"
+    },
+    "open_shared_cache": {
+      "server": "vibe",
+      "tool": "dyld_list_images"
+    },
+    "open_app_bundle": {
+      "server": "vibe",
+      "tool": "malimite_open_bundle"
+    },
+    "listing_disassemble": {
+      "server": "vibe",
+      "tool": "listing_disassemble"
+    },
+    "listing_define_data": {
+      "server": "vibe",
+      "tool": "listing_define_data"
+    },
+    "listing_clear_code": {
+      "server": "vibe",
+      "tool": "listing_clear_code"
+    },
+    "listing_create_label": {
+      "server": "vibe",
+      "tool": "listing_create_label"
+    },
+    "listing_create_function": {
+      "server": "vibe",
+      "tool": "listing_create_function"
+    },
+    "listing_add_bookmark": {
+      "server": "vibe",
+      "tool": "listing_add_bookmark"
+    },
+    "listing_create_structure": {
+      "server": "vibe",
+      "tool": "listing_create_structure"
+    },
+    "save_program": {
+      "server": "vibe",
+      "tool": "vibe_proxy_analysis"
+    },
+    "bsim_search": null,
+    "bsim_overview": null,
+    "edit_cut": null,
+    "edit_copy": {
+      "server": "vibe",
+      "tool": "edit_copy"
+    },
+    "edit_paste": null,
+    "search_memory": {
+      "server": "vibe",
+      "tool": "search_memory"
+    },
+    "open_debugger": null,
+    "open_emulator": null,
+    "provider_create": {
+      "server": "vibe",
+      "tool": "provider_create"
+    },
+    "debugger_control": {
+      "server": "vibe",
+      "tool": "debugger_control"
+    },
+    "vt_session": {
+      "server": "vibe",
+      "tool": "vt_session"
+    }
+  },
+  "providers": {
+    "listing": {
+      "server": "analysis",
+      "tool": "disassemble_function"
+    },
+    "decompiler": {
+      "server": "analysis",
+      "tool": "decompile_function"
+    },
+    "program_tree": {
+      "server": "analysis",
+      "tool": "list_project_files"
+    },
+    "symbol_tree": {
+      "server": "analysis",
+      "tool": "list_namespaces"
+    },
+    "data_types": {
+      "server": "analysis",
+      "tool": "list_data_types"
+    },
+    "functions": {
+      "server": "analysis",
+      "tool": "list_functions"
+    },
+    "strings": {
+      "server": "analysis",
+      "tool": "list_strings"
+    },
+    "memory_map": {
+      "server": "analysis",
+      "tool": "list_segments"
+    },
+    "symbol_table": {
+      "server": "analysis",
+      "tools": [
+        "list_exports",
+        "list_imports",
+        "list_globals"
+      ]
+    },
+    "bytes": {
+      "server": "analysis",
+      "tools": [
+        "read_memory",
+        "inspect_memory_content"
+      ]
+    },
+    "bookmarks": {
+      "server": "analysis",
+      "tool": "list_bookmarks"
+    },
+    "script_manager": {
+      "server": "vibe",
+      "tools": [
+        "vibe_list_scripts",
+        "list_ghidra_scripts",
+        "run_ghidra_script"
+      ]
+    },
+    "python": {
+      "server": "vibe",
+      "tool": "vibe_list_scripts"
+    },
+    "function_graph": {
+      "server": "analysis",
+      "tools": [
+        "get_function_call_graph",
+        "analyze_control_flow"
+      ]
+    },
+    "defined_data": {
+      "server": "analysis",
+      "tool": "list_data_items"
+    },
+    "external_programs": {
+      "server": "analysis",
+      "tool": "list_external_locations"
+    },
+    "symbol_references": {
+      "server": "analysis",
+      "tools": [
+        "get_xrefs_to",
+        "get_xrefs_from"
+      ]
+    },
+    "comments": {
+      "server": "vibe",
+      "tool": "vibe_list_comments"
+    },
+    "checksum": {
+      "server": "analysis",
+      "tool": "get_function_hash"
+    },
+    "datatype_preview": {
+      "server": "analysis",
+      "tool": "get_struct_layout"
+    },
+    "disassembled_view": {
+      "server": "analysis",
+      "tool": "disassemble_function"
+    },
+    "entropy": {
+      "server": "vibe",
+      "tool": "vibe_list_entropy"
+    },
+    "overview": {
+      "server": "vibe",
+      "tool": "vibe_list_entropy"
+    },
+    "equates": {
+      "server": "vibe",
+      "tool": "vibe_list_equates"
+    },
+    "relocations": {
+      "server": "vibe",
+      "tool": "vibe_list_relocations"
+    },
+    "registers": {
+      "server": "vibe",
+      "tool": "vibe_list_registers"
+    },
+    "function_tags": {
+      "server": "vibe",
+      "tool": "vibe_list_function_tags"
+    },
+    "rag": {
+      "server": "vibe",
+      "tools": [
+        "rag_discover",
+        "rag_index",
+        "rag_search",
+        "rag_stats"
+      ]
+    },
+    "rules": {
+      "server": "vibe",
+      "tools": [
+        "rules_get",
+        "rules_set",
+        "rules_list"
+      ]
+    },
+    "dsc": {
+      "server": "vibe",
+      "tools": [
+        "dyld_find_cache",
+        "dyld_list_images",
+        "dyld_import_image"
+      ]
+    },
+    "apple_bundle": {
+      "server": "vibe",
+      "tools": [
+        "malimite_open_bundle",
+        "malimite_list_bundle_binaries",
+        "malimite_analyze",
+        "malimite_list_classes",
+        "malimite_translate"
+      ]
+    },
+    "swift_classes": {
+      "server": "vibe",
+      "tools": [
+        "swift_list_namespaces",
+        "swift_demangle"
+      ]
+    },
+    "agent": {
+      "server": "vibe",
+      "tools": [
+        "rag_discover",
+        "vibe_proxy_analysis"
+      ]
+    },
+    "mcp": {
+      "server": "analysis",
+      "tool": "check_connection"
+    }
+  }
+}

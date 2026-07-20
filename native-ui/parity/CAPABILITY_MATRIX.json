@@ -1,0 +1,6079 @@
+{
+  "version": 1,
+  "generated_by": "scripts/generate-capability-matrix.py",
+  "description": "Executable stock capability probes \u2014 every wired inventory id + universe module",
+  "count": 362,
+  "counts_by_probe": {
+    "mcp": 110,
+    "engine": 60,
+    "gui_action": 56,
+    "runtime_gap": 10,
+    "module_present": 95,
+    "gui_a11y": 31
+  },
+  "cases": [
+    {
+      "id": "ghidra.vibe.debugger.provider.bookmarks",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Bookmarks",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_bookmarks",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.bookmarks"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.breakpoints",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Breakpoints",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Breakpoints"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.bundle_manager",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Bundle Manager",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Bundle Manager"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.bytes",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Bytes",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "read_memory",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.bytes"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.checksum",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Checksum Generator",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_function_hash",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.checksum"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.comments",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Comments",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_comments",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.comments"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.connections",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Connections",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Connections"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.console",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Debug Console",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "check_connection",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.console"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.data_types",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Data Type Manager",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_data_types",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.data_types"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.datatype_preview",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Data Type Preview",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_struct_layout",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.datatype_preview"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.decompiler",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Decompile",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "decompile_function",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.decompiler"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.defined_data",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Defined Data",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_data_items",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.defined_data"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.diff_apply_settings",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Diff Apply Settings",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Diff Apply Settings"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.diff_details",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Diff Details",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Diff Details"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.disassembled_view",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Disassembled View",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "disassemble_function",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.disassembled_view"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.equates",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Equates Table",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_equates",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.equates"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.external_programs",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "External Programs",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_external_locations",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.external_programs"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_call_graph",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Function Call Graph",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Function Call Graph"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_call_trees",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Function Call Trees",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Function Call Trees"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_graph",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Function Graph",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_function_call_graph",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.function_graph"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_tags",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Function Tags",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_function_tags",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.function_tags"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.functions",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Functions",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_functions",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.functions"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.instruction_info",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Instruction Info",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Instruction Info"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.listing",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Dynamic",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "disassemble_function",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.listing"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memory",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Memory",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Memory"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memory_map",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Memory Map",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_segments",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.memory_map"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memory_range_mappings",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Memory Range Mappings",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Memory Range Mappings"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memview",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Memview",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Memview"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.model",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Model",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Model"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.modules",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Modules",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Modules"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.pcode_stepper",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Pcode Stepper",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Pcode Stepper"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.program_tree",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Program Trees",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_segments",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.program_tree"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.python",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Python",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_scripts",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.python"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.regions",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Regions",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Regions"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.registers",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Registers",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_registers",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.registers"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.relocations",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Relocation Table",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_relocations",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.relocations"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.script_manager",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Script Manager",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_scripts",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.script_manager"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.stack",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Stack",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Stack"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.static_mappings",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Static Mappings",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Static Mappings"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.strings",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Defined Strings",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_strings",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.strings"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.symbol_references",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Symbol References",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_xrefs_to",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.symbol_references"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.symbol_table",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Symbol Table",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_exports",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.symbol_table"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.symbol_tree",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Symbol Tree",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_namespaces",
+        "action": null,
+        "a11y_id": "ghidra.vibe.debugger.provider.symbol_tree"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.terminal",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Terminal",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Terminal"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.threads",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Threads",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Threads"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.time",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Time",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Time"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.watches",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "provider_body",
+      "label": "Watches",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Watches"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.interrupt",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "main_toolbar",
+      "label": "Interrupt",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "interrupt"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.launch",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "main_toolbar",
+      "label": "Launch",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "launch"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.resume",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "main_toolbar",
+      "label": "Resume",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "resume"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.save",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "main_toolbar",
+      "label": "Save",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_proxy_analysis",
+        "action": "save_program",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.step_into",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "main_toolbar",
+      "label": "Step Into",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "step_into"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.step_out",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "main_toolbar",
+      "label": "Step Out",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "step_out"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.step_over",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "main_toolbar",
+      "label": "Step Over",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "step_over"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.tracermi_connect",
+      "kind": "inventory",
+      "tool": "Debugger",
+      "inventory_tool": "Debugger",
+      "surface": "main_toolbar",
+      "label": "TraceRmi Connect",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "tracermi_connect"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.bookmarks",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Bookmarks",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_bookmarks",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.bookmarks"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.breakpoints",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Breakpoints",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Breakpoints"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.bundle_manager",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Bundle Manager",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Bundle Manager"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.bytes",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Bytes",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "read_memory",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.bytes"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.checksum",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Checksum Generator",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_function_hash",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.checksum"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.comments",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Comments",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_comments",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.comments"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.console",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Debug Console",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "check_connection",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.console"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.data_types",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Data Type Manager",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_data_types",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.data_types"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.datatype_preview",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Data Type Preview",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_struct_layout",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.datatype_preview"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.decompiler",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Decompile",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "decompile_function",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.decompiler"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.defined_data",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Defined Data",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_data_items",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.defined_data"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.disassembled_view",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Disassembled View",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "disassemble_function",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.disassembled_view"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.equates",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Equates Table",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_equates",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.equates"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.external_programs",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "External Programs",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_external_locations",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.external_programs"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_call_graph",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Function Call Graph",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Function Call Graph"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_call_trees",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Function Call Trees",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Function Call Trees"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_graph",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Function Graph",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_function_call_graph",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.function_graph"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_tags",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Function Tags",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_function_tags",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.function_tags"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.functions",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Functions",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_functions",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.functions"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.listing",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Dynamic",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "disassemble_function",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.listing"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memory",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Memory",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Memory"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memory_map",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Memory Map",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_segments",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.memory_map"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memory_range_mappings",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Memory Range Mappings",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Memory Range Mappings"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memview",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Memview",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Memview"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.model",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Model",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Model"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.modules",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Modules",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Modules"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.objects",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Objects",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Objects"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.pcode_stepper",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Pcode Stepper",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Pcode Stepper"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.program_tree",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Program Trees",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_segments",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.program_tree"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.python",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Interpreter",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_scripts",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.python"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.regions",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Regions",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Regions"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.registers",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Registers",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_registers",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.registers"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.relocations",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Relocation Table",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_relocations",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.relocations"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.script_manager",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Script Manager",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_scripts",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.script_manager"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.stack",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Stack",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Stack"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.static_mappings",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Static Mappings",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Static Mappings"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.strings",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Defined Strings",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_strings",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.strings"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.symbol_references",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Symbol References",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_xrefs_to",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.symbol_references"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.symbol_table",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Symbol Table",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_exports",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.symbol_table"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.symbol_tree",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Symbol Tree",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_namespaces",
+        "action": null,
+        "a11y_id": "ghidra.vibe.emulator.provider.symbol_tree"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.threads",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Threads",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Threads"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.time",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Time",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Time"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.watches",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "provider_body",
+      "label": "Watches",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_list",
+        "args": {
+          "provider": "Watches"
+        },
+        "via": "vibe_or_engine"
+      },
+      "pass_rule": "json_has_rows_or_has_target_false"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.emulate",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "main_toolbar",
+      "label": "Emulate",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "emulate"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.finish",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "main_toolbar",
+      "label": "Finish",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "finish"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.interrupt",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "main_toolbar",
+      "label": "Interrupt",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "interrupt"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.save",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "main_toolbar",
+      "label": "Save",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_proxy_analysis",
+        "action": "save_program",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.skip",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "main_toolbar",
+      "label": "Skip",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "skip"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.step",
+      "kind": "inventory",
+      "tool": "Emulator",
+      "inventory_tool": "Emulator",
+      "surface": "main_toolbar",
+      "label": "Step",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "debugger_control",
+        "args": {
+          "op": "step"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.menu.analysis.auto_analyze",
+      "kind": "inventory",
+      "tool": "Analysis",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Auto Analyze\u2026",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "run_analysis",
+        "action": "auto_analyze",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.app.about",
+      "kind": "inventory",
+      "tool": "GhidraVibe",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "About GhidraVibe",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "about",
+        "a11y_id": "ghidra.vibe.menu.app.about"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.bsim.overview",
+      "kind": "inventory",
+      "tool": "BSim",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "BSim Overview",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "reason": "Wave E \u2014 BSim DB UI / live agent path not capability-proven"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.menu.bsim.search",
+      "kind": "inventory",
+      "tool": "BSim",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "BSim Search\u2026",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "reason": "Wave E \u2014 BSim DB UI / live agent path not capability-proven"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.copy",
+      "kind": "inventory",
+      "tool": "Edit",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Copy",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "edit_copy",
+        "action": "edit_copy",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.cut",
+      "kind": "inventory",
+      "tool": "Edit",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Cut",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "reason": "action edit_cut is null/Wave-E in tool-map",
+        "action": "edit_cut"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.paste",
+      "kind": "inventory",
+      "tool": "Edit",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Paste",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "reason": "action edit_paste is null/Wave-E in tool-map",
+        "action": "edit_paste"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.redo",
+      "kind": "inventory",
+      "tool": "Edit",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Redo",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_redo",
+        "action": "redo",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.undo",
+      "kind": "inventory",
+      "tool": "Edit",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Undo",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_undo",
+        "action": "undo",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.close",
+      "kind": "inventory",
+      "tool": "File",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Close Program",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "close_program",
+        "a11y_id": "ghidra.vibe.menu.file.close"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.import",
+      "kind": "inventory",
+      "tool": "File",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Import File\u2026",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "import_file",
+        "a11y_id": "ghidra.vibe.menu.file.import"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.new_project",
+      "kind": "inventory",
+      "tool": "File",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "New Project\u2026",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "new_project",
+        "a11y_id": "ghidra.vibe.menu.file.new_project"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.open_project",
+      "kind": "inventory",
+      "tool": "File",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Open Project\u2026",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "open_project",
+        "a11y_id": "ghidra.vibe.menu.file.open_project"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.save",
+      "kind": "inventory",
+      "tool": "File",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Save Program",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_proxy_analysis",
+        "action": "save_program",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.graph.function",
+      "kind": "inventory",
+      "tool": "Graph",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Function Graph",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_function_graph",
+        "a11y_id": "ghidra.vibe.menu.graph.function"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.help.ghidra",
+      "kind": "inventory",
+      "tool": "Help",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "GhidraVibe Help\u2026",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_help",
+        "a11y_id": "ghidra.vibe.menu.help.ghidra"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.help.headless",
+      "kind": "inventory",
+      "tool": "Help",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Headless Help",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "headless_help",
+        "a11y_id": "ghidra.vibe.menu.help.headless"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.help.tip",
+      "kind": "inventory",
+      "tool": "Help",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Tip of the Day\u2026",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "tip_of_the_day",
+        "a11y_id": "ghidra.vibe.menu.help.tip"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.navigation.goto",
+      "kind": "inventory",
+      "tool": "Navigation",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Go To\u2026",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "disassemble_function",
+        "action": "goto",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.navigation.next",
+      "kind": "inventory",
+      "tool": "Navigation",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Next Location",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_nav_forward",
+        "action": "nav_fwd",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.navigation.prev",
+      "kind": "inventory",
+      "tool": "Navigation",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Previous Location",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_nav_back",
+        "action": "nav_back",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.search.functions",
+      "kind": "inventory",
+      "tool": "Search",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Search Functions\u2026",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "search_functions",
+        "a11y_id": "ghidra.vibe.menu.search.functions"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.search.memory",
+      "kind": "inventory",
+      "tool": "Search",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Memory\u2026",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "search_memory",
+        "action": "search_memory",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.search.strings",
+      "kind": "inventory",
+      "tool": "Search",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Search Strings\u2026",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "search_strings",
+        "a11y_id": "ghidra.vibe.menu.search.strings"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.select.clear",
+      "kind": "inventory",
+      "tool": "Select",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Clear Selection",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_clear_selection",
+        "action": "clear_selection",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.tools.codebrowser",
+      "kind": "inventory",
+      "tool": "Tools",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "CodeBrowser",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_codebrowser",
+        "a11y_id": "ghidra.vibe.menu.tools.codebrowser"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.tools.mcp_health",
+      "kind": "inventory",
+      "tool": "Tools",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "MCP Health",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "check_connection",
+        "action": "mcp_health",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.tools.start_mcp",
+      "kind": "inventory",
+      "tool": "Tools",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Start Analysis MCP",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "check_connection",
+        "action": "start_mcp",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.agent",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Agent",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_agent",
+        "a11y_id": "ghidra.vibe.menu.window.agent"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.bookmarks",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Bookmarks",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_bookmarks",
+        "a11y_id": "ghidra.vibe.menu.window.bookmarks"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.bytes",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Bytes",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_bytes",
+        "a11y_id": "ghidra.vibe.menu.window.bytes"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.checksum",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Checksum Generator",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_checksum",
+        "a11y_id": "ghidra.vibe.menu.window.checksum"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.code_editor",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Code Editor",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_code_editor",
+        "a11y_id": "ghidra.vibe.menu.window.code_editor"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.codebrowser",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "CodeBrowser",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_codebrowser",
+        "a11y_id": "ghidra.vibe.menu.window.codebrowser"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.comments",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Comments",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_comments",
+        "a11y_id": "ghidra.vibe.menu.window.comments"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.console",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Console",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_console",
+        "a11y_id": "ghidra.vibe.menu.window.console"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.data_types",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Data Type Manager",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_data_types",
+        "a11y_id": "ghidra.vibe.menu.window.data_types"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.datatype_preview",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Data Type Preview",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_datatype_preview",
+        "a11y_id": "ghidra.vibe.menu.window.datatype_preview"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.decompiler",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Decompiler",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_decompiler",
+        "a11y_id": "ghidra.vibe.menu.window.decompiler"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.defined_data",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Defined Data",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_defined_data",
+        "a11y_id": "ghidra.vibe.menu.window.defined_data"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.disassembled_view",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Disassembled View",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_disassembled_view",
+        "a11y_id": "ghidra.vibe.menu.window.disassembled_view"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.entropy",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Entropy",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_entropy",
+        "a11y_id": "ghidra.vibe.menu.window.entropy"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.equates",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Equates Table",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_equates",
+        "a11y_id": "ghidra.vibe.menu.window.equates"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.external_programs",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "External Programs",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_external_programs",
+        "a11y_id": "ghidra.vibe.menu.window.external_programs"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.function_graph",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Function Graph",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_function_graph",
+        "a11y_id": "ghidra.vibe.menu.window.function_graph"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.function_tags",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Function Tags",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_function_tags",
+        "a11y_id": "ghidra.vibe.menu.window.function_tags"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.functions",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Functions",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_functions",
+        "a11y_id": "ghidra.vibe.menu.window.functions"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.listing",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Listing",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_listing",
+        "a11y_id": "ghidra.vibe.menu.window.listing"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.mcp",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "MCP",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_mcp",
+        "a11y_id": "ghidra.vibe.menu.window.mcp"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.memory_map",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Memory Map",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_memory_map",
+        "a11y_id": "ghidra.vibe.menu.window.memory_map"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.overview",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Overview",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_overview",
+        "a11y_id": "ghidra.vibe.menu.window.overview"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.program_tree",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Program Trees",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_program_tree",
+        "a11y_id": "ghidra.vibe.menu.window.program_tree"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.project",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Project Window",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_project",
+        "a11y_id": "ghidra.vibe.menu.window.project"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.python",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Python",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_python",
+        "a11y_id": "ghidra.vibe.menu.window.python"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.rag",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "RAG / JSpace",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_rag",
+        "a11y_id": "ghidra.vibe.menu.window.rag"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.registers",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Register Manager",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_registers",
+        "a11y_id": "ghidra.vibe.menu.window.registers"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.relocations",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Relocation Table",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_relocations",
+        "a11y_id": "ghidra.vibe.menu.window.relocations"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.rules",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Rules",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_rules",
+        "a11y_id": "ghidra.vibe.menu.window.rules"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.script_manager",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Script Manager",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_script_manager",
+        "a11y_id": "ghidra.vibe.menu.window.script_manager"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.strings",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Defined Strings",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_strings",
+        "a11y_id": "ghidra.vibe.menu.window.strings"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.swift_classes",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Swift Classes",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_swift_classes",
+        "a11y_id": "ghidra.vibe.menu.window.swift_classes"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.symbol_references",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Symbol References",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_symbol_references",
+        "a11y_id": "ghidra.vibe.menu.window.symbol_references"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.symbol_table",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Symbol Table",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_symbol_table",
+        "a11y_id": "ghidra.vibe.menu.window.symbol_table"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.symbol_tree",
+      "kind": "inventory",
+      "tool": "Window",
+      "inventory_tool": "CodeBrowser",
+      "surface": "menubar",
+      "label": "Symbol Tree",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_symbol_tree",
+        "a11y_id": "ghidra.vibe.menu.window.symbol_tree"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.module.configurations.public_release",
+      "kind": "module",
+      "tool": "Configurations",
+      "surface": "module",
+      "label": "Public_Release",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Configurations",
+        "name": "Public_Release"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.annotationvalidator",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "AnnotationValidator",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "AnnotationValidator"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_dbgeng",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-agent-dbgeng",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-agent-dbgeng",
+        "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_drgn",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-agent-drgn",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-agent-drgn",
+        "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_gdb",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-agent-gdb",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-agent-gdb",
+        "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_lldb",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-agent-lldb",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-agent-lldb",
+        "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_x64dbg",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-agent-x64dbg",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-agent-x64dbg",
+        "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_api",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-api",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-api"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_importers",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-importers",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-importers"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_isf",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-isf",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-isf"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_jpda",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-jpda",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-jpda"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_rmi_trace",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Debugger-rmi-trace",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Debugger-rmi-trace"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.framework_tracemodeling",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "Framework-TraceModeling",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "Framework-TraceModeling"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.proposedutils",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "ProposedUtils",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "ProposedUtils"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.taintanalysis",
+      "kind": "module",
+      "tool": "Debug",
+      "surface": "module",
+      "label": "TaintAnalysis",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Debug",
+        "name": "TaintAnalysis"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.base",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "Base",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "Base"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.bsim",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "BSim",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "BSim"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.bsimfeaturevisualizer",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "BSimFeatureVisualizer",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "BSimFeatureVisualizer"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.bytepatterns",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "BytePatterns",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "BytePatterns"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.byteviewer",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "ByteViewer",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "ByteViewer"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.codecompare",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "CodeCompare",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "CodeCompare"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.datagraph",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "DataGraph",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "DataGraph"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.debugutils",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "DebugUtils",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "DebugUtils"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.decompiler",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "Decompiler",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "Decompiler"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.decompilerdependent",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "DecompilerDependent",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "DecompilerDependent"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.fileformats",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "FileFormats",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "FileFormats"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.functiongraph",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "FunctionGraph",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "FunctionGraph"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.functiongraphdecompilerextension",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "FunctionGraphDecompilerExtension",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "FunctionGraphDecompilerExtension"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.functionid",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "FunctionID",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "FunctionID"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.ghidrago",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "GhidraGo",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "GhidraGo"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.ghidraserver",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "GhidraServer",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "GhidraServer"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.gnudemangler",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "GnuDemangler",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "GnuDemangler"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.graphfunctioncalls",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "GraphFunctionCalls",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "GraphFunctionCalls"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.graphservices",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "GraphServices",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "GraphServices"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.microsoftcodeanalyzer",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "MicrosoftCodeAnalyzer",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "MicrosoftCodeAnalyzer"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.microsoftdemangler",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "MicrosoftDemangler",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "MicrosoftDemangler"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.microsoftdmang",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "MicrosoftDmang",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "MicrosoftDmang"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.pdb",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "PDB",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "PDB"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.programdiff",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "ProgramDiff",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "ProgramDiff"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.programgraph",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "ProgramGraph",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "ProgramGraph"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.pyghidra",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "PyGhidra",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "runtime_gap",
+      "probe_spec": {
+        "category": "Features",
+        "name": "PyGhidra",
+        "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session"
+      },
+      "pass_rule": "listed_in_runtime_gaps"
+    },
+    {
+      "id": "ghidra.vibe.module.features.recognizers",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "Recognizers",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "Recognizers"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.sarif",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "Sarif",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "Sarif"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.sourcecodelookup",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "SourceCodeLookup",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "SourceCodeLookup"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.swiftdemangler",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "SwiftDemangler",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "SwiftDemangler"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.systememulation",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "SystemEmulation",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "SystemEmulation"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.versiontracking",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "VersionTracking",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "VersionTracking"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.versiontrackingbsim",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "VersionTrackingBSim",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "VersionTrackingBSim"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.features.wildcardassembler",
+      "kind": "module",
+      "tool": "Features",
+      "surface": "module",
+      "label": "WildcardAssembler",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Features",
+        "name": "WildcardAssembler"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.db",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "DB",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "DB"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.docking",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "Docking",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "Docking"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.emulation",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "Emulation",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "Emulation"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.filesystem",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "FileSystem",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "FileSystem"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.generic",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "Generic",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "Generic"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.graph",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "Graph",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "Graph"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.gui",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "Gui",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "Gui"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.help",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "Help",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "Help"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.project",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "Project",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "Project"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.pty",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "Pty",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "Pty"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.softwaremodeling",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "SoftwareModeling",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "SoftwareModeling"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.framework.utility",
+      "kind": "module",
+      "tool": "Framework",
+      "surface": "module",
+      "label": "Utility",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Framework",
+        "name": "Utility"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.6502",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "6502",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "6502"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.68000",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "68000",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "68000"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.8048",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "8048",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "8048"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.8051",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "8051",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "8051"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.8085",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "8085",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "8085"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.aarch64",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "AARCH64",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "AARCH64"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.arm",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "ARM",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "ARM"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.atmel",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "Atmel",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "Atmel"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.bpf",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "BPF",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "BPF"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.cp1600",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "CP1600",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "CP1600"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.cr16",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "CR16",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "CR16"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.dalvik",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "Dalvik",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "Dalvik"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.data",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "DATA",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "DATA"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.ebpf",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "eBPF",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "eBPF"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.hcs08",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "HCS08",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "HCS08"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.hcs12",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "HCS12",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "HCS12"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.hexagon",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "Hexagon",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "Hexagon"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.jvm",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "JVM",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "JVM"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.loongarch",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "Loongarch",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "Loongarch"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.m16c",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "M16C",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "M16C"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.m8c",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "M8C",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "M8C"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.mc6800",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "MC6800",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "MC6800"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.mcs96",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "MCS96",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "MCS96"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.mips",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "MIPS",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "MIPS"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.nds32",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "NDS32",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "NDS32"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.pa_risc",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "PA-RISC",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "PA-RISC"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.pic",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "PIC",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "PIC"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.powerpc",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "PowerPC",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "PowerPC"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.riscv",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "RISCV",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "RISCV"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.sparc",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "Sparc",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "Sparc"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.superh",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "SuperH",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "SuperH"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.superh4",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "SuperH4",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "SuperH4"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.ti_msp430",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "TI_MSP430",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "TI_MSP430"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.toy",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "Toy",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "Toy"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.tricore",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "tricore",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "tricore"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.v850",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "V850",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "V850"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.x86",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "x86",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "x86"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.xtensa",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "Xtensa",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "Xtensa"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.module.processors.z80",
+      "kind": "module",
+      "tool": "Processors",
+      "surface": "module",
+      "label": "Z80",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "module_present",
+      "probe_spec": {
+        "category": "Processors",
+        "name": "Z80"
+      },
+      "pass_rule": "module_jar_present"
+    },
+    {
+      "id": "ghidra.vibe.project.body.active_project",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_body",
+      "label": "Active Project (Tree View | Table View + Filter)",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.project.body.active_project"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.project.body.logpanel",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_body",
+      "label": "LogPanel (status window)",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.project.body.logpanel"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.project.body.running_tools_workspace_combo",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_body",
+      "label": "Running Tools + Workspace combo",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.project.body.running_tools_workspace_combo"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.project.body.tool_chest",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_body",
+      "label": "Tool Chest",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.project.body.tool_chest"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.project.tool.codebrowser",
+      "kind": "inventory",
+      "tool": "Tool Chest",
+      "inventory_tool": "Project Window",
+      "surface": "tool_chest",
+      "label": "CodeBrowser",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_codebrowser",
+        "a11y_id": "ghidra.vibe.project.tool.codebrowser"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.project.tool.debugger",
+      "kind": "inventory",
+      "tool": "Tool Chest",
+      "inventory_tool": "Project Window",
+      "surface": "tool_chest",
+      "label": "Debugger",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "open_debugger",
+        "a11y_id": "ghidra.vibe.project.tool.debugger"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.project.tool.emulator",
+      "kind": "inventory",
+      "tool": "Tool Chest",
+      "inventory_tool": "Project Window",
+      "surface": "tool_chest",
+      "label": "Emulator",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "open_emulator",
+        "a11y_id": "ghidra.vibe.project.tool.emulator"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.project.tool.version_tracking",
+      "kind": "inventory",
+      "tool": "Tool Chest",
+      "inventory_tool": "Project Window",
+      "surface": "tool_chest",
+      "label": "Version Tracking",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_version_tracking",
+        "a11y_id": "ghidra.vibe.project.tool.version_tracking"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.refresh",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_toolbar",
+      "label": "Refresh",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "refresh_vc"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_add",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_toolbar",
+      "label": "Add to Version Control",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vc_op",
+        "args": {
+          "op": "vc_add"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "ok_true_or_grey_without_repo"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_checkin",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_toolbar",
+      "label": "CheckIn",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vc_op",
+        "args": {
+          "op": "vc_checkin"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "ok_true_or_grey_without_repo"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_checkout",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_toolbar",
+      "label": "CheckOut",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vc_op",
+        "args": {
+          "op": "vc_checkout"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "ok_true_or_grey_without_repo"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_find",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_toolbar",
+      "label": "Find Checkouts",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vc_op",
+        "args": {
+          "op": "vc_find"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "ok_true_or_grey_without_repo"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_undo",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_toolbar",
+      "label": "UndoCheckOut",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vc_op",
+        "args": {
+          "op": "vc_undo"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "ok_true_or_grey_without_repo"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_update",
+      "kind": "inventory",
+      "tool": "Project Window",
+      "inventory_tool": "Project Window",
+      "surface": "project_toolbar",
+      "label": "Update",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vc_op",
+        "args": {
+          "op": "vc_update"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "ok_true_or_grey_without_repo"
+    },
+    {
+      "id": "ghidra.vibe.provider.bookmarks",
+      "kind": "inventory",
+      "tool": "Bookmarks",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Bookmarks",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_bookmarks",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.bookmarks"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.bytes",
+      "kind": "inventory",
+      "tool": "Bytes",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Bytes : No Program",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "read_memory",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.bytes"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.checksum",
+      "kind": "inventory",
+      "tool": "Checksum Generator",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Checksum Generator",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_function_hash",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.checksum"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.comments",
+      "kind": "inventory",
+      "tool": "Comments",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Comments",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_comments",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.comments"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.console",
+      "kind": "inventory",
+      "tool": "Console",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Console",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "check_connection",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.console"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.console.clear",
+      "kind": "inventory",
+      "tool": "Console",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Clear Console",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.console.clear"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.console.input",
+      "kind": "inventory",
+      "tool": "Console",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Console Input",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.console.input"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.console.lock",
+      "kind": "inventory",
+      "tool": "Console",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Scroll Lock",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.console.lock"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types",
+      "kind": "inventory",
+      "tool": "Data Type Manager",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Data Type Manager",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_data_types",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.data_types"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.back",
+      "kind": "inventory",
+      "tool": "Data Type Manager",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Previous Data Type",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.data_types.back"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.create",
+      "kind": "inventory",
+      "tool": "Data Type Manager",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Create Data Type",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.data_types.create"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.filter_go",
+      "kind": "inventory",
+      "tool": "Data Type Manager",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Apply Filter",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.data_types.filter_go"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.forward",
+      "kind": "inventory",
+      "tool": "Data Type Manager",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Next Data Type",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.data_types.forward"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.open_archive",
+      "kind": "inventory",
+      "tool": "Data Type Manager",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Open Archive",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.data_types.open_archive"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.settings",
+      "kind": "inventory",
+      "tool": "Data Type Manager",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Settings",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.data_types.settings"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.datatype_preview",
+      "kind": "inventory",
+      "tool": "Data Type Preview",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Data Type Preview",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_struct_layout",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.datatype_preview"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler",
+      "kind": "inventory",
+      "tool": "Decompile",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Decompile",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "decompile_function",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.decompiler"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.export",
+      "kind": "inventory",
+      "tool": "Decompile",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Export",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.decompiler.export"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.options",
+      "kind": "inventory",
+      "tool": "Decompile",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Decompiler Options",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.decompiler.options"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.refresh",
+      "kind": "inventory",
+      "tool": "Decompile",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Refresh",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.decompiler.refresh"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.defined_data",
+      "kind": "inventory",
+      "tool": "Defined Data",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Defined Data",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_data_items",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.defined_data"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.disassembled_view",
+      "kind": "inventory",
+      "tool": "Disassembled View",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Disassembled View",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "disassemble_function",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.disassembled_view"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.entropy",
+      "kind": "inventory",
+      "tool": "Entropy",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Entropy",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_entropy",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.entropy"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.equates",
+      "kind": "inventory",
+      "tool": "Equates Table",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Equates Table",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_equates",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.equates"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.external_programs",
+      "kind": "inventory",
+      "tool": "External Programs",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "External Programs",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_external_locations",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.external_programs"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.function_graph",
+      "kind": "inventory",
+      "tool": "Function Graph",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Function Graph",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_function_call_graph",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.function_graph"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.function_tags",
+      "kind": "inventory",
+      "tool": "Function Tags",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Function Tags",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_function_tags",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.function_tags"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.functions",
+      "kind": "inventory",
+      "tool": "Functions",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Functions",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_functions",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.functions"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.listing",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Listing",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "disassemble_function",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.listing"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.goto_field",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Go To field",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.listing.goto_field"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.marker",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Marker",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.listing.marker"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.settings",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Listing Settings",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.listing.settings"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.memory_map",
+      "kind": "inventory",
+      "tool": "Memory Map",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Memory Map",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_segments",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.memory_map"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.overview",
+      "kind": "inventory",
+      "tool": "Overview",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Overview",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_entropy",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.overview"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree",
+      "kind": "inventory",
+      "tool": "Program Trees",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Program Trees",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_segments",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.program_tree"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.create_folder",
+      "kind": "inventory",
+      "tool": "Program Trees",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Create Folder",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.program_tree.create_folder"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.create_fragment",
+      "kind": "inventory",
+      "tool": "Program Trees",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Create Fragment",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.program_tree.create_fragment"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.create_tree",
+      "kind": "inventory",
+      "tool": "Program Trees",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Create Tree",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.program_tree.create_tree"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.python",
+      "kind": "inventory",
+      "tool": "Python",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Python",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_scripts",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.python"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.registers",
+      "kind": "inventory",
+      "tool": "Register Manager",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Register Manager",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_registers",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.registers"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.relocations",
+      "kind": "inventory",
+      "tool": "Relocation Table",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Relocation Table",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_relocations",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.relocations"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.script_manager",
+      "kind": "inventory",
+      "tool": "Script Manager",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Script Manager",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_list_scripts",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.script_manager"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.strings",
+      "kind": "inventory",
+      "tool": "Defined Strings",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Defined Strings",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_strings",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.strings"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_references",
+      "kind": "inventory",
+      "tool": "Symbol References",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Symbol References",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "get_xrefs_to",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.symbol_references"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_table",
+      "kind": "inventory",
+      "tool": "Symbol Table",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Symbol Table",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_exports",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.symbol_table"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree",
+      "kind": "inventory",
+      "tool": "Symbol Tree",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_body",
+      "label": "Symbol Tree",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "list_namespaces",
+        "action": null,
+        "a11y_id": "ghidra.vibe.provider.symbol_tree"
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.create_class",
+      "kind": "inventory",
+      "tool": "Symbol Tree",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Create Class",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.symbol_tree.create_class"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.create_namespace",
+      "kind": "inventory",
+      "tool": "Symbol Tree",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Create Namespace",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.symbol_tree.create_namespace"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.create_symbol",
+      "kind": "inventory",
+      "tool": "Symbol Tree",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Create Symbol",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.symbol_tree.create_symbol"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.filter_go",
+      "kind": "inventory",
+      "tool": "Symbol Tree",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Apply Filter",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.symbol_tree.filter_go"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.snapshot",
+      "kind": "inventory",
+      "tool": "Symbol Tree",
+      "inventory_tool": "CodeBrowser",
+      "surface": "provider_toolbar",
+      "label": "Capture Symbol Tree",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.provider.symbol_tree.snapshot"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.startup.tip_of_the_day",
+      "kind": "inventory",
+      "tool": "Front End",
+      "inventory_tool": "Project Window",
+      "surface": "startup",
+      "label": "Tip of the Day",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.startup.tip_of_the_day"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.startup.user_agreement",
+      "kind": "inventory",
+      "tool": "Front End",
+      "inventory_tool": "Project Window",
+      "surface": "startup",
+      "label": "User Agreement",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.startup.user_agreement"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.startup.what_s_new_welcome_help",
+      "kind": "inventory",
+      "tool": "Front End",
+      "inventory_tool": "Project Window",
+      "surface": "startup",
+      "label": "What's New / Welcome Help",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.startup.what_s_new_welcome_help"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.startup.workspace_project",
+      "kind": "inventory",
+      "tool": "Front End",
+      "inventory_tool": "Project Window",
+      "surface": "startup",
+      "label": "Workspace/Project",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "gui_a11y",
+      "probe_spec": {
+        "a11y_id": "ghidra.vibe.startup.workspace_project"
+      },
+      "pass_rule": "a11y_catalog_or_gui_state"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.analyze",
+      "kind": "inventory",
+      "tool": "CodeBrowser",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "Auto Analyze",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "run_analysis",
+        "action": "auto_analyze",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.goto",
+      "kind": "inventory",
+      "tool": "CodeBrowser",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "Go To",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "disassemble_function",
+        "action": "goto",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_b",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "B",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "listing_add_bookmark",
+        "action": "listing_add_bookmark",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_d",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "D",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "listing_define_data",
+        "action": "listing_define_data",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_f",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "F",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "listing_create_function",
+        "action": "listing_create_function",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_i",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "I",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "listing_disassemble",
+        "action": "listing_disassemble",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_l",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "L",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "listing_create_label",
+        "action": "listing_create_label",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_u",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "U",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "listing_clear_code",
+        "action": "listing_clear_code",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_v",
+      "kind": "inventory",
+      "tool": "Listing",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "V",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "listing_create_structure",
+        "action": "listing_create_structure",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.mcp_health",
+      "kind": "inventory",
+      "tool": "CodeBrowser",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "Engine Status",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "check_connection",
+        "action": "mcp_health",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.nav_back",
+      "kind": "inventory",
+      "tool": "CodeBrowser",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "Previous Location",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_nav_back",
+        "action": "nav_back",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.nav_fwd",
+      "kind": "inventory",
+      "tool": "CodeBrowser",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "Next Location",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_nav_forward",
+        "action": "nav_fwd",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.redo",
+      "kind": "inventory",
+      "tool": "CodeBrowser",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "Redo",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_redo",
+        "action": "redo",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.save",
+      "kind": "inventory",
+      "tool": "CodeBrowser",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "Save Program",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_proxy_analysis",
+        "action": "save_program",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.start_mcp",
+      "kind": "inventory",
+      "tool": "CodeBrowser",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "Restart Engine",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "analysis",
+        "tool": "check_connection",
+        "action": "start_mcp",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.undo",
+      "kind": "inventory",
+      "tool": "CodeBrowser",
+      "inventory_tool": "CodeBrowser",
+      "surface": "main_toolbar",
+      "label": "Undo",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "mcp",
+      "probe_spec": {
+        "server": "vibe",
+        "tool": "vibe_undo",
+        "action": "undo",
+        "a11y_id": null
+      },
+      "pass_rule": "mcp_success_non_error"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.provider.version_tracking_implied_matches",
+      "kind": "inventory",
+      "tool": "Version Tracking",
+      "inventory_tool": "Version Tracking",
+      "surface": "provider_body",
+      "label": "Version Tracking Implied Matches",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_version_tracking_implied_matches",
+        "a11y_id": "ghidra.vibe.version_tracking.provider.version_tracking_implied_matches"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.provider.version_tracking_markup_items",
+      "kind": "inventory",
+      "tool": "Version Tracking",
+      "inventory_tool": "Version Tracking",
+      "surface": "provider_body",
+      "label": "Version Tracking Markup Items",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_version_tracking_markup_items",
+        "a11y_id": "ghidra.vibe.version_tracking.provider.version_tracking_markup_items"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.provider.version_tracking_matches",
+      "kind": "inventory",
+      "tool": "Version Tracking",
+      "inventory_tool": "Version Tracking",
+      "surface": "provider_body",
+      "label": "Version Tracking Matches",
+      "tier": "m3_engine",
+      "stock": true,
+      "probe": "gui_action",
+      "probe_spec": {
+        "action": "show_version_tracking_matches",
+        "a11y_id": "ghidra.vibe.version_tracking.provider.version_tracking_matches"
+      },
+      "pass_rule": "gui_action_accepted"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.apply_markup",
+      "kind": "inventory",
+      "tool": "Version Tracking",
+      "inventory_tool": "Version Tracking",
+      "surface": "main_toolbar",
+      "label": "Apply Markup",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vt_session",
+        "args": {
+          "op": "apply_markup"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.create_session",
+      "kind": "inventory",
+      "tool": "Version Tracking",
+      "inventory_tool": "Version Tracking",
+      "surface": "main_toolbar",
+      "label": "Create Session",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vt_session",
+        "args": {
+          "op": "create_session"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.run_correlators",
+      "kind": "inventory",
+      "tool": "Version Tracking",
+      "inventory_tool": "Version Tracking",
+      "surface": "main_toolbar",
+      "label": "Run Correlators",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vt_session",
+        "args": {
+          "op": "run_correlators"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.save_session",
+      "kind": "inventory",
+      "tool": "Version Tracking",
+      "inventory_tool": "Version Tracking",
+      "surface": "main_toolbar",
+      "label": "Save Session",
+      "tier": "m2_ui",
+      "stock": true,
+      "probe": "engine",
+      "probe_spec": {
+        "method": "vt_session",
+        "args": {
+          "op": "save_session"
+        },
+        "via": "mcp_or_engine"
+      },
+      "pass_rule": "json_ok_or_applied"
+    }
+  ]
+}

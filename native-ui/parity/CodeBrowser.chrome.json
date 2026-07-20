@@ -1,0 +1,215 @@
+{
+  "tool": "CodeBrowser",
+  "stock": true,
+  "menuBar": [
+    "File",
+    "Edit",
+    "Analysis",
+    "BSim",
+    "Graph",
+    "Navigation",
+    "Search",
+    "Select",
+    "Tools",
+    "Window",
+    "Help"
+  ],
+  "defaultActiveProviders": [
+    "Program Trees",
+    "Symbol Tree",
+    "Data Type Manager",
+    "Listing",
+    "Decompile",
+    "Console"
+  ],
+  "windowMenuProviders": [
+    "Entropy",
+    "Overview",
+    "Bytes",
+    "Defined Data",
+    "Defined Strings",
+    "Equates Table",
+    "External Programs",
+    "Functions",
+    "Relocation Table",
+    "Data Type Preview",
+    "Disassembled View",
+    "Bookmarks",
+    "Script Manager",
+    "Memory Map",
+    "Function Graph",
+    "Register Manager",
+    "Symbol Table",
+    "Symbol References",
+    "Checksum Generator",
+    "Function Tags",
+    "Comments",
+    "Python",
+    "MCP",
+    "Agent",
+    "RAG / JSpace",
+    "Rules",
+    "Shared Cache",
+    "Apple Bundle / IPA",
+    "Swift Classes",
+    "Code Editor"
+  ],
+  "toolbarGroups": [
+    "Previous Location",
+    "Next Location",
+    "Save Program",
+    "Undo",
+    "Redo",
+    "Go To",
+    "Auto Analyze",
+    "MCP Health",
+    "Start MCP",
+    "Shared Cache",
+    "Open App Bundle"
+  ],
+  "listingMnemonicToolbar": ["I", "D", "U", "L", "F", "V", "B"],
+  "providerLocalToolbars": {
+    "Program Trees": [
+      {
+        "id": "ghidra.vibe.provider.program_tree.create_tree",
+        "label": "Create Tree",
+        "hint": "Create a new program tree",
+        "behavior": "wired",
+        "mcp": { "server": "vibe", "tool": "provider_create" }
+      },
+      {
+        "id": "ghidra.vibe.provider.program_tree.create_folder",
+        "label": "Create Folder",
+        "hint": "Create a folder in the program tree",
+        "behavior": "wired",
+        "mcp": { "server": "vibe", "tool": "provider_create" }
+      },
+      {
+        "id": "ghidra.vibe.provider.program_tree.create_fragment",
+        "label": "Create Fragment",
+        "hint": "Create a memory fragment",
+        "behavior": "wired",
+        "mcp": { "server": "vibe", "tool": "provider_create" }
+      }
+    ],
+    "Symbol Tree": [
+      {
+        "id": "ghidra.vibe.provider.symbol_tree.create_namespace",
+        "label": "Create Namespace",
+        "behavior": "wired",
+        "mcp": { "server": "vibe", "tool": "provider_create" }
+      },
+      {
+        "id": "ghidra.vibe.provider.symbol_tree.create_class",
+        "label": "Create Class",
+        "behavior": "wired",
+        "mcp": { "server": "vibe", "tool": "provider_create" }
+      },
+      {
+        "id": "ghidra.vibe.provider.symbol_tree.create_symbol",
+        "label": "Create Symbol",
+        "behavior": "wired",
+        "mcp": { "server": "vibe", "tool": "provider_create" }
+      },
+      {
+        "id": "ghidra.vibe.provider.symbol_tree.snapshot",
+        "label": "Capture Symbol Tree",
+        "mcp": { "server": "analysis", "tool": "list_namespaces" },
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.symbol_tree.filter_go",
+        "label": "Apply Filter",
+        "behavior": "wired"
+      }
+    ],
+    "Data Type Manager": [
+      {
+        "id": "ghidra.vibe.provider.data_types.back",
+        "label": "Previous Data Type",
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.data_types.forward",
+        "label": "Next Data Type",
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.data_types.create",
+        "label": "Create Data Type",
+        "behavior": "wired",
+        "mcp": { "server": "vibe", "tool": "provider_create" }
+      },
+      {
+        "id": "ghidra.vibe.provider.data_types.open_archive",
+        "label": "Open Archive",
+        "mcp": { "server": "analysis", "tool": "list_data_types" },
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.data_types.settings",
+        "label": "Settings",
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.data_types.filter_go",
+        "label": "Apply Filter",
+        "behavior": "wired"
+      }
+    ],
+    "Listing": [
+      {
+        "id": "ghidra.vibe.provider.listing.settings",
+        "label": "Listing Settings",
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.listing.marker",
+        "label": "Marker",
+        "behavior": "wired",
+        "mcp": { "server": "vibe", "tool": "listing_add_bookmark" }
+      },
+      {
+        "id": "ghidra.vibe.provider.listing.goto_field",
+        "label": "Go To",
+        "mcp": { "server": "analysis", "tool": "disassemble_function" },
+        "behavior": "wired"
+      }
+    ],
+    "Decompile": [
+      {
+        "id": "ghidra.vibe.provider.decompiler.refresh",
+        "label": "Refresh",
+        "mcp": { "server": "analysis", "tool": "decompile_function" },
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.decompiler.options",
+        "label": "Decompiler Options",
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.decompiler.export",
+        "label": "Export",
+        "behavior": "wired"
+      }
+    ],
+    "Console": [
+      {
+        "id": "ghidra.vibe.provider.console.lock",
+        "label": "Scroll Lock",
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.console.clear",
+        "label": "Clear Console",
+        "behavior": "wired"
+      },
+      {
+        "id": "ghidra.vibe.provider.console.input",
+        "label": "Console Input",
+        "behavior": "wired"
+      }
+    ]
+  }
+}

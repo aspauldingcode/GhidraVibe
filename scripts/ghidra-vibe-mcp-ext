@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# GhidraVibe MCP extension: Malimite / dyld / rules / RAG / gap / nav tools.
+# Default http://127.0.0.1:8092 — same surface for native UI and Cursor.
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Packaged layout: share/ghidra-vibe/ghidra-vibe-mcp-ext + share/ghidra-vibe/lib/
+# Repo layout: scripts/ghidra-vibe-mcp-ext + scripts/lib/
+for lib in "${SCRIPT_DIR}/lib" "$(cd "${SCRIPT_DIR}/.." && pwd)/lib"; do
+  if [[ -d "${lib}/vibe_mcp" ]]; then
+    export PYTHONPATH="${lib}${PYTHONPATH:+:$PYTHONPATH}"
+    break
+  fi
+done
+HOST="${GHIDRA_VIBE_MCP_EXT_HOST:-127.0.0.1}"
+PORT="${GHIDRA_VIBE_MCP_EXT_PORT:-8092}"
+exec python3 -m vibe_mcp --host "$HOST" --port "$PORT" "$@"

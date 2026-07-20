@@ -1,0 +1,941 @@
+{
+  "version": 2,
+  "tool": "Debugger",
+  "stock": true,
+  "generated_by": "scripts/extract-stock-inventory.py",
+  "count": 58,
+  "counts": {
+    "wired": 58,
+    "disabled_honest": 0
+  },
+  "entries": [
+    {
+      "id": "ghidra.vibe.debugger.provider.bookmarks",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Bookmarks",
+      "hint": "Show Bookmarks",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.breakpoints",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Breakpoints",
+      "hint": "Show Breakpoints",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.bundle_manager",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Bundle Manager",
+      "hint": "Show Bundle Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.bytes",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Bytes",
+      "hint": "Show Bytes",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.checksum",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Checksum Generator",
+      "hint": "Show Checksum Generator",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.comments",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Comments",
+      "hint": "Show Comments",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.connections",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Connections",
+      "hint": "Show Connections",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.console",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Debug Console",
+      "hint": "Show Debug Console",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.console",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Console",
+      "hint": "Show Console",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.data_types",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Data Type Manager",
+      "hint": "Show Data Type Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.datatype_preview",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Data Type Preview",
+      "hint": "Show Data Type Preview",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.decompiler",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Decompile",
+      "hint": "Show Decompile",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.defined_data",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Defined Data",
+      "hint": "Show Defined Data",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.diff_apply_settings",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Diff Apply Settings",
+      "hint": "Show Diff Apply Settings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.diff_details",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Diff Details",
+      "hint": "Show Diff Details",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.disassembled_view",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Disassembled View",
+      "hint": "Show Disassembled View",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.equates",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Equates Table",
+      "hint": "Show Equates Table",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.external_programs",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "External Programs",
+      "hint": "Show External Programs",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_call_graph",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Function Call Graph",
+      "hint": "Show Function Call Graph",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_call_trees",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Function Call Trees",
+      "hint": "Show Function Call Trees",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_graph",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Function Graph",
+      "hint": "Show Function Graph",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_tags",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Function Tags",
+      "hint": "Show Function Tags",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.functions",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Functions",
+      "hint": "Show Functions",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.instruction_info",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Instruction Info",
+      "hint": "Show Instruction Info",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.listing",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Dynamic",
+      "hint": "Show Dynamic",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.listing",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Listing",
+      "hint": "Show Listing",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memory",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Memory",
+      "hint": "Show Memory",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memory_map",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Memory Map",
+      "hint": "Show Memory Map",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memory_range_mappings",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Memory Range Mappings",
+      "hint": "Show Memory Range Mappings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memview",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Memview",
+      "hint": "Show Memview",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.model",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Model",
+      "hint": "Show Model",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.modules",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Modules",
+      "hint": "Show Modules",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.pcode_stepper",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Pcode Stepper",
+      "hint": "Show Pcode Stepper",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.program_tree",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Program Trees",
+      "hint": "Show Program Trees",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.python",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Python",
+      "hint": "Show Python",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.regions",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Regions",
+      "hint": "Show Regions",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.registers",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Registers",
+      "hint": "Show Registers",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.registers",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Register Manager",
+      "hint": "Show Register Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.relocations",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Relocation Table",
+      "hint": "Show Relocation Table",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.script_manager",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Script Manager",
+      "hint": "Show Script Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.stack",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Stack",
+      "hint": "Show Stack",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.static_mappings",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Static Mappings",
+      "hint": "Show Static Mappings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.strings",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Defined Strings",
+      "hint": "Show Defined Strings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.symbol_references",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Symbol References",
+      "hint": "Show Symbol References",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.symbol_table",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Symbol Table",
+      "hint": "Show Symbol Table",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.symbol_tree",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Symbol Tree",
+      "hint": "Show Symbol Tree",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.terminal",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Terminal",
+      "hint": "Show Terminal",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.threads",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Threads",
+      "hint": "Show Threads",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.time",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Time",
+      "hint": "Show Time",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.watches",
+      "surface": "provider_body",
+      "owner": "Debugger",
+      "label": "Watches",
+      "hint": "Show Watches",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.interrupt",
+      "surface": "main_toolbar",
+      "owner": "Debugger",
+      "label": "Interrupt",
+      "hint": "Interrupt",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.launch",
+      "surface": "main_toolbar",
+      "owner": "Debugger",
+      "label": "Launch",
+      "hint": "Launch",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.resume",
+      "surface": "main_toolbar",
+      "owner": "Debugger",
+      "label": "Resume",
+      "hint": "Resume",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.save",
+      "surface": "main_toolbar",
+      "owner": "Debugger",
+      "label": "Save",
+      "hint": "Save",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.step_into",
+      "surface": "main_toolbar",
+      "owner": "Debugger",
+      "label": "Step Into",
+      "hint": "Step Into",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.step_out",
+      "surface": "main_toolbar",
+      "owner": "Debugger",
+      "label": "Step Out",
+      "hint": "Step Out",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.step_over",
+      "surface": "main_toolbar",
+      "owner": "Debugger",
+      "label": "Step Over",
+      "hint": "Step Over",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.tracermi_connect",
+      "surface": "main_toolbar",
+      "owner": "Debugger",
+      "label": "TraceRmi Connect",
+      "hint": "TraceRmi Connect",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Full Malimite-parity Apple / IPA workflow for GhidraVibe.
+# Thin wrapper around: PYTHONPATH=scripts/lib python3 -m malimite …
+#
+# See docs/APPLE.md and https://github.com/LaurieWired/Malimite
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+export PYTHONPATH="${ROOT}/scripts/lib${PYTHONPATH:+:$PYTHONPATH}"
+export GHIDRA_VIBE_SCRIPT_PATH="${GHIDRA_VIBE_SCRIPT_PATH:-$ROOT/ghidra_scripts}"
+
+PY=(python3 -m malimite)
+
+usage() {
+  cat <<'EOF'
+Usage (Malimite parity):
+  ghidra-vibe-apple unpack --ipa PATH [--out DIR]
+  ghidra-vibe-apple find-bin --app PATH | --ipa PATH
+  ghidra-vibe-apple info --app PATH
+  ghidra-vibe-apple resources --app PATH | --dir PATH
+  ghidra-vibe-apple harvest --root PATH --db FILE
+  ghidra-vibe-apple decode-plist --file PATH
+  ghidra-vibe-apple libraries list|add|remove|reset …
+  ghidra-vibe-apple analyze PATH|--input PATH [--project DIR] [--db FILE]
+  ghidra-vibe-apple import --app|--ipa|--bin PATH [--project DIR]
+  ghidra-vibe-apple db init|stats|classes|functions|search|strings|resources|refs …
+  ghidra-vibe-apple translate --action auto_fix|summarize|find_vulnerabilities --code-file F
+
+Full analyze = unpack + Info.plist + resource harvest + ImportAppleBundle
+  + DumpClassDataVibe (skip libs) + entrypoints + function refs → SQLite.
+EOF
+}
+
+run_analyze() {
+  local input="" project="$ROOT/ghidra-vibe-projects/MalimiteImport" db=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --input) input="$2"; shift 2 ;;
+      --project) project="$2"; shift 2 ;;
+      --db) db="$2"; shift 2 ;;
+      --headless|--scripts-dir) shift 2 ;;
+      -*) shift ;;
+      *)
+        if [[ -z "$input" ]]; then input="$1"; fi
+        shift
+        ;;
+    esac
+  done
+  [[ -n "$input" ]] || { echo "analyze: path required" >&2; exit 1; }
+  db="${db:-$project/malimite.db}"
+  mkdir -p "$project"
+  exec "${PY[@]}" analyze "$input" --project "$project" --db "$db"
+}
+
+main() {
+  local cmd="${1:-}"
+  shift || true
+  case "$cmd" in
+    -h|--help|help|"") usage; exit 0 ;;
+    unpack|find-bin|info|resources|harvest|decode-plist|libraries|db|translate|import-dump)
+      exec "${PY[@]}" "$cmd" "$@"
+      ;;
+    analyze)
+      run_analyze "$@"
+      ;;
+    import)
+      local input="" project="$ROOT/ghidra-vibe-projects/MalimiteImport"
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --ipa|--app|--bin) input="$2"; shift 2 ;;
+          --project) project="$2"; shift 2 ;;
+          --program) shift 2 ;;
+          *) shift ;;
+        esac
+      done
+      [[ -n "$input" ]] || { echo "--ipa|--app|--bin required" >&2; exit 1; }
+      run_analyze --input "$input" --project "$project"
+      ;;
+    *)
+      exec "${PY[@]}" "$cmd" "$@"
+      ;;
+  esac
+}
+
+main "$@"

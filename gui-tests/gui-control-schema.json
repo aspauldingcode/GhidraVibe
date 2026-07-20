@@ -1,0 +1,21 @@
+{
+  "service": "ghidra-vibe-gui",
+  "baseUrlEnv": "GHIDRA_VIBE_GUI_URL",
+  "defaultBaseUrl": "http://127.0.0.1:8091",
+  "routes": [
+    { "method": "GET", "path": "/health" },
+    { "method": "GET", "path": "/state" },
+    { "method": "POST", "path": "/navigate", "body": { "pane": "string" } },
+    { "method": "POST", "path": "/select_function", "body": { "name": "string", "address": "string", "id": "string" } },
+    { "method": "POST", "path": "/search", "body": { "query": "string" } },
+    { "method": "POST", "path": "/action", "body": { "id": "string" } },
+    { "method": "GET", "path": "/dyld/caches" },
+    { "method": "POST", "path": "/dyld/list", "body": { "query": "string" } },
+    { "method": "POST", "path": "/dyld/open", "body": { "image": "string", "analyze": "bool?", "project": "string?", "project_name": "string?" } },
+    { "method": "POST", "path": "/refresh_classes", "body": {} },
+    { "method": "GET", "path": "/rag/stats" },
+    { "method": "POST", "path": "/rag/index" },
+    { "method": "POST", "path": "/rag/discover", "body": { "query": "string" } },
+    { "method": "GET", "path": "/a11y/catalog" }
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "version": 1,
+  "menus": [
+    {
+      "id": "file",
+      "label": "File",
+      "items": [
+        {
+          "id": "file.new_project",
+          "title": "New Project…",
+          "action": "new_project"
+        },
+        {
+          "id": "file.open_project",
+          "title": "Open Project…",
+          "action": "open_project",
+          "shortcut": "o",
+          "modifiers": ["command"]
+        },
+        {
+          "id": "file.import",
+          "title": "Import File…",
+          "action": "import_file",
+          "shortcut": "i",
+          "modifiers": ["command", "shift"]
+        },
+        {
+          "id": "file.open_framework_from_dsc",
+          "title": "Open Framework from Shared Cache…",
+          "action": "open_framework_from_dsc",
+          "shortcut": "o",
+          "modifiers": ["command", "shift"]
+        },
+        {
+          "id": "file.open_app_bundle",
+          "title": "Open App Bundle…",
+          "action": "open_app_bundle"
+        },
+        {
+          "id": "file.import_apple",
+          "title": "Analyze App Bundle…",
+          "action": "import_apple"
+        },
+        {
+          "id": "file.open_shared_cache",
+          "title": "Browse Shared Cache…",
+          "action": "open_shared_cache"
+        },
+        {
+          "id": "file.save",
+          "title": "Save Program",
+          "action": "save_program",
+          "shortcut": "s",
+          "modifiers": ["command"]
+        },
+        {
+          "id": "file.close",
+          "title": "Close Program",
+          "action": "close_program"
+        }
+      ]
+    },
+    {
+      "id": "edit",
+      "label": "Edit",
+      "items": [
+        { "id": "edit.undo", "title": "Undo", "action": "undo" },
+        { "id": "edit.redo", "title": "Redo", "action": "redo" },
+        { "id": "edit.cut", "title": "Cut", "action": "edit_cut" },
+        { "id": "edit.copy", "title": "Copy", "action": "edit_copy" },
+        { "id": "edit.paste", "title": "Paste", "action": "edit_paste" }
+      ]
+    },
+    {
+      "id": "project",
+      "label": "Project",
+      "frontEndOnly": true,
+      "items": [
+        { "id": "project.workspace", "title": "Select Project / Workspace…", "action": "show_workspace" },
+        { "id": "project.window", "title": "Project Window", "action": "show_project" }
+      ]
+    },
+    {
+      "id": "analysis",
+      "label": "Analysis",
+      "items": [
+        { "id": "analysis.auto_analyze", "title": "Auto Analyze…", "action": "auto_analyze" }
+      ]
+    },
+    {
+      "id": "bsim",
+      "label": "BSim",
+      "items": [
+        { "id": "bsim.search", "title": "BSim Search…", "action": "bsim_search" },
+        { "id": "bsim.overview", "title": "BSim Overview", "action": "bsim_overview" }
+      ]
+    },
+    {
+      "id": "graph",
+      "label": "Graph",
+      "items": [
+        { "id": "graph.function", "title": "Function Graph", "action": "show_function_graph" }
+      ]
+    },
+    {
+      "id": "navigation",
+      "label": "Navigation",
+      "items": [
+        {
+          "id": "navigation.goto",
+          "title": "Go To…",
+          "action": "goto",
+          "shortcut": "g",
+          "modifiers": ["command", "shift"]
+        },
+        { "id": "navigation.prev", "title": "Previous Location", "action": "nav_back" },
+        { "id": "navigation.next", "title": "Next Location", "action": "nav_fwd" }
+      ]
+    },
+    {
+      "id": "search",
+      "label": "Search",
+      "items": [
+        { "id": "search.strings", "title": "For Strings…", "action": "search_strings" },
+        { "id": "search.functions", "title": "For Functions…", "action": "search_functions" },
+        { "id": "search.memory", "title": "Memory…", "action": "search_memory" }
+      ]
+    },
+    {
+      "id": "select",
+      "label": "Select",
+      "items": [
+        { "id": "select.clear", "title": "Clear Selection", "action": "clear_selection" }
+      ]
+    },
+    {
+      "id": "tools",
+      "label": "Tools",
+      "items": [
+        { "id": "tools.start_mcp", "title": "Start Analysis MCP", "action": "start_mcp" },
+        { "id": "tools.mcp_health", "title": "MCP Health", "action": "mcp_health" },
+        {
+          "id": "tools.codebrowser",
+          "title": "CodeBrowser",
+          "action": "show_codebrowser",
+          "frontEndOnly": true
+        }
+      ]
+    },
+    {
+      "id": "window",
+      "label": "Window",
+      "items": [
+        { "id": "window.project", "title": "Project Window", "action": "show_project" },
+        { "id": "window.codebrowser", "title": "CodeBrowser", "action": "show_codebrowser" },
+        { "id": "window.program_tree", "title": "Program Trees", "action": "show_program_tree" },
+        { "id": "window.symbol_tree", "title": "Symbol Tree", "action": "show_symbol_tree" },
+        { "id": "window.data_types", "title": "Data Type Manager", "action": "show_data_types" },
+        { "id": "window.listing", "title": "Listing", "action": "show_listing" },
+        { "id": "window.decompiler", "title": "Decompile", "action": "show_decompiler" },
+        { "id": "window.console", "title": "Console", "action": "show_console" },
+        { "id": "window.datatype_preview", "title": "Data Type Preview", "action": "show_datatype_preview" },
+        { "id": "window.disassembled_view", "title": "Disassembled View", "action": "show_disassembled_view" },
+        { "id": "window.entropy", "title": "Entropy", "action": "show_entropy" },
+        { "id": "window.overview", "title": "Overview", "action": "show_overview" },
+        { "id": "window.bytes", "title": "Bytes", "action": "show_bytes" },
+        { "id": "window.defined_data", "title": "Defined Data", "action": "show_defined_data" },
+        { "id": "window.strings", "title": "Defined Strings", "action": "show_strings" },
+        { "id": "window.equates", "title": "Equates Table", "action": "show_equates" },
+        { "id": "window.external_programs", "title": "External Programs", "action": "show_external_programs" },
+        { "id": "window.functions", "title": "Functions", "action": "show_functions" },
+        { "id": "window.relocations", "title": "Relocation Table", "action": "show_relocations" },
+        { "id": "window.bookmarks", "title": "Bookmarks", "action": "show_bookmarks" },
+        { "id": "window.script_manager", "title": "Script Manager", "action": "show_script_manager" },
+        { "id": "window.memory_map", "title": "Memory Map", "action": "show_memory_map" },
+        { "id": "window.function_graph", "title": "Function Graph", "action": "show_function_graph" },
+        { "id": "window.registers", "title": "Register Manager", "action": "show_registers" },
+        { "id": "window.symbol_table", "title": "Symbol Table", "action": "show_symbol_table" },
+        { "id": "window.symbol_references", "title": "Symbol References", "action": "show_symbol_references" },
+        { "id": "window.checksum", "title": "Checksum Generator", "action": "show_checksum" },
+        { "id": "window.function_tags", "title": "Function Tags", "action": "show_function_tags" },
+        { "id": "window.comments", "title": "Comments", "action": "show_comments" },
+        { "id": "window.python", "title": "Python", "action": "show_python" },
+        { "id": "window.mcp", "title": "MCP", "action": "show_mcp" },
+        { "id": "window.agent", "title": "Agent", "action": "show_agent" },
+        { "id": "window.rag", "title": "RAG / JSpace", "action": "show_rag" },
+        { "id": "window.rules", "title": "Rules", "action": "show_rules" },
+        { "id": "window.dsc", "title": "Shared Cache", "action": "show_dsc" },
+        { "id": "window.apple", "title": "Apple Bundle / IPA", "action": "show_apple" },
+        { "id": "window.swift_classes", "title": "Swift Classes", "action": "show_swift_classes" },
+        { "id": "window.code_editor", "title": "Code Editor", "action": "show_code_editor" }
+      ]
+    },
+    {
+      "id": "help",
+      "label": "Help",
+      "items": [
+        { "id": "help.ghidra", "title": "GhidraVibe Help…", "action": "show_help" },
+        { "id": "help.tip", "title": "Tip of the Day…", "action": "tip_of_the_day" },
+        { "id": "help.headless", "title": "Headless Help", "action": "headless_help" }
+      ]
+    },
+    {
+      "id": "app",
+      "label": "GhidraVibe",
+      "items": [
+        { "id": "app.about", "title": "About GhidraVibe", "action": "about" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,416 @@
+{
+  "tool": "Emulator",
+  "stock": true,
+  "menuBar": [
+    "File",
+    "Edit",
+    "Analysis",
+    "Emulator",
+    "Graph",
+    "Navigation",
+    "Search",
+    "Select",
+    "Tools",
+    "Window",
+    "Help"
+  ],
+  "defaultActiveProviders": [
+    "Data Type Manager",
+    "Program Trees",
+    "Symbol Tree",
+    "Debug Console",
+    "Model",
+    "Dynamic",
+    "Listing",
+    "Decompile"
+  ],
+  "windowMenuProviders": [
+    "Bytes",
+    "Defined Data",
+    "Defined Strings",
+    "Equates Table",
+    "External Programs",
+    "Functions",
+    "Relocation Table",
+    "Modules",
+    "Registers",
+    "Breakpoints",
+    "Interpreter",
+    "Data Type Preview",
+    "Disassembled View",
+    "Bookmarks",
+    "Function Call Trees",
+    "Regions",
+    "Stack",
+    "Console",
+    "Watches",
+    "Threads",
+    "Time",
+    "Pcode Stepper",
+    "Script Manager",
+    "Memory Map",
+    "Function Graph",
+    "Register Manager",
+    "Symbol Table",
+    "Symbol References",
+    "Checksum Generator",
+    "Function Tags",
+    "Comments",
+    "Python",
+    "Function Call Graph",
+    "Memory Range Mappings",
+    "Bundle Manager",
+    "Objects",
+    "Static Mappings",
+    "Memview",
+    "Memory",
+    "Jython"
+  ],
+  "providers": [
+    {
+      "title": "Data Type Manager",
+      "owner": "DataTypeManagerPlugin",
+      "name": "DataTypes Provider",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Program Trees",
+      "owner": "ProgramTreePlugin",
+      "name": "Program Tree",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Symbol Tree",
+      "owner": "SymbolTreePlugin",
+      "name": "Symbol Tree",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Debug Console",
+      "owner": "DebuggerConsolePlugin",
+      "name": "Debug Console",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Model",
+      "owner": "DebuggerModelPlugin",
+      "name": "Model",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Dynamic",
+      "owner": "DebuggerListingPlugin",
+      "name": "Listing",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Listing",
+      "owner": "CodeBrowserPlugin",
+      "name": "Listing",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Decompile",
+      "owner": "DecompilePlugin",
+      "name": "Decompiler",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Bytes",
+      "owner": "ByteViewerPlugin",
+      "name": "Bytes",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Defined Data",
+      "owner": "DataWindowPlugin",
+      "name": "Data Window",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Defined Strings",
+      "owner": "ViewStringsPlugin",
+      "name": "Defined Strings",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Equates Table",
+      "owner": "EquateTablePlugin",
+      "name": "Equates Table",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "External Programs",
+      "owner": "ReferencesPlugin",
+      "name": "External Programs",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Functions",
+      "owner": "FunctionWindowPlugin",
+      "name": "Functions Window",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Relocation Table",
+      "owner": "RelocationTablePlugin",
+      "name": "Relocation Table",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Modules",
+      "owner": "DebuggerModulesPlugin",
+      "name": "Modules",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Registers",
+      "owner": "DebuggerRegistersPlugin",
+      "name": "Registers",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Breakpoints",
+      "owner": "DebuggerBreakpointsPlugin",
+      "name": "Breakpoints",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Interpreter",
+      "owner": "InterpreterPanelPlugin",
+      "name": "DebuggerInterpreterPlugin",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Data Type Preview",
+      "owner": "DataTypePreviewPlugin",
+      "name": "Data Type Preview",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Disassembled View",
+      "owner": "DisassembledViewPlugin",
+      "name": "Virtual Disassembler - Current Instruction",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Bookmarks",
+      "owner": "BookmarkPlugin",
+      "name": "Bookmarks",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Function Call Trees",
+      "owner": "CallTreePlugin",
+      "name": "Function Call Trees",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Regions",
+      "owner": "DebuggerRegionsPlugin",
+      "name": "Regions",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Stack",
+      "owner": "DebuggerStackPlugin",
+      "name": "Stack",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Console",
+      "owner": "ConsolePlugin",
+      "name": "Console",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Watches",
+      "owner": "DebuggerWatchesPlugin",
+      "name": "Watches",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Threads",
+      "owner": "DebuggerThreadsPlugin",
+      "name": "Threads",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Time",
+      "owner": "DebuggerTimePlugin",
+      "name": "Time",
+      "active_default": true,
+      "stock": true
+    },
+    {
+      "title": "Pcode Stepper",
+      "owner": "DebuggerPcodeStepperPlugin",
+      "name": "Pcode Stepper",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Script Manager",
+      "owner": "GhidraScriptMgrPlugin",
+      "name": "Script Manager",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Memory Map",
+      "owner": "MemoryMapPlugin",
+      "name": "Memory Map",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Function Graph",
+      "owner": "FunctionGraphPlugin",
+      "name": "Function Graph",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Register Manager",
+      "owner": "RegisterPlugin",
+      "name": "Register Manager",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Symbol Table",
+      "owner": "SymbolTablePlugin",
+      "name": "Symbol Table",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Symbol References",
+      "owner": "SymbolTablePlugin",
+      "name": "Symbol References",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Checksum Generator",
+      "owner": "ComputeChecksumsPlugin",
+      "name": "Checksum Generator",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Function Tags",
+      "owner": "FunctionTagPlugin",
+      "name": "Function Tags",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Comments",
+      "owner": "CommentWindowPlugin",
+      "name": "Comment Window",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Python",
+      "owner": "InterpreterPanelPlugin",
+      "name": "Python",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Function Call Graph",
+      "owner": "FunctionCallGraphPlugin",
+      "name": "Function Call Graph",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Memory Range Mappings",
+      "owner": "DebuggerStaticMappingPlugin",
+      "name": "Memory Range Mappings",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Bundle Manager",
+      "owner": "GhidraScriptMgrPlugin",
+      "name": "BundleManager",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Objects",
+      "owner": "DebuggerTimelinePlugin",
+      "name": "Objects",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Static Mappings",
+      "owner": "DebuggerStaticMappingPlugin",
+      "name": "Static Mappings",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Memview",
+      "owner": "DebuggerMemviewPlugin",
+      "name": "Memview",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Memory",
+      "owner": "DebuggerMemoryBytesPlugin",
+      "name": "Memory",
+      "active_default": false,
+      "stock": true
+    },
+    {
+      "title": "Jython",
+      "owner": "InterpreterPanelPlugin",
+      "name": "Jython",
+      "active_default": false,
+      "stock": true
+    }
+  ],
+  "source": "defaultTools/Emulator.tool",
+  "toolbarGroups": [
+    "Emulate",
+    "Step",
+    "Skip",
+    "Finish",
+    "Interrupt",
+    "Save"
+  ]
+}

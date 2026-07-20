@@ -1,0 +1,12 @@
+# Linux GTK a11y smoke (AT-SPI / agent-device linux driver).
+context platform=linux timeout=120000
+env APP_TARGET="${APP_TARGET:-ghidra-vibe}"
+open "${APP_TARGET}" --relaunch
+wait "id=\"ghidra.vibe.root\" || label=GhidraVibe" 20000
+snapshot -i
+is exists "id=\"ghidra.vibe.toolbar.mcp_health\" || label=\"MCP Health\""
+is exists "id=\"ghidra.vibe.project\" || label=Project"
+is exists "id=\"ghidra.vibe.status.message\""
+click "id=\"ghidra.vibe.toolbar.mcp_health\" || label=\"MCP Health\""
+wait "id=\"ghidra.vibe.status.mcp\"" 5000
+close

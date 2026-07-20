@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Headless launcher with auto RAM-aware MAXMEM + forced AWT headless.
+# Stock nixpkgs analyzeHeadless hardcodes MAXMEM=2G (too small for DSC slide fixups).
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=lib/detect-maxmem.sh
+source "${SCRIPT_DIR}/lib/detect-maxmem.sh"
+MEM="$(detect_ghidra_maxmem)"
+VMARG_LIST="${GHIDRA_VIBE_VMARGS:--XX:ParallelGCThreads=2 -XX:CICompilerCount=2 -Djava.awt.headless=true -Dghidra.vibe.nativeUi=1 }"
+
+resolve_support_dir() {
+  if [[ -n "${GHIDRA_INSTALL_DIR:-}" && -x "${GHIDRA_INSTALL_DIR}/support/launch.sh" ]]; then
+    echo "${GHIDRA_INSTALL_DIR}/support"
+    return
+  fi
+  local ah
+  ah="$(command -v ghidra-analyzeHeadless || true)"
+  if [[ -n "$ah" ]]; then
+    local real
+    real="$(readlink -f "$ah" 2>/dev/null || readlink "$ah" 2>/dev/null || echo "$ah")"
+    echo "$(cd "$(dirname "$real")" && pwd)"
+    return
+  fi
+  echo "Cannot locate Ghidra support/ (set GHIDRA_INSTALL_DIR)" >&2
+  exit 1
+}
+
+SUPPORT="$(resolve_support_dir)"
+echo "ghidra-vibe-analyzeHeadless MAXMEM=$MEM (auto unless GHIDRA_VIBE_MAXMEM set) support=$SUPPORT" >&2
+exec "$SUPPORT/launch.sh" fg jdk Ghidra-Headless "$MEM" "$VMARG_LIST" \
+  ghidra.app.util.headless.AnalyzeHeadless "$@"

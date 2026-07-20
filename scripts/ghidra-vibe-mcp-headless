@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+# True headless program-engine API (GhidraMCPHeadlessServer) — separate JVM for
+# agents, batch, and GHIDRA_VIBE_ENGINE=sidecar. The native GUI embeds the same
+# server in-process via libghidravibe_engine (default GHIDRA_VIBE_ENGINE=inprocess).
+# Usage: ghidra-vibe-mcp-headless [--port 8089] [--project PATH] [--program NAME] ...
+set -euo pipefail
+
+# When nix copies this script alone into the store, dirname($0) is /nix/store —
+# never look only next to $0. Prefer GHIDRA_VIBE_LIB / packaged share tree.
+resolve_vibe_lib() {
+  local d cand
+  if [[ -n "${GHIDRA_VIBE_LIB:-}" && -f "${GHIDRA_VIBE_LIB}/detect-maxmem.sh" ]]; then
+    echo "${GHIDRA_VIBE_LIB}"
+    return 0
+  fi
+  d="$(cd "$(dirname "$0")" && pwd)"
+  for cand in \
+    "${d}/lib/detect-maxmem.sh" \
+    "${d}/../share/ghidra-vibe/lib/detect-maxmem.sh" \
+    "${d}/../lib/detect-maxmem.sh"
+  do
+    if [[ -f "$cand" ]]; then
+      echo "$(cd "$(dirname "$cand")" && pwd)"
+      return 0
+    fi
+  done
+  # GHIDRA_INSTALL_DIR is $out/lib/ghidra → share lives at $out/share/ghidra-vibe/lib
+  if [[ -n "${GHIDRA_INSTALL_DIR:-}" && -f "${GHIDRA_INSTALL_DIR}/../../share/ghidra-vibe/lib/detect-maxmem.sh" ]]; then
+    echo "$(cd "${GHIDRA_INSTALL_DIR}/../../share/ghidra-vibe/lib" && pwd)"
+    return 0
+  fi
+  echo "detect-maxmem.sh not found (set GHIDRA_VIBE_LIB)" >&2
+  exit 1
+}
+
+VIBE_LIB="$(resolve_vibe_lib)"
+# shellcheck source=lib/detect-maxmem.sh
+source "${VIBE_LIB}/detect-maxmem.sh"
+MEM="$(detect_ghidra_maxmem)"
+# AWT headless=true: engine JVM has no Swing window (native UI is the GUI).
+VMARG_LIST="${GHIDRA_VIBE_VMARGS:--XX:ParallelGCThreads=2 -XX:CICompilerCount=2 -Djava.awt.headless=true -Dghidra.vibe.nativeUi=1 }"
+
+# Isolate settings so ~/Library/ghidra/*/Extensions/GhidraMCP cannot collide with
+# the bundled Extensions/GhidraMCP in GHIDRA_INSTALL_DIR (in-process + headless).
+VIBE_SETTINGS="${GHIDRA_VIBE_SETTINGS_DIR:-$HOME/Library/ghidra-vibe/settings}"
+mkdir -p "${VIBE_SETTINGS}"
+VMARG_LIST="${VMARG_LIST} -Dapplication.settingsdir=${VIBE_SETTINGS} "
+
+# Pre-accept so Java never raises Swing UserAgreementDialog (native UI owns consent).
+seed_pref() {
+  local pref="$1"
+  mkdir -p "$(dirname "$pref")"
+  if [[ -f "$pref" ]] && grep -q '^USER_AGREEMENT=ACCEPT' "$pref" 2>/dev/null; then
+    return 0
+  fi
+  if [[ -f "$pref" ]]; then
+    grep -v '^USER_AGREEMENT=' "$pref" >"${pref}.tmp" 2>/dev/null || true
+    echo 'USER_AGREEMENT=ACCEPT' >>"${pref}.tmp"
+    mv "${pref}.tmp" "$pref"
+  else
+    echo 'USER_AGREEMENT=ACCEPT' >"$pref"
+  fi
+}
+seed_pref "${VIBE_SETTINGS}/preferences"
+for pref in "$HOME"/Library/ghidra/*/preferences; do
+  [[ -f "$pref" ]] || continue
+  seed_pref "$pref"
+done
+
+resolve_ghidra_home() {
+  if [[ -n "${GHIDRA_INSTALL_DIR:-}" && -x "${GHIDRA_INSTALL_DIR}/support/launch.sh" ]]; then
+    echo "${GHIDRA_INSTALL_DIR}"
+    return
+  fi
+  if [[ -n "${GHIDRA_VIBE_BIN:-}" ]]; then
+    local real
+    real="$(readlink -f "${GHIDRA_VIBE_BIN}" 2>/dev/null || readlink "${GHIDRA_VIBE_BIN}" 2>/dev/null || echo "${GHIDRA_VIBE_BIN}")"
+    echo "$(cd "$(dirname "$real")/../lib/ghidra" 2>/dev/null && pwd)"
+    return
+  fi
+  echo "Set GHIDRA_INSTALL_DIR to a vibe Ghidra tree" >&2
+  exit 1
+}
+
+SRC="$(resolve_ghidra_home)"
+MCP_JAR="$(find "${SRC}/Ghidra/Extensions/GhidraMCP/lib" -name 'GhidraMCP-*.jar' 2>/dev/null | head -1 || true)"
+if [[ -z "${MCP_JAR}" || ! -f "${MCP_JAR}" ]]; then
+  echo "GhidraMCP jar not found under ${SRC}/Ghidra/Extensions/GhidraMCP/lib" >&2
+  exit 1
+fi
+
+RUNTIME="${GHIDRA_VIBE_RUNTIME_HOME:-${TMPDIR:-/tmp}/ghidra-vibe-runtime-$$}"
+if [[ ! -x "${RUNTIME}/support/launch.sh" ]]; then
+  rm -rf "${RUNTIME}"
+  mkdir -p "${RUNTIME}/Ghidra/patch"
+  # Symlink install; materialize patch/ with MCP jar for early classpath.
+  for name in "${SRC}"/*; do
+    base="$(basename "$name")"
+    if [[ "$base" == "Ghidra" ]]; then
+      mkdir -p "${RUNTIME}/Ghidra"
+      for n2 in "${SRC}/Ghidra"/*; do
+        b2="$(basename "$n2")"
+        if [[ "$b2" == "patch" ]]; then
+          cp -f "${MCP_JAR}" "${RUNTIME}/Ghidra/patch/$(basename "${MCP_JAR}")"
+        else
+          ln -sfn "$n2" "${RUNTIME}/Ghidra/${b2}"
+        fi
+      done
+    else
+      ln -sfn "$name" "${RUNTIME}/${base}"
+    fi
+  done
+fi
+
+# Headless provider expects project-relative paths like /AppKit, not bare AppKit.
+args=()
+while [[ $# -gt 0 ]]; do
+  if [[ "$1" == "--program" && $# -ge 2 && "$2" != /* && "$2" != -* ]]; then
+    args+=(--program "/$2")
+    shift 2
+  else
+    args+=("$1")
+    shift
+  fi
+done
+
+echo "ghidra-vibe-mcp-headless MAXMEM=$MEM runtime=$RUNTIME" >&2
+# Ensure MCP jar is always in patch/ even when RUNTIME is reused.
+mkdir -p "${RUNTIME}/Ghidra/patch"
+cp -f "${MCP_JAR}" "${RUNTIME}/Ghidra/patch/$(basename "${MCP_JAR}")"
+# Application name must be a known Ghidra layout ("Ghidra") so patch/ + Extensions
+# land on the launcher classpath. "Ghidra-MCP-Headless" is not a stock app id and
+# yields ClassNotFound for the headless server main.
+# With `set -u`, empty "${args[@]}" is an unbound error — expand only when set.
+exec "${RUNTIME}/support/launch.sh" fg jdk Ghidra "$MEM" "$VMARG_LIST" \
+  com.xebyte.headless.GhidraMCPHeadlessServer ${args[@]+"${args[@]}"}

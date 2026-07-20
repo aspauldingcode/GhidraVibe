@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "description": "CI-enforced stock gaps (disabled_honest or depth shell/partial). Ratchet max_stock_disabled down as waves land.",
+  "max_stock_disabled": 0,
+  "gaps": []
+}

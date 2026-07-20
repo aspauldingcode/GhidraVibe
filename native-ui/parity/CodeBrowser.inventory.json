@@ -1,0 +1,2604 @@
+{
+  "version": 2,
+  "tool": "CodeBrowser",
+  "stock": true,
+  "generated_by": "scripts/extract-stock-inventory.py",
+  "count": 146,
+  "counts": {
+    "wired": 133,
+    "disabled_honest": 13,
+    "stock": 131,
+    "m2_ui": 73,
+    "m3_engine": 60,
+    "m1": 0
+  },
+  "entries": [
+    {
+      "id": "ghidra.vibe.menu.analysis.auto_analyze",
+      "surface": "menubar",
+      "owner": "Analysis",
+      "label": "Auto Analyze\u2026",
+      "hint": "Run auto analysis",
+      "mcp": {
+        "server": "analysis",
+        "tool": "run_analysis"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.app.about",
+      "surface": "menubar",
+      "owner": "GhidraVibe",
+      "label": "About GhidraVibe",
+      "hint": "About GhidraVibe",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.bsim.overview",
+      "surface": "menubar",
+      "owner": "BSim",
+      "label": "BSim Overview",
+      "hint": "BSim overview (requires BSim)",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.bsim.search",
+      "surface": "menubar",
+      "owner": "BSim",
+      "label": "BSim Search\u2026",
+      "hint": "BSim similarity search (requires BSim)",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.copy",
+      "surface": "menubar",
+      "owner": "Edit",
+      "label": "Copy",
+      "hint": "Copy",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.cut",
+      "surface": "menubar",
+      "owner": "Edit",
+      "label": "Cut",
+      "hint": "Cut",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.paste",
+      "surface": "menubar",
+      "owner": "Edit",
+      "label": "Paste",
+      "hint": "Paste",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.redo",
+      "surface": "menubar",
+      "owner": "Edit",
+      "label": "Redo",
+      "hint": "Redo",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_redo"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.undo",
+      "surface": "menubar",
+      "owner": "Edit",
+      "label": "Undo",
+      "hint": "Undo",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_undo"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.close",
+      "surface": "menubar",
+      "owner": "File",
+      "label": "Close Program",
+      "hint": "Close the current program",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.import",
+      "surface": "menubar",
+      "owner": "File",
+      "label": "Import File\u2026",
+      "hint": "Import a program into the project",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.import_apple",
+      "surface": "menubar",
+      "owner": "File",
+      "label": "Import IPA / App Bundle\u2026",
+      "hint": "Import IPA / App Bundle\u2026",
+      "mcp": {
+        "server": "vibe",
+        "tool": "malimite_analyze"
+      },
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.new_project",
+      "surface": "menubar",
+      "owner": "File",
+      "label": "New Project\u2026",
+      "hint": "New Project\u2026",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.open_app_bundle",
+      "surface": "menubar",
+      "owner": "File",
+      "label": "Open App Bundle\u2026",
+      "hint": "Open whole macOS .app / IPA as a bundle",
+      "mcp": {
+        "server": "vibe",
+        "tool": "malimite_open_bundle"
+      },
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.open_project",
+      "surface": "menubar",
+      "owner": "File",
+      "label": "Open Project\u2026",
+      "hint": "Open a Ghidra project",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.open_shared_cache",
+      "surface": "menubar",
+      "owner": "File",
+      "label": "Open Shared Cache\u2026",
+      "hint": "IDA-like dyld shared cache: DSC Index then load selected module",
+      "mcp": {
+        "server": "vibe",
+        "tool": "dyld_list_images"
+      },
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.menu.file.save",
+      "surface": "menubar",
+      "owner": "File",
+      "label": "Save Program",
+      "hint": "Save the current program",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_proxy_analysis"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.graph.function",
+      "surface": "menubar",
+      "owner": "Graph",
+      "label": "Function Graph",
+      "hint": "Function Graph",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.help.ghidra",
+      "surface": "menubar",
+      "owner": "Help",
+      "label": "GhidraVibe Help\u2026",
+      "hint": "GhidraVibe Help\u2026",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.help.headless",
+      "surface": "menubar",
+      "owner": "Help",
+      "label": "Headless Help",
+      "hint": "Headless Help",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.help.tip",
+      "surface": "menubar",
+      "owner": "Help",
+      "label": "Tip of the Day\u2026",
+      "hint": "Tip of the Day\u2026",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.navigation.goto",
+      "surface": "menubar",
+      "owner": "Navigation",
+      "label": "Go To\u2026",
+      "hint": "Go to address or label",
+      "mcp": {
+        "server": "analysis",
+        "tool": "disassemble_function"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.navigation.next",
+      "surface": "menubar",
+      "owner": "Navigation",
+      "label": "Next Location",
+      "hint": "Next Location",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_nav_forward"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.navigation.prev",
+      "surface": "menubar",
+      "owner": "Navigation",
+      "label": "Previous Location",
+      "hint": "Previous Location",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_nav_back"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.search.functions",
+      "surface": "menubar",
+      "owner": "Search",
+      "label": "Search Functions\u2026",
+      "hint": "Search functions",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.search.memory",
+      "surface": "menubar",
+      "owner": "Search",
+      "label": "Memory\u2026",
+      "hint": "Memory\u2026",
+      "mcp": {
+        "server": "vibe",
+        "tool": "search_memory"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.search.strings",
+      "surface": "menubar",
+      "owner": "Search",
+      "label": "Search Strings\u2026",
+      "hint": "Search defined strings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.select.clear",
+      "surface": "menubar",
+      "owner": "Select",
+      "label": "Clear Selection",
+      "hint": "Clear Selection",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_clear_selection"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.tools.codebrowser",
+      "surface": "menubar",
+      "owner": "Tools",
+      "label": "CodeBrowser",
+      "hint": "CodeBrowser",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.tools.mcp_health",
+      "surface": "menubar",
+      "owner": "Tools",
+      "label": "MCP Health",
+      "hint": "MCP Health",
+      "mcp": {
+        "server": "analysis",
+        "tool": "check_connection"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.tools.start_mcp",
+      "surface": "menubar",
+      "owner": "Tools",
+      "label": "Start Analysis MCP",
+      "hint": "Start Analysis MCP",
+      "mcp": {
+        "server": "analysis",
+        "tool": "check_connection"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.agent",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Agent",
+      "hint": "Show Agent panel",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.apple",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Apple Bundle / IPA",
+      "hint": "Apple Bundle / IPA",
+      "mcp": null,
+      "stock": false,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.bookmarks",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Bookmarks",
+      "hint": "Bookmarks",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.bytes",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Bytes",
+      "hint": "Bytes",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.checksum",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Checksum Generator",
+      "hint": "Checksum Generator",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.code_editor",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Code Editor",
+      "hint": "Code Editor",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.codebrowser",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "CodeBrowser",
+      "hint": "CodeBrowser",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.comments",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Comments",
+      "hint": "Comments",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.console",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Console",
+      "hint": "Console",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.data_types",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Data Type Manager",
+      "hint": "Data Type Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.datatype_preview",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Data Type Preview",
+      "hint": "Data Type Preview",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.decompiler",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Decompiler",
+      "hint": "Show Decompiler provider",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.defined_data",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Defined Data",
+      "hint": "Defined Data",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.disassembled_view",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Disassembled View",
+      "hint": "Disassembled View",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.dsc",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Shared Cache",
+      "hint": "Show Shared Cache panel",
+      "mcp": null,
+      "stock": false,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.entropy",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Entropy",
+      "hint": "Entropy",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.equates",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Equates Table",
+      "hint": "Equates Table",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.external_programs",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "External Programs",
+      "hint": "External Programs",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.function_graph",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Function Graph",
+      "hint": "Function Graph",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.function_tags",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Function Tags",
+      "hint": "Function Tags",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.functions",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Functions",
+      "hint": "Functions",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.listing",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Listing",
+      "hint": "Show Listing provider",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.mcp",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "MCP",
+      "hint": "Show MCP panel",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.memory_map",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Memory Map",
+      "hint": "Memory Map",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.overview",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Overview",
+      "hint": "Overview",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.program_tree",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Program Trees",
+      "hint": "Program Trees",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.project",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Project Window",
+      "hint": "Project Window",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.python",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Python",
+      "hint": "Python",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.rag",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "RAG / JSpace",
+      "hint": "Show RAG panel",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.registers",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Register Manager",
+      "hint": "Register Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.relocations",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Relocation Table",
+      "hint": "Relocation Table",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.rules",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Rules",
+      "hint": "Show Rules panel",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.script_manager",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Script Manager",
+      "hint": "Script Manager",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.strings",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Defined Strings",
+      "hint": "Defined Strings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.swift_classes",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Swift Classes",
+      "hint": "Swift Classes",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.symbol_references",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Symbol References",
+      "hint": "Symbol References",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.symbol_table",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Symbol Table",
+      "hint": "Symbol Table",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.menu.window.symbol_tree",
+      "surface": "menubar",
+      "owner": "Window",
+      "label": "Symbol Tree",
+      "hint": "Symbol Tree",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.agent",
+      "surface": "provider_body",
+      "owner": "Agent",
+      "label": "Agent",
+      "hint": "Agent provider pane",
+      "mcp": {
+        "server": "vibe",
+        "tools": [
+          "rag_discover",
+          "vibe_proxy_analysis"
+        ]
+      },
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle_ipa",
+      "surface": "provider_body",
+      "owner": "Apple Bundle / IPA",
+      "label": "Apple Bundle / IPA",
+      "hint": "Show Apple Bundle / IPA",
+      "mcp": null,
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.provider.bookmarks",
+      "surface": "provider_body",
+      "owner": "Bookmarks",
+      "label": "Bookmarks",
+      "hint": "Bookmarks provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_bookmarks"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.bytes",
+      "surface": "provider_body",
+      "owner": "Bytes",
+      "label": "Bytes : No Program",
+      "hint": "Bytes : No Program provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tools": [
+          "read_memory",
+          "inspect_memory_content"
+        ]
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.checksum",
+      "surface": "provider_body",
+      "owner": "Checksum Generator",
+      "label": "Checksum Generator",
+      "hint": "Checksum Generator provider",
+      "mcp": {
+        "server": "analysis",
+        "tool": "get_function_hash"
+      },
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.code_editor",
+      "surface": "provider_body",
+      "owner": "Code Editor",
+      "label": "Code Editor",
+      "hint": "Edit decompile / agent text",
+      "mcp": null,
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.provider.comments",
+      "surface": "provider_body",
+      "owner": "Comments",
+      "label": "Comments",
+      "hint": "Comments provider",
+      "mcp": {
+        "server": "analysis",
+        "tool": "get_comments"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.console",
+      "surface": "provider_body",
+      "owner": "Console",
+      "label": "Console",
+      "hint": "Console provider pane",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.console.clear",
+      "surface": "provider_toolbar",
+      "owner": "Console",
+      "label": "Clear Console",
+      "hint": "Clear console output",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.console.input",
+      "surface": "provider_toolbar",
+      "owner": "Console",
+      "label": "Console Input",
+      "hint": "Scripting console input",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.console.lock",
+      "surface": "provider_toolbar",
+      "owner": "Console",
+      "label": "Scroll Lock",
+      "hint": "Toggle console scroll lock",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types",
+      "surface": "provider_body",
+      "owner": "Data Type Manager",
+      "label": "Data Type Manager",
+      "hint": "Data Type Manager provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_data_types"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.back",
+      "surface": "provider_toolbar",
+      "owner": "Data Type Manager",
+      "label": "Previous Data Type",
+      "hint": "Navigate to the previous data type",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.create",
+      "surface": "provider_toolbar",
+      "owner": "Data Type Manager",
+      "label": "Create Data Type",
+      "hint": "Create a new data type",
+      "mcp": {
+        "server": "vibe",
+        "tool": "provider_create"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.filter_go",
+      "surface": "provider_toolbar",
+      "owner": "Data Type Manager",
+      "label": "Apply Filter",
+      "hint": "Apply the data type filter",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.forward",
+      "surface": "provider_toolbar",
+      "owner": "Data Type Manager",
+      "label": "Next Data Type",
+      "hint": "Navigate to the next data type",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.open_archive",
+      "surface": "provider_toolbar",
+      "owner": "Data Type Manager",
+      "label": "Open Archive",
+      "hint": "Open or refresh a data type archive",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_data_types"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.settings",
+      "surface": "provider_toolbar",
+      "owner": "Data Type Manager",
+      "label": "Settings",
+      "hint": "Data Type Manager settings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.datatype_preview",
+      "surface": "provider_body",
+      "owner": "Data Type Preview",
+      "label": "Data Type Preview",
+      "hint": "Data Type Preview provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "get_struct_layout"
+      },
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler",
+      "surface": "provider_body",
+      "owner": "Decompile",
+      "label": "Decompile",
+      "hint": "Decompile provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "decompile_function"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.export",
+      "surface": "provider_toolbar",
+      "owner": "Decompile",
+      "label": "Export",
+      "hint": "Export decompiler output",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.options",
+      "surface": "provider_toolbar",
+      "owner": "Decompile",
+      "label": "Decompiler Options",
+      "hint": "Decompiler options",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.refresh",
+      "surface": "provider_toolbar",
+      "owner": "Decompile",
+      "label": "Refresh",
+      "hint": "Refresh decompiler",
+      "mcp": {
+        "server": "analysis",
+        "tool": "decompile_function"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.defined_data",
+      "surface": "provider_body",
+      "owner": "Defined Data",
+      "label": "Defined Data",
+      "hint": "Defined Data provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_data_items"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.disassembled_view",
+      "surface": "provider_body",
+      "owner": "Disassembled View",
+      "label": "Disassembled View",
+      "hint": "Disassembled View provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "disassemble_function"
+      },
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.entropy",
+      "surface": "provider_body",
+      "owner": "Entropy",
+      "label": "Entropy",
+      "hint": "Entropy provider pane",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_list_entropy"
+      },
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.equates",
+      "surface": "provider_body",
+      "owner": "Equates Table",
+      "label": "Equates Table",
+      "hint": "Equates Table provider",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_list_equates"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.external_programs",
+      "surface": "provider_body",
+      "owner": "External Programs",
+      "label": "External Programs",
+      "hint": "External Programs provider",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_external_locations"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.function_graph",
+      "surface": "provider_body",
+      "owner": "Function Graph",
+      "label": "Function Graph",
+      "hint": "Function Graph provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tools": [
+          "get_function_call_graph",
+          "analyze_control_flow"
+        ]
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.function_tags",
+      "surface": "provider_body",
+      "owner": "Function Tags",
+      "label": "Function Tags",
+      "hint": "Function Tags provider pane",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_list_function_tags"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.functions",
+      "surface": "provider_body",
+      "owner": "Functions",
+      "label": "Functions",
+      "hint": "Functions provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_functions"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.listing",
+      "surface": "provider_body",
+      "owner": "Listing",
+      "label": "Listing",
+      "hint": "Listing provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "disassemble_function"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.goto_field",
+      "surface": "provider_toolbar",
+      "owner": "Listing",
+      "label": "Go To field",
+      "hint": "Enter address or label",
+      "mcp": {
+        "server": "analysis",
+        "tool": "disassemble_function"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.marker",
+      "surface": "provider_toolbar",
+      "owner": "Listing",
+      "label": "Marker",
+      "hint": "Listing markers",
+      "mcp": {
+        "server": "vibe",
+        "tool": "listing_add_bookmark"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.settings",
+      "surface": "provider_toolbar",
+      "owner": "Listing",
+      "label": "Listing Settings",
+      "hint": "Listing display settings",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.mcp",
+      "surface": "provider_body",
+      "owner": "MCP",
+      "label": "MCP",
+      "hint": "MCP provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "check_connection"
+      },
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.provider.memory_map",
+      "surface": "provider_body",
+      "owner": "Memory Map",
+      "label": "Memory Map",
+      "hint": "Memory Map provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_segments"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.overview",
+      "surface": "provider_body",
+      "owner": "Overview",
+      "label": "Overview",
+      "hint": "Overview provider pane",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_list_entropy"
+      },
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree",
+      "surface": "provider_body",
+      "owner": "Program Trees",
+      "label": "Program Trees",
+      "hint": "Program Trees provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_project_files"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.create_folder",
+      "surface": "provider_toolbar",
+      "owner": "Program Trees",
+      "label": "Create Folder",
+      "hint": "Create a folder in the program tree",
+      "mcp": {
+        "server": "vibe",
+        "tool": "provider_create"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.create_fragment",
+      "surface": "provider_toolbar",
+      "owner": "Program Trees",
+      "label": "Create Fragment",
+      "hint": "Create a memory fragment in the program tree",
+      "mcp": {
+        "server": "vibe",
+        "tool": "provider_create"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.create_tree",
+      "surface": "provider_toolbar",
+      "owner": "Program Trees",
+      "label": "Create Tree",
+      "hint": "Create a new program tree",
+      "mcp": {
+        "server": "vibe",
+        "tool": "provider_create"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.python",
+      "surface": "provider_body",
+      "owner": "Python",
+      "label": "Python",
+      "hint": "Python provider",
+      "mcp": {
+        "server": "analysis",
+        "tool": "run_ghidra_script"
+      },
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.rag_jspace",
+      "surface": "provider_body",
+      "owner": "RAG / JSpace",
+      "label": "RAG / JSpace",
+      "hint": "Show RAG / JSpace",
+      "mcp": null,
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.provider.registers",
+      "surface": "provider_body",
+      "owner": "Register Manager",
+      "label": "Register Manager",
+      "hint": "Register Manager provider",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_list_registers"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.relocations",
+      "surface": "provider_body",
+      "owner": "Relocation Table",
+      "label": "Relocation Table",
+      "hint": "Relocation Table provider pane",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_list_relocations"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.rules",
+      "surface": "provider_body",
+      "owner": "Rules",
+      "label": "Rules",
+      "hint": "Rules provider pane",
+      "mcp": {
+        "server": "vibe",
+        "tools": [
+          "rules_get",
+          "rules_set",
+          "rules_list"
+        ]
+      },
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.provider.script_manager",
+      "surface": "provider_body",
+      "owner": "Script Manager",
+      "label": "Script Manager",
+      "hint": "Script Manager provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tools": [
+          "list_ghidra_scripts",
+          "run_ghidra_script"
+        ]
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.shared_cache",
+      "surface": "provider_body",
+      "owner": "Shared Cache",
+      "label": "Shared Cache",
+      "hint": "Show Shared Cache",
+      "mcp": null,
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.provider.strings",
+      "surface": "provider_body",
+      "owner": "Defined Strings",
+      "label": "Defined Strings",
+      "hint": "Show Defined Strings",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_strings"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.swift_classes",
+      "surface": "provider_body",
+      "owner": "Swift Classes",
+      "label": "Swift Classes",
+      "hint": "Namespaces",
+      "mcp": {
+        "server": "vibe",
+        "tools": [
+          "swift_list_namespaces",
+          "swift_demangle"
+        ]
+      },
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_references",
+      "surface": "provider_body",
+      "owner": "Symbol References",
+      "label": "Symbol References",
+      "hint": "Symbol References provider",
+      "mcp": {
+        "server": "analysis",
+        "tools": [
+          "get_xrefs_to",
+          "get_xrefs_from"
+        ]
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_table",
+      "surface": "provider_body",
+      "owner": "Symbol Table",
+      "label": "Symbol Table",
+      "hint": "Symbol Table provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tools": [
+          "list_exports",
+          "list_imports",
+          "list_globals"
+        ]
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree",
+      "surface": "provider_body",
+      "owner": "Symbol Tree",
+      "label": "Symbol Tree",
+      "hint": "Symbol Tree provider pane",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_namespaces"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.create_class",
+      "surface": "provider_toolbar",
+      "owner": "Symbol Tree",
+      "label": "Create Class",
+      "hint": "Create a class in the symbol tree",
+      "mcp": {
+        "server": "vibe",
+        "tool": "provider_create"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.create_namespace",
+      "surface": "provider_toolbar",
+      "owner": "Symbol Tree",
+      "label": "Create Namespace",
+      "hint": "Create a namespace in the symbol tree",
+      "mcp": {
+        "server": "vibe",
+        "tool": "provider_create"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.create_symbol",
+      "surface": "provider_toolbar",
+      "owner": "Symbol Tree",
+      "label": "Create Symbol",
+      "hint": "Create a symbol in the symbol tree",
+      "mcp": {
+        "server": "vibe",
+        "tool": "provider_create"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.filter_go",
+      "surface": "provider_toolbar",
+      "owner": "Symbol Tree",
+      "label": "Apply Filter",
+      "hint": "Apply the symbol tree filter",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.snapshot",
+      "surface": "provider_toolbar",
+      "owner": "Symbol Tree",
+      "label": "Capture Symbol Tree",
+      "hint": "Refresh / capture the symbol tree",
+      "mcp": {
+        "server": "analysis",
+        "tool": "list_namespaces"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.analyze",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Auto Analyze",
+      "hint": "Run auto analysis on the current program",
+      "mcp": {
+        "server": "analysis",
+        "tool": "run_analysis"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.apple",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Apple Bundle",
+      "hint": "Import IPA / .app",
+      "mcp": {
+        "server": "vibe",
+        "tool": "malimite_open_bundle"
+      },
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.dsc",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Shared Cache",
+      "hint": "Open dyld shared cache index and import any image",
+      "mcp": {
+        "server": "vibe",
+        "tool": "dyld_list_images"
+      },
+      "stock": false,
+      "tier": "m2_shell",
+      "depth": "shell",
+      "platforms": {
+        "macos": "disabled_honest",
+        "gtk": "disabled_honest"
+      },
+      "behavior": "disabled_honest"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.goto",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Go To",
+      "hint": "Go to address or label",
+      "mcp": {
+        "server": "analysis",
+        "tool": "disassemble_function"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_b",
+      "surface": "main_toolbar",
+      "owner": "Listing",
+      "label": "B",
+      "hint": "Add bookmark",
+      "mcp": {
+        "server": "vibe",
+        "tool": "listing_add_bookmark"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_d",
+      "surface": "main_toolbar",
+      "owner": "Listing",
+      "label": "D",
+      "hint": "Define data at current location",
+      "mcp": {
+        "server": "vibe",
+        "tool": "listing_define_data"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_f",
+      "surface": "main_toolbar",
+      "owner": "Listing",
+      "label": "F",
+      "hint": "Create function",
+      "mcp": {
+        "server": "vibe",
+        "tool": "listing_create_function"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_i",
+      "surface": "main_toolbar",
+      "owner": "Listing",
+      "label": "I",
+      "hint": "Disassemble at current location",
+      "mcp": {
+        "server": "vibe",
+        "tool": "listing_disassemble"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_l",
+      "surface": "main_toolbar",
+      "owner": "Listing",
+      "label": "L",
+      "hint": "Create label",
+      "mcp": {
+        "server": "vibe",
+        "tool": "listing_create_label"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_u",
+      "surface": "main_toolbar",
+      "owner": "Listing",
+      "label": "U",
+      "hint": "Clear code bytes",
+      "mcp": {
+        "server": "vibe",
+        "tool": "listing_clear_code"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_v",
+      "surface": "main_toolbar",
+      "owner": "Listing",
+      "label": "V",
+      "hint": "Create structure or array",
+      "mcp": {
+        "server": "vibe",
+        "tool": "listing_create_structure"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.mcp_health",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Engine Status",
+      "hint": "Check analysis MCP connection",
+      "mcp": {
+        "server": "analysis",
+        "tool": "check_connection"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.nav_back",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Previous Location",
+      "hint": "Navigate back",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_nav_back"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.nav_fwd",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Next Location",
+      "hint": "Navigate forward",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_nav_forward"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.redo",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Redo",
+      "hint": "Redo last edit",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_redo"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.save",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Save Program",
+      "hint": "Save current program",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_proxy_analysis"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.start_mcp",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Restart Engine",
+      "hint": "Restart the program engine",
+      "mcp": {
+        "server": "analysis",
+        "tool": "check_connection"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.toolbar.undo",
+      "surface": "main_toolbar",
+      "owner": "CodeBrowser",
+      "label": "Undo",
+      "hint": "Undo last edit",
+      "mcp": {
+        "server": "vibe",
+        "tool": "vibe_undo"
+      },
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    }
+  ]
+}

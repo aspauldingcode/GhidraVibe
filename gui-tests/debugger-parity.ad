@@ -1,0 +1,14 @@
+# Stock Debugger tool — open from Tool Chest and verify shell a11y.
+# Prefers run-smoke defaults: agreement + smokeStartProject.
+context platform=macos timeout=120000
+env APP_TARGET="${APP_TARGET}"
+open "${APP_TARGET}" --relaunch
+wait "id=\"ghidra.vibe.project\" || label=\"Tool Chest\"" 25000
+click "id=\"ghidra.vibe.project.tool.debugger\" || label=\"Debugger\""
+wait "id=\"ghidra.vibe.debugger\" || label=\"Debugger\"" 10000
+snapshot -i
+is exists "id=\"ghidra.vibe.debugger\" || label=\"TraceRmi Connect\""
+click "id=\"ghidra.vibe.debugger.toolbar.tracermi_connect\" || label=\"TraceRmi Connect\""
+wait "id=\"ghidra.vibe.status.message\" || label=\"Status message\"" 5000
+snapshot -i
+close

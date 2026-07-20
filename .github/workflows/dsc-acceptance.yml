@@ -1,0 +1,28 @@
+name: dsc-acceptance
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  dsc-import:
+    runs-on: [self-hosted, macOS, tahoe, apple-silicon]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+        continue-on-error: true
+      - name: Acceptance DSC generic import
+        run: |
+          chmod +x gui-tests/acceptance-dsc-import.sh scripts/ghidra-vibe-dyld
+          export GHIDRA_VIBE_DYLD="$PWD/scripts/ghidra-vibe-dyld"
+          export DSC_ACCEPT_IMAGE="${DSC_ACCEPT_IMAGE:-AppKit}"
+          ./gui-tests/acceptance-dsc-import.sh
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsc-acceptance
+          path: ghidra-vibe-projects/
+          if-no-files-found: ignore

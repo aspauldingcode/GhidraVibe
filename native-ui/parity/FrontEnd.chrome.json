@@ -1,0 +1,40 @@
+{
+  "tool": "Project Window",
+  "menuBar": [
+    "File",
+    "Edit",
+    "Project",
+    "Tools",
+    "Help"
+  ],
+  "dockingToolbar": [
+    "Add to Version Control",
+    "CheckOut",
+    "Update",
+    "CheckIn",
+    "UndoCheckOut",
+    "Find Checkouts",
+    "\u2014",
+    "Refresh"
+  ],
+  "contentTopToBottom": [
+    "Tool Chest",
+    "Active Project (Tree View | Table View + Filter)",
+    "Running Tools + Workspace combo",
+    "LogPanel (status window)"
+  ],
+  "defaultTools": [
+    "CodeBrowser",
+    "Debugger",
+    "Emulator",
+    "Version Tracking"
+  ],
+  "startupAfterSplash": [
+    "User Agreement",
+    "What's New / Welcome Help",
+    "Tip of the Day",
+    "Workspace/Project"
+  ],
+  "stock": true,
+  "parity": "1:1 Project Window / Front End"
+}

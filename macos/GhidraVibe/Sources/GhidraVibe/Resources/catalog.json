@@ -1,0 +1,4285 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "ghidra.vibe.agent.sidebar",
+      "label": "Agent sidebar",
+      "hint": "Trailing Agent chat column",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agreement",
+      "label": "Ghidra User Agreement",
+      "hint": "Apache License and SRE usage notice",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agreement.agree",
+      "label": "I Agree",
+      "hint": "Accept the Ghidra user agreement",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agreement.body",
+      "label": "Agreement text",
+      "hint": "License and SRE usage terms",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agreement.decline",
+      "label": "I Don't Agree",
+      "hint": "Decline and quit",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser",
+      "label": "CodeBrowser",
+      "hint": "Main reverse-engineering tool",
+      "traits": [
+        "window"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.console_tabs",
+      "label": "Console tabs",
+      "hint": "Console / Bookmarks",
+      "traits": [
+        "tabGroup"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.header.entropy",
+      "label": "Entropy",
+      "hint": "Show Entropy provider",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.header.overview",
+      "label": "Overview",
+      "hint": "Show Overview provider",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.left_dock",
+      "label": "Left dock",
+      "hint": "Program Trees, Symbol Tree, and Data Type Manager",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.more",
+      "label": "More\u2026",
+      "hint": "Show additional provider tabs",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.project_window",
+      "label": "Project Window",
+      "hint": "Return to Front End / Project Window",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.right_tabs",
+      "label": "Provider tabs",
+      "hint": "CodeBrowser right provider tabs",
+      "traits": [
+        "tabGroup"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.agent",
+      "label": "Agent",
+      "hint": "Show agent",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.bookmarks",
+      "label": "Bookmarks",
+      "hint": "Show bookmarks",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.bytes",
+      "label": "Bytes",
+      "hint": "Show bytes",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.checksum",
+      "label": "Checksum Generator",
+      "hint": "Show Checksum Generator",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.comments",
+      "label": "Comments",
+      "hint": "Show Comments",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.datatype_preview",
+      "label": "Data Type Preview",
+      "hint": "Show Data Type Preview",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.decompiler",
+      "label": "Decompiler",
+      "hint": "Show decompiler",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.defined_data",
+      "label": "Defined Data",
+      "hint": "Show Defined Data",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.disassembled_view",
+      "label": "Disassembled View",
+      "hint": "Show Disassembled View",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.dsc",
+      "label": "Dsc",
+      "hint": "Show dsc",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.entropy",
+      "label": "Entropy",
+      "hint": "Show Entropy",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.equates",
+      "label": "Equates Table",
+      "hint": "Show Equates Table",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.external_programs",
+      "label": "External Programs",
+      "hint": "Show External Programs",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.function_graph",
+      "label": "Function Graph",
+      "hint": "Show function_graph",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.function_tags",
+      "label": "Function Tags",
+      "hint": "Show Function Tags",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.functions",
+      "label": "Functions",
+      "hint": "Show functions",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.mcp",
+      "label": "Mcp",
+      "hint": "Show mcp",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.memory_map",
+      "label": "Memory Map",
+      "hint": "Show memory_map",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.overview",
+      "label": "Overview",
+      "hint": "Show Overview",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.python",
+      "label": "Python",
+      "hint": "Show Python",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.rag",
+      "label": "Rag",
+      "hint": "Show rag",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.registers",
+      "label": "Register Manager",
+      "hint": "Show Register Manager",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.relocations",
+      "label": "Relocation Table",
+      "hint": "Show Relocation Table",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.rules",
+      "label": "Rules",
+      "hint": "Show rules",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.script_manager",
+      "label": "Script Manager",
+      "hint": "Show script_manager",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.strings",
+      "label": "Strings",
+      "hint": "Show strings",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.symbol_references",
+      "label": "Symbol References",
+      "hint": "Show Symbol References",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.codebrowser.tab.symbol_table",
+      "label": "Symbol Table",
+      "hint": "Show symbol_table",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.bookmarks",
+      "label": "Bookmarks",
+      "hint": "Show Bookmarks",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.breakpoints",
+      "label": "Breakpoints",
+      "hint": "Show Breakpoints",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.bundle_manager",
+      "label": "Bundle Manager",
+      "hint": "Show Bundle Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.bytes",
+      "label": "Bytes",
+      "hint": "Show Bytes",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.checksum",
+      "label": "Checksum Generator",
+      "hint": "Show Checksum Generator",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.checksum_generator",
+      "label": "Checksum Generator",
+      "hint": "Show Checksum Generator",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.comments",
+      "label": "Comments",
+      "hint": "Show Comments",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.connections",
+      "label": "Connections",
+      "hint": "Show Connections",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.console",
+      "label": "Console",
+      "hint": "Show Console",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.data_type_manager",
+      "label": "Data Type Manager",
+      "hint": "Show Data Type Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.data_type_preview",
+      "label": "Data Type Preview",
+      "hint": "Show Data Type Preview",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.data_types",
+      "label": "Data Type Manager",
+      "hint": "Show Data Type Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.datatype_preview",
+      "label": "Data Type Preview",
+      "hint": "Show Data Type Preview",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.debug_console",
+      "label": "Debug Console",
+      "hint": "Show Debug Console",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.decompile",
+      "label": "Decompile",
+      "hint": "Show Decompile",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.decompiler",
+      "label": "Decompile",
+      "hint": "Show Decompile",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.defined_data",
+      "label": "Defined Data",
+      "hint": "Show Defined Data",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.defined_strings",
+      "label": "Defined Strings",
+      "hint": "Show Defined Strings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.diff_apply_settings",
+      "label": "Diff Apply Settings",
+      "hint": "Show Diff Apply Settings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.diff_details",
+      "label": "Diff Details",
+      "hint": "Show Diff Details",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.disassembled_view",
+      "label": "Disassembled View",
+      "hint": "Show Disassembled View",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.dynamic",
+      "label": "Dynamic",
+      "hint": "Show Dynamic",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.equates",
+      "label": "Equates Table",
+      "hint": "Show Equates Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.equates_table",
+      "label": "Equates Table",
+      "hint": "Show Equates Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.external_programs",
+      "label": "External Programs",
+      "hint": "Show External Programs",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_call_graph",
+      "label": "Function Call Graph",
+      "hint": "Show Function Call Graph",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_call_trees",
+      "label": "Function Call Trees",
+      "hint": "Show Function Call Trees",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_graph",
+      "label": "Function Graph",
+      "hint": "Show Function Graph",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.function_tags",
+      "label": "Function Tags",
+      "hint": "Show Function Tags",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.functions",
+      "label": "Functions",
+      "hint": "Show Functions",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.instruction_info",
+      "label": "Instruction Info",
+      "hint": "Show Instruction Info",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.listing",
+      "label": "Listing",
+      "hint": "Show Listing",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memory",
+      "label": "Memory",
+      "hint": "Show Memory",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memory_map",
+      "label": "Memory Map",
+      "hint": "Show Memory Map",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memory_range_mappings",
+      "label": "Memory Range Mappings",
+      "hint": "Show Memory Range Mappings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.memview",
+      "label": "Memview",
+      "hint": "Show Memview",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.model",
+      "label": "Model",
+      "hint": "Show Model",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.modules",
+      "label": "Modules",
+      "hint": "Show Modules",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.pcode_stepper",
+      "label": "Pcode Stepper",
+      "hint": "Show Pcode Stepper",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.program_tree",
+      "label": "Program Trees",
+      "hint": "Show Program Trees",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.program_trees",
+      "label": "Program Trees",
+      "hint": "Show Program Trees",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.python",
+      "label": "Python",
+      "hint": "Show Python",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.regions",
+      "label": "Regions",
+      "hint": "Show Regions",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.register_manager",
+      "label": "Register Manager",
+      "hint": "Show Register Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.registers",
+      "label": "Registers",
+      "hint": "Show Registers",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.relocation_table",
+      "label": "Relocation Table",
+      "hint": "Show Relocation Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.relocations",
+      "label": "Relocation Table",
+      "hint": "Show Relocation Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.script_manager",
+      "label": "Script Manager",
+      "hint": "Show Script Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.stack",
+      "label": "Stack",
+      "hint": "Show Stack",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.static_mappings",
+      "label": "Static Mappings",
+      "hint": "Show Static Mappings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.strings",
+      "label": "Defined Strings",
+      "hint": "Show Defined Strings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.symbol_references",
+      "label": "Symbol References",
+      "hint": "Show Symbol References",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.symbol_table",
+      "label": "Symbol Table",
+      "hint": "Show Symbol Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.symbol_tree",
+      "label": "Symbol Tree",
+      "hint": "Show Symbol Tree",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.terminal",
+      "label": "Terminal",
+      "hint": "Show Terminal",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.threads",
+      "label": "Threads",
+      "hint": "Show Threads",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.time",
+      "label": "Time",
+      "hint": "Show Time",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.provider.watches",
+      "label": "Watches",
+      "hint": "Show Watches",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.interrupt",
+      "label": "Interrupt",
+      "hint": "Interrupt",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.launch",
+      "label": "Launch",
+      "hint": "Launch",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.resume",
+      "label": "Resume",
+      "hint": "Resume",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.save",
+      "label": "Save",
+      "hint": "Save",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.step_into",
+      "label": "Step Into",
+      "hint": "Step Into",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.step_out",
+      "label": "Step Out",
+      "hint": "Step Out",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.step_over",
+      "label": "Step Over",
+      "hint": "Step Over",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.debugger.toolbar.tracermi_connect",
+      "label": "TraceRmi Connect",
+      "hint": "TraceRmi Connect",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.dock.drop.bottomStrip",
+      "label": "Dock to Bottom Strip",
+      "hint": "Drop provider on bottom strip",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.drop.center",
+      "label": "Dock to Center",
+      "hint": "Drop provider on center",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.drop.console",
+      "label": "Dock to Console",
+      "hint": "Drop provider on console stack",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.drop.floating",
+      "label": "Float provider",
+      "hint": "Undock provider into a floating window",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.drop.header",
+      "label": "Dock to Header",
+      "hint": "Drop provider on header",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.drop.left",
+      "label": "Dock to Left",
+      "hint": "Drop provider on left dock",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.drop.right",
+      "label": "Dock to Right",
+      "hint": "Drop provider on right stack",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.drop_banner",
+      "label": "Dock drop banner",
+      "hint": "Drop targets while dragging a provider",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.float.close",
+      "label": "Close floating provider",
+      "hint": "Close floating provider window",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.float.reattach",
+      "label": "Dock Back",
+      "hint": "Reattach floating provider to home region",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.region.bottomStrip",
+      "label": "Bottom strip dock",
+      "hint": "Bottom strip drop region",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.region.center",
+      "label": "Center dock",
+      "hint": "Center dock drop region",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.region.console",
+      "label": "Console dock",
+      "hint": "Console stack drop region",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.region.header",
+      "label": "Header dock",
+      "hint": "Header stack drop region",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.region.left",
+      "label": "Left dock",
+      "hint": "Left dock drop region",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.dock.region.right",
+      "label": "Right dock",
+      "hint": "Right dock drop region",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.bookmarks",
+      "label": "Bookmarks",
+      "hint": "Show Bookmarks",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.breakpoints",
+      "label": "Breakpoints",
+      "hint": "Show Breakpoints",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.bundle_manager",
+      "label": "Bundle Manager",
+      "hint": "Show Bundle Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.bytes",
+      "label": "Bytes",
+      "hint": "Show Bytes",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.checksum",
+      "label": "Checksum Generator",
+      "hint": "Show Checksum Generator",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.checksum_generator",
+      "label": "Checksum Generator",
+      "hint": "Show Checksum Generator",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.comments",
+      "label": "Comments",
+      "hint": "Show Comments",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.console",
+      "label": "Console",
+      "hint": "Show Console",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.data_type_manager",
+      "label": "Data Type Manager",
+      "hint": "Show Data Type Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.data_type_preview",
+      "label": "Data Type Preview",
+      "hint": "Show Data Type Preview",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.data_types",
+      "label": "Data Type Manager",
+      "hint": "Show Data Type Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.datatype_preview",
+      "label": "Data Type Preview",
+      "hint": "Show Data Type Preview",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.debug_console",
+      "label": "Debug Console",
+      "hint": "Show Debug Console",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.decompile",
+      "label": "Decompile",
+      "hint": "Show Decompile",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.decompiler",
+      "label": "Decompile",
+      "hint": "Show Decompile",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.defined_data",
+      "label": "Defined Data",
+      "hint": "Show Defined Data",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.defined_strings",
+      "label": "Defined Strings",
+      "hint": "Show Defined Strings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.disassembled_view",
+      "label": "Disassembled View",
+      "hint": "Show Disassembled View",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.dynamic",
+      "label": "Dynamic",
+      "hint": "Show Dynamic",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.equates",
+      "label": "Equates Table",
+      "hint": "Show Equates Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.equates_table",
+      "label": "Equates Table",
+      "hint": "Show Equates Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.external_programs",
+      "label": "External Programs",
+      "hint": "Show External Programs",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_call_graph",
+      "label": "Function Call Graph",
+      "hint": "Show Function Call Graph",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_call_trees",
+      "label": "Function Call Trees",
+      "hint": "Show Function Call Trees",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_graph",
+      "label": "Function Graph",
+      "hint": "Show Function Graph",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.function_tags",
+      "label": "Function Tags",
+      "hint": "Show Function Tags",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.functions",
+      "label": "Functions",
+      "hint": "Show Functions",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.interpreter",
+      "label": "Interpreter",
+      "hint": "Show Interpreter",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.jython",
+      "label": "Jython",
+      "hint": "Show Jython",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.listing",
+      "label": "Listing",
+      "hint": "Show Listing",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memory",
+      "label": "Memory",
+      "hint": "Show Memory",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memory_map",
+      "label": "Memory Map",
+      "hint": "Show Memory Map",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memory_range_mappings",
+      "label": "Memory Range Mappings",
+      "hint": "Show Memory Range Mappings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.memview",
+      "label": "Memview",
+      "hint": "Show Memview",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.model",
+      "label": "Model",
+      "hint": "Show Model",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.modules",
+      "label": "Modules",
+      "hint": "Show Modules",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.objects",
+      "label": "Objects",
+      "hint": "Show Objects",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.pcode_stepper",
+      "label": "Pcode Stepper",
+      "hint": "Show Pcode Stepper",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.program_tree",
+      "label": "Program Trees",
+      "hint": "Show Program Trees",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.program_trees",
+      "label": "Program Trees",
+      "hint": "Show Program Trees",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.python",
+      "label": "Python",
+      "hint": "Show Python",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.regions",
+      "label": "Regions",
+      "hint": "Show Regions",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.register_manager",
+      "label": "Register Manager",
+      "hint": "Show Register Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.registers",
+      "label": "Registers",
+      "hint": "Show Registers",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.relocation_table",
+      "label": "Relocation Table",
+      "hint": "Show Relocation Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.relocations",
+      "label": "Relocation Table",
+      "hint": "Show Relocation Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.script_manager",
+      "label": "Script Manager",
+      "hint": "Show Script Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.stack",
+      "label": "Stack",
+      "hint": "Show Stack",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.static_mappings",
+      "label": "Static Mappings",
+      "hint": "Show Static Mappings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.strings",
+      "label": "Defined Strings",
+      "hint": "Show Defined Strings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.symbol_references",
+      "label": "Symbol References",
+      "hint": "Show Symbol References",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.symbol_table",
+      "label": "Symbol Table",
+      "hint": "Show Symbol Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.symbol_tree",
+      "label": "Symbol Tree",
+      "hint": "Show Symbol Tree",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.threads",
+      "label": "Threads",
+      "hint": "Show Threads",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.time",
+      "label": "Time",
+      "hint": "Show Time",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.provider.watches",
+      "label": "Watches",
+      "hint": "Show Watches",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.emulate",
+      "label": "Emulate",
+      "hint": "Emulate",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.finish",
+      "label": "Finish",
+      "hint": "Finish",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.interrupt",
+      "label": "Interrupt",
+      "hint": "Interrupt",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.save",
+      "label": "Save",
+      "hint": "Save",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.skip",
+      "label": "Skip",
+      "hint": "Skip",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.emulator.toolbar.step",
+      "label": "Step",
+      "hint": "Step",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.framework_open",
+      "label": "Open Framework",
+      "hint": "Open framework from Shared Cache",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.framework_open.analyze_toggle",
+      "label": "Auto Analyze after open",
+      "hint": "Run analysis after open",
+      "traits": [
+        "checkBox"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.framework_open.cache_path",
+      "label": "Cache path",
+      "hint": "dyld shared cache path",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.framework_open.cancel",
+      "label": "Cancel",
+      "hint": "Close framework picker",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.framework_open.list",
+      "label": "Framework list",
+      "hint": "Matching Shared Cache images",
+      "traits": [
+        "list"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.framework_open.open",
+      "label": "Open",
+      "hint": "Open selected framework",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.framework_open.search",
+      "label": "Search frameworks",
+      "hint": "Filter Shared Cache images",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.goto.cancel",
+      "label": "Cancel",
+      "hint": "Dismiss Go To dialog",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.goto.go",
+      "label": "Go",
+      "hint": "Navigate to the entered address or label",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.headless.ok",
+      "label": "OK",
+      "hint": "Dismiss headless help",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.help",
+      "label": "Ghidra Help",
+      "hint": "Welcome and documentation",
+      "traits": [
+        "window"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.help.close",
+      "label": "Close Help",
+      "hint": "Close help window",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.help.content",
+      "label": "Help content",
+      "hint": "Help article body",
+      "traits": [
+        "textArea"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.help.open_project",
+      "label": "Open Project Window",
+      "hint": "Leave help for Project Window",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.help.toc",
+      "label": "Help topics",
+      "hint": "Table of contents",
+      "traits": [
+        "list"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.analysis",
+      "label": "Analysis",
+      "hint": "Analysis menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.analysis.auto_analyze",
+      "label": "Auto Analyze\u2026",
+      "hint": "Run auto analysis",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.bsim.overview",
+      "label": "BSim Overview",
+      "hint": "BSim overview (requires BSim)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.bsim.search",
+      "label": "BSim Search\u2026",
+      "hint": "BSim similarity search (requires BSim)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.edit",
+      "label": "Edit",
+      "hint": "Edit menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.file",
+      "label": "File",
+      "hint": "File menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.file.close",
+      "label": "Close Program",
+      "hint": "Close the current program",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.file.import",
+      "label": "Import File\u2026",
+      "hint": "Import a program into the project",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.file.open_app_bundle",
+      "label": "Open App Bundle\u2026",
+      "hint": "Open whole macOS .app / IPA as a bundle",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.file.open_framework_from_dsc",
+      "label": "Open Framework from Shared Cache\u2026",
+      "hint": "Open a framework from dyld shared cache",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.file.open_project",
+      "label": "Open Project\u2026",
+      "hint": "Open a Ghidra project",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.file.open_shared_cache",
+      "label": "Browse Shared Cache\u2026",
+      "hint": "Browse full Shared Cache index",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.file.save",
+      "label": "Save Program",
+      "hint": "Save the current program",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.graph",
+      "label": "Graph",
+      "hint": "Graph menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.help",
+      "label": "Help",
+      "hint": "Help menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.help.about",
+      "label": "About GhidraVibe",
+      "hint": "About this application",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.navigation",
+      "label": "Navigation",
+      "hint": "Navigation menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.navigation.goto",
+      "label": "Go To\u2026",
+      "hint": "Go to address or label",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.project",
+      "label": "Project",
+      "hint": "Project menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.project.new",
+      "label": "New Project\u2026",
+      "hint": "Create a new project",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.search",
+      "label": "Search",
+      "hint": "Search menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.search.functions",
+      "label": "Search Functions\u2026",
+      "hint": "Search functions",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.search.strings",
+      "label": "Search Strings\u2026",
+      "hint": "Search defined strings",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.select",
+      "label": "Select",
+      "hint": "Select menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.tools",
+      "label": "Tools",
+      "hint": "Tools menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.window",
+      "label": "Window",
+      "hint": "Window menu",
+      "traits": [
+        "menu"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.window.agent",
+      "label": "Agent",
+      "hint": "Show Agent panel",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.window.decompiler",
+      "label": "Decompiler",
+      "hint": "Show Decompiler provider",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.window.dsc",
+      "label": "Shared Cache",
+      "hint": "Show Shared Cache panel",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.window.listing",
+      "label": "Listing",
+      "hint": "Show Listing provider",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.window.mcp",
+      "label": "MCP",
+      "hint": "Show MCP panel",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.window.rag",
+      "label": "RAG / JSpace",
+      "hint": "Show RAG panel",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.window.rules",
+      "label": "Rules",
+      "hint": "Show Rules panel",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project",
+      "label": "Project Window",
+      "hint": "Manage projects and programs",
+      "traits": [
+        "window"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.body.active_project",
+      "label": "Active Project (Tree View | Table View + Filter)",
+      "hint": "Active Project (Tree View | Table View + Filter)",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.project.body.logpanel",
+      "label": "LogPanel (status window)",
+      "hint": "LogPanel (status window)",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.project.body.running_tools_workspace_combo",
+      "label": "Running Tools + Workspace combo",
+      "hint": "Running Tools + Workspace combo",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.project.body.tool_chest",
+      "label": "Tool Chest",
+      "hint": "Tool Chest",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.project.data_tabs",
+      "label": "Project data tabs",
+      "hint": "Tree View / Table View",
+      "traits": [
+        "tabGroup"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.filter",
+      "label": "Project filter",
+      "hint": "Filter Active Project",
+      "traits": [
+        "searchField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.import",
+      "label": "Import File",
+      "hint": "Import a binary into the project",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.log",
+      "label": "Log panel",
+      "hint": "Front End log / status window",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.new",
+      "label": "New Project",
+      "hint": "Create a Ghidra project",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.open",
+      "label": "Open Project",
+      "hint": "Open an existing project",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.open_program",
+      "label": "Open Program",
+      "hint": "Open selected program in CodeBrowser",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.running_codebrowser",
+      "label": "Running CodeBrowser",
+      "hint": "Focus or open the running CodeBrowser tool",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.show_log",
+      "label": "Show Log",
+      "hint": "Show Console / Log",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.start_mcp",
+      "label": "Restart Engine",
+      "hint": "Restart the in-process program engine",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.switch_workspace",
+      "label": "Switch Workspace",
+      "hint": "Return to workspace picker",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.tool.apple",
+      "label": "App Bundle",
+      "hint": "Open App Bundle from Tool Chest",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.tool.codebrowser",
+      "label": "CodeBrowser tool",
+      "hint": "Open CodeBrowser for the selected program",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.tool.debugger",
+      "label": "Debugger",
+      "hint": "Open Debugger tool (TraceRmi when connected)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.tool.dsc",
+      "label": "Shared Cache tool",
+      "hint": "Open Shared Cache panel",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.tool.emulator",
+      "label": "Emulator",
+      "hint": "Open Emulator tool when pcode/emulate MCP is available",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.tool.help",
+      "label": "Help tool",
+      "hint": "Open Ghidra Help",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.tool.mcp",
+      "label": "MCP tool",
+      "hint": "Open MCP panel",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.tool.version_tracking",
+      "label": "Version Tracking",
+      "hint": "Open Version Tracking to match source and destination programs",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.refresh",
+      "label": "Refresh",
+      "hint": "Refresh Active Project tree and recent projects",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_add",
+      "label": "Add to Version Control",
+      "hint": "Add the selected file to version control (shared project)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_checkin",
+      "label": "CheckIn",
+      "hint": "Check in local changes to the repository",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_checkout",
+      "label": "CheckOut",
+      "hint": "Check out the selected file for editing",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_find",
+      "label": "Find Checkouts",
+      "hint": "Find files that are currently checked out",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_undo",
+      "label": "UndoCheckOut",
+      "hint": "Undo checkout and discard local VC changes",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_update",
+      "label": "Update",
+      "hint": "Update selected file from the repository",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.tree",
+      "label": "Project tree",
+      "hint": "Open projects and programs",
+      "traits": [
+        "outline"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.project.workspace_picker",
+      "label": "Workspace",
+      "hint": "Active workspace",
+      "traits": [
+        "popUpButton"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent",
+      "label": "Agent",
+      "hint": "Agent provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.apply",
+      "label": "Apply pending edits",
+      "hint": "Apply agent rename/comment proposals",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.autonomous_re",
+      "label": "Autonomous RE",
+      "hint": "Run Autonomous RE playbook",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.chrome",
+      "label": "agent chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.clear_pending",
+      "label": "Clear pending edits",
+      "hint": "Discard pending agent edits",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.close",
+      "label": "Close agent",
+      "hint": "Close this provider pane",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.composer",
+      "label": "Agent composer",
+      "hint": "Ask the agent",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.improve",
+      "label": "Improve decompile",
+      "hint": "Propose readability renames and comments",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.index",
+      "label": "Index JSpace",
+      "hint": "Index RAG from MCP",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.send",
+      "label": "Send",
+      "hint": "Send agent message",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.transcript",
+      "label": "Transcript",
+      "hint": "Agent conversation",
+      "traits": [
+        "textArea"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle",
+      "label": "App Bundle",
+      "hint": "IPA and app import",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.entrypoint.go",
+      "label": "Go to entrypoint",
+      "hint": "Navigate Listing to this entrypoint address",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.import",
+      "label": "Import to project",
+      "hint": "Run ghidra-vibe-apple import",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.libraries.reload",
+      "label": "Reload",
+      "hint": "Reload skipped library namespace list",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.libraries.reset",
+      "label": "Reset defaults",
+      "hint": "Restore Malimite default skipped libraries",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.list",
+      "label": "Resource list",
+      "hint": "plist/strings/nib/car",
+      "traits": [
+        "list"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.open",
+      "label": "Open IPA / App",
+      "hint": "Pick bundle",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.path",
+      "label": "Bundle path",
+      "hint": "Selected IPA or app",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.refresh_db",
+      "label": "Refresh DB",
+      "hint": "Reload Malimite SQLite class/function/string tables",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.resources",
+      "label": "List resources",
+      "hint": "List Apple resources",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.translate.load_db",
+      "label": "Load DB function",
+      "hint": "Copy selected Malimite DB function into translate input",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.translate.load_decompile",
+      "label": "Load current decompile",
+      "hint": "Copy CodeBrowser decompile into translate input",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.translate.run",
+      "label": "Run Translate",
+      "hint": "Run Malimite LLM translate action via vibe MCP",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle.translate.to_agent",
+      "label": "Send to Agent",
+      "hint": "Copy translate output into Agent composer",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.apple_bundle_ipa",
+      "label": "Apple Bundle / IPA",
+      "hint": "Show Apple Bundle / IPA",
+      "traits": [
+        "group"
+      ],
+      "stock": false
+    },
+    {
+      "id": "ghidra.vibe.provider.bookmarks",
+      "label": "Bookmarks",
+      "hint": "Bookmarks provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.bookmarks.body",
+      "label": "Bookmarks",
+      "hint": "Bookmarks content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.bookmarks.chrome",
+      "label": "bookmarks chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.bookmarks.close",
+      "label": "Close bookmarks",
+      "hint": "Close this provider pane",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.bytes",
+      "label": "Bytes : No Program",
+      "hint": "Bytes : No Program provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.bytes.body",
+      "label": "Bytes : No Program",
+      "hint": "Bytes : No Program content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.bytes.chrome",
+      "label": "bytes chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.bytes.close",
+      "label": "Close bytes",
+      "hint": "Close this provider pane",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.checksum",
+      "label": "Checksum Generator",
+      "hint": "Checksum Generator provider",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.checksum.body",
+      "label": "Checksum Generator body",
+      "hint": "Checksum Generator content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.checksum_generator",
+      "label": "Checksum Generator",
+      "hint": "Show Checksum Generator",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.provider.code_editor",
+      "label": "Code Editor",
+      "hint": "Edit decompile / agent text",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.code_editor.body",
+      "label": "Editor body",
+      "hint": "Monospace editor",
+      "traits": [
+        "textArea"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.code_editor.load",
+      "label": "Load decompile",
+      "hint": "Copy decompiler into editor",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.code_editor.to_agent",
+      "label": "Send to Agent",
+      "hint": "Open agent with editor text",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.comments",
+      "label": "Comments",
+      "hint": "Comments provider",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.comments.body",
+      "label": "Comments body",
+      "hint": "Comments content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.commentwindow",
+      "label": "Comments",
+      "hint": "Comments provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.commentwindow.body",
+      "label": "Comments",
+      "hint": "Comments content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.computechecksums",
+      "label": "Checksum Generator",
+      "hint": "Checksum Generator provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.computechecksums.body",
+      "label": "Checksum Generator",
+      "hint": "Checksum Generator content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.console",
+      "label": "Console",
+      "hint": "Console provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.console.chrome",
+      "label": "console chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.console.clear",
+      "label": "Clear Console",
+      "hint": "Clear console output",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.console.close",
+      "label": "Close Console",
+      "hint": "Hide Console / Bookmarks stack (Window \u2192 Console to reopen)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.console.input",
+      "label": "Console Input",
+      "hint": "Scripting console input",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.console.lock",
+      "label": "Scroll Lock",
+      "hint": "Toggle console scroll lock",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.console.text",
+      "label": "Console",
+      "hint": "Analysis console output",
+      "traits": [
+        "textArea"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_type_preview",
+      "label": "Data Type Preview",
+      "hint": "Show Data Type Preview",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types",
+      "label": "Data Type Manager",
+      "hint": "Data Type Manager provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.back",
+      "label": "Previous Data Type",
+      "hint": "Navigate to the previous data type",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.chrome",
+      "label": "data_types chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.close",
+      "label": "Close Data Type Manager",
+      "hint": "Close Data Type Manager (Window \u2192 Data Type Manager to reopen)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.create",
+      "label": "Create Data Type",
+      "hint": "Create a new data type",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.filter_go",
+      "label": "Apply Filter",
+      "hint": "Apply the data type filter",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.forward",
+      "label": "Next Data Type",
+      "hint": "Navigate to the next data type",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.open_archive",
+      "label": "Open Archive",
+      "hint": "Open or refresh a data type archive",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.search",
+      "label": "Filter data types",
+      "hint": "Filter Data Type Manager",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.settings",
+      "label": "Settings",
+      "hint": "Data Type Manager settings",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.data_types.tree",
+      "label": "Data types",
+      "hint": "Data type archives",
+      "traits": [
+        "outline"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.datatype_preview",
+      "label": "Data Type Preview",
+      "hint": "Data Type Preview provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.datatype_preview.body",
+      "label": "Data Type Preview",
+      "hint": "Data Type Preview content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler",
+      "label": "Decompile",
+      "hint": "Decompile provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.chrome",
+      "label": "decompiler chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.close",
+      "label": "Close Decompiler",
+      "hint": "Close Decompiler provider (Window \u2192 Decompile to reopen)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.export",
+      "label": "Export",
+      "hint": "Export decompiler output",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.options",
+      "label": "Decompiler Options",
+      "hint": "Decompiler options",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.refresh",
+      "label": "Refresh",
+      "hint": "Refresh decompiler",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.decompiler.text",
+      "label": "Decompiler text",
+      "hint": "Decompiled C-like output",
+      "traits": [
+        "textArea"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.defined_data",
+      "label": "Defined Data",
+      "hint": "Defined Data provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.defined_data.body",
+      "label": "Defined Data",
+      "hint": "Defined Data content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.disassembled_view",
+      "label": "Disassembled View",
+      "hint": "Disassembled View provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.disassembled_view.body",
+      "label": "Disassembled View",
+      "hint": "Disassembled View content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc",
+      "label": "Shared Cache",
+      "hint": "Shared Cache provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc.analyze_toggle",
+      "label": "Auto-analyze after load",
+      "hint": "Run full analysis after DSC module load (slow; off by default like IDA open-first)",
+      "traits": [
+        "checkbox"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc.cache_path",
+      "label": "Cache path",
+      "hint": "dyld shared cache path",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc.chrome",
+      "label": "dsc chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc.close",
+      "label": "Close dsc",
+      "hint": "Close this provider pane",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc.image_list",
+      "label": "Image list",
+      "hint": "DSC images",
+      "traits": [
+        "list"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc.image_search",
+      "label": "Image filter",
+      "hint": "Filter DSC images",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc.import",
+      "label": "Import image",
+      "hint": "Import selected image with Apple symbols",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc.open_framework",
+      "label": "Open Framework",
+      "hint": "Open framework picker",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.dsc.refresh",
+      "label": "Open cache",
+      "hint": "Open on-device dyld shared cache and rescan DSC Index",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.entropy",
+      "label": "Entropy",
+      "hint": "Entropy provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.entropy.body",
+      "label": "Entropy",
+      "hint": "Entropy content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.equates",
+      "label": "Equates Table",
+      "hint": "Equates Table provider",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.equates.body",
+      "label": "Equates Table body",
+      "hint": "Equates Table content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.equates_table",
+      "label": "Equates Table",
+      "hint": "Show Equates Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.provider.equatetable",
+      "label": "Equates Table",
+      "hint": "Equates Table provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.equatetable.body",
+      "label": "Equates Table",
+      "hint": "Equates Table content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.external_programs",
+      "label": "External Programs",
+      "hint": "External Programs provider",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.external_programs.body",
+      "label": "External Programs body",
+      "hint": "External Programs content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.function_graph",
+      "label": "Function Graph",
+      "hint": "Function Graph provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.function_graph.body",
+      "label": "Function Graph",
+      "hint": "Function Graph CFG canvas",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.function_graph.refresh",
+      "label": "Refresh Graph",
+      "hint": "Rebuild control-flow graph for the selected function",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.function_tags",
+      "label": "Function Tags",
+      "hint": "Function Tags provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.function_tags.body",
+      "label": "Function Tags",
+      "hint": "Function Tags content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.functions",
+      "label": "Functions",
+      "hint": "Functions provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.functions.chrome",
+      "label": "functions chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.functions.close",
+      "label": "Close functions",
+      "hint": "Close this provider pane",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.functions.list",
+      "label": "Functions",
+      "hint": "Function list",
+      "traits": [
+        "list"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.functions.reload",
+      "label": "Reload",
+      "hint": "Reload from MCP",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.functions.search",
+      "label": "Search functions",
+      "hint": "Filter functions",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.interpreterpanel",
+      "label": "Python",
+      "hint": "Python provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.interpreterpanel.body",
+      "label": "Python",
+      "hint": "Python content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.listing",
+      "label": "Listing",
+      "hint": "Listing provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.chrome",
+      "label": "listing chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.close",
+      "label": "Close Listing",
+      "hint": "Close Listing provider (Window \u2192 Listing to reopen)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.goto_field",
+      "label": "Go To field",
+      "hint": "Enter address or label",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.marker",
+      "label": "Marker",
+      "hint": "Listing markers",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.settings",
+      "label": "Listing Settings",
+      "hint": "Listing display settings",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.listing.text",
+      "label": "Listing text",
+      "hint": "Disassembly listing",
+      "traits": [
+        "textArea"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.mcp",
+      "label": "MCP",
+      "hint": "MCP provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.mcp.chrome",
+      "label": "mcp chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.mcp.close",
+      "label": "Close mcp",
+      "hint": "Close this provider pane",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.mcp.health",
+      "label": "Check health",
+      "hint": "Ping MCP",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.mcp.start",
+      "label": "Restart Engine",
+      "hint": "Restart the program engine",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.mcp.url",
+      "label": "MCP server URL",
+      "hint": "Analysis MCP base URL",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.memory_map",
+      "label": "Memory Map",
+      "hint": "Memory Map provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.memory_map.body",
+      "label": "Memory Map",
+      "hint": "Memory Map content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.memory_map.chrome",
+      "label": "memory_map chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.memory_map.close",
+      "label": "Close memory_map",
+      "hint": "Close this provider pane",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.overview",
+      "label": "Overview",
+      "hint": "Overview provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.overview.body",
+      "label": "Overview",
+      "hint": "Overview content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree",
+      "label": "Program Trees",
+      "hint": "Program Trees provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.chrome",
+      "label": "program_tree chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.close",
+      "label": "Close Program Trees",
+      "hint": "Close Program Trees (Window \u2192 Program Trees to reopen)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.create_folder",
+      "label": "Create Folder",
+      "hint": "Create a folder in the program tree",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.create_fragment",
+      "label": "Create Fragment",
+      "hint": "Create a memory fragment in the program tree",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.create_tree",
+      "label": "Create Tree",
+      "hint": "Create a new program tree",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.program_tree.tree",
+      "label": "Program tree",
+      "hint": "Program fragments and modules",
+      "traits": [
+        "outline"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.python",
+      "label": "Python",
+      "hint": "Python provider",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.python.body",
+      "label": "Python body",
+      "hint": "Python content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.python.run",
+      "label": "Run via MCP scripts",
+      "hint": "Run the Python draft through analysis MCP scripts API",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.rag",
+      "label": "RAG / JSpace",
+      "hint": "RAG / JSpace provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.rag.discover",
+      "label": "Discover",
+      "hint": "Run RAG discover",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.rag.index",
+      "label": "Index",
+      "hint": "Index JSpace",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.rag.query",
+      "label": "RAG query",
+      "hint": "Discover via JSpace",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.rag_jspace",
+      "label": "RAG / JSpace",
+      "hint": "Show RAG / JSpace",
+      "traits": [
+        "group"
+      ],
+      "stock": false
+    },
+    {
+      "id": "ghidra.vibe.provider.references",
+      "label": "External Programs",
+      "hint": "External Programs provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.references.body",
+      "label": "External Programs",
+      "hint": "External Programs content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.register",
+      "label": "Register Manager",
+      "hint": "Register Manager provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.register.body",
+      "label": "Register Manager",
+      "hint": "Register Manager content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.register_manager",
+      "label": "Register Manager",
+      "hint": "Show Register Manager",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.provider.registers",
+      "label": "Register Manager",
+      "hint": "Register Manager provider",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.registers.body",
+      "label": "Register Manager body",
+      "hint": "Register Manager content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.relocation_table",
+      "label": "Relocation Table",
+      "hint": "Show Relocation Table",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.provider.relocations",
+      "label": "Relocation Table",
+      "hint": "Relocation Table provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.relocations.body",
+      "label": "Relocation Table",
+      "hint": "Relocation Table content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.rules",
+      "label": "Rules",
+      "hint": "Rules provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.rules.editor",
+      "label": "Rules editor",
+      "hint": "Edit playbook rules",
+      "traits": [
+        "textArea"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.rules.save",
+      "label": "Save rules",
+      "hint": "Save playbook",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.script_manager",
+      "label": "Script Manager",
+      "hint": "Script Manager provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.script_manager.body",
+      "label": "Script Manager",
+      "hint": "Script Manager content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.script_manager.refresh",
+      "label": "Refresh scripts",
+      "hint": "Reload Ghidra script list from analysis MCP",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.script_manager.run",
+      "label": "Run script",
+      "hint": "Execute this script via analysis MCP",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.shared_cache",
+      "label": "Shared Cache",
+      "hint": "Show Shared Cache",
+      "traits": [
+        "group"
+      ],
+      "stock": false
+    },
+    {
+      "id": "ghidra.vibe.provider.strings",
+      "label": "Defined Strings",
+      "hint": "Show Defined Strings",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.provider.strings.chrome",
+      "label": "strings chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.strings.close",
+      "label": "Close strings",
+      "hint": "Close this provider pane",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.swift_classes",
+      "label": "Classes",
+      "hint": "ObjC and Swift class browser",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.swift_classes.dump",
+      "label": "Dump via headless",
+      "hint": "DumpSwiftNamespaces",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.swift_classes.go",
+      "label": "Go to namespace",
+      "hint": "Navigate to this Swift/ObjC namespace",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.swift_classes.list",
+      "label": "Swift class list",
+      "hint": "Namespace rows",
+      "traits": [
+        "list"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.swift_classes.refresh",
+      "label": "Refresh namespaces",
+      "hint": "From symbols/functions",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.swift_classes.tabs",
+      "label": "Classes tabs",
+      "hint": "ObjC / Swift",
+      "traits": [
+        "tabGroup"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_references",
+      "label": "Symbol References",
+      "hint": "Symbol References provider",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_references.body",
+      "label": "Symbol References body",
+      "hint": "Symbol References content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_table",
+      "label": "Symbol Table",
+      "hint": "Symbol Table provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_table.body",
+      "label": "Symbol Table",
+      "hint": "Symbol Table content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree",
+      "label": "Symbol Tree",
+      "hint": "Symbol Tree provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.chrome",
+      "label": "symbol_tree chrome",
+      "hint": "Provider title bar \u2014 drag to redock",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.close",
+      "label": "Close Symbol Tree",
+      "hint": "Close Symbol Tree (Window \u2192 Symbol Tree to reopen)",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.create_class",
+      "label": "Create Class",
+      "hint": "Create a class in the symbol tree",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.create_namespace",
+      "label": "Create Namespace",
+      "hint": "Create a namespace in the symbol tree",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.create_symbol",
+      "label": "Create Symbol",
+      "hint": "Create a symbol in the symbol tree",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.filter_go",
+      "label": "Apply Filter",
+      "hint": "Apply the symbol tree filter",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.search",
+      "label": "Search symbols",
+      "hint": "Filter symbol tree",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.snapshot",
+      "label": "Capture Symbol Tree",
+      "hint": "Refresh / capture the symbol tree",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.symbol_tree.tree",
+      "label": "Symbol tree",
+      "hint": "Navigate symbols",
+      "traits": [
+        "outline"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.version_tracking.open_codebrowser",
+      "label": "Open CodeBrowser",
+      "hint": "Open CodeBrowser to inspect matched programs",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.viewstrings",
+      "label": "Defined Strings",
+      "hint": "Defined Strings provider pane",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.viewstrings.body",
+      "label": "Defined Strings",
+      "hint": "Defined Strings content",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.root",
+      "label": "GhidraVibe",
+      "hint": "Native Ghidra shell",
+      "traits": [
+        "application"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.sheet.close",
+      "label": "Close",
+      "hint": "Close provider sheet",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.splash",
+      "label": "Splash",
+      "hint": "Ghidra startup splash",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.splash.status",
+      "label": "Splash status",
+      "hint": "Startup phase message",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.splash.title",
+      "label": "GHIDRA",
+      "hint": "Product title",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.splash.version",
+      "label": "Version",
+      "hint": "Build and Java version",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.startup.tip_of_the_day",
+      "label": "Tip of the Day",
+      "hint": "Tip of the Day",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.startup.user_agreement",
+      "label": "User Agreement",
+      "hint": "User Agreement",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.startup.what_s_new_welcome_help",
+      "label": "What's New / Welcome Help",
+      "hint": "What's New / Welcome Help",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.startup.workspace_project",
+      "label": "Workspace/Project",
+      "hint": "Workspace/Project",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.status.bar",
+      "label": "Status bar",
+      "hint": "Application status",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.status.busy_badge",
+      "label": "Task monitor title",
+      "hint": "Active background task (Auto Analysis, DSC Import, \u2026)",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.status.cancel_analysis",
+      "label": "Cancel Auto Analysis",
+      "hint": "Cancel the current Auto Analyze wait",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.status.elapsed",
+      "label": "Task elapsed time",
+      "hint": "Seconds the current background task has been running",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.status.mcp",
+      "label": "Engine status",
+      "hint": "Program engine status (in-process). Cursor MCP is optional.",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.status.message",
+      "label": "Status message",
+      "hint": "Current status text",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.status.progress",
+      "label": "Task progress spinner",
+      "hint": "Indeterminate progress while a background task runs",
+      "traits": [
+        "progressIndicator"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.status.progress_bar",
+      "label": "Task progress bar",
+      "hint": "Full-width indeterminate bar (stock Task Monitor)",
+      "traits": [
+        "progressIndicator"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.tip",
+      "label": "Tip of the Day",
+      "hint": "Startup tip sheet",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.tip.close",
+      "label": "Close",
+      "hint": "Close Tip of the Day",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.tip.dont_show",
+      "label": "Don't Show Again",
+      "hint": "Disable Tip of the Day on startup",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.tip.next",
+      "label": "Next Tip",
+      "hint": "Show the next tip",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.agent_sidebar",
+      "label": "Agent sidebar",
+      "hint": "Show or hide the Agent chat sidebar",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.analyze",
+      "label": "Auto Analyze",
+      "hint": "Run auto analysis on the current program",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.apple",
+      "label": "App Bundle\u2026",
+      "hint": "Open .app / .ipa / .framework",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.decompile",
+      "label": "Decompile",
+      "hint": "Decompile the selected function",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.dsc",
+      "label": "Framework\u2026",
+      "hint": "Open a framework from the Shared Cache",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.fetch_functions",
+      "label": "Fetch Functions",
+      "hint": "Reload function list from MCP",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.goto",
+      "label": "Go To",
+      "hint": "Go to address or label",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_b",
+      "label": "B",
+      "hint": "Add bookmark",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_d",
+      "label": "D",
+      "hint": "Define data at current location",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_f",
+      "label": "F",
+      "hint": "Create function",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_i",
+      "label": "I",
+      "hint": "Disassemble at current location",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_l",
+      "label": "L",
+      "hint": "Create label",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_u",
+      "label": "U",
+      "hint": "Clear code bytes",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.listing_v",
+      "label": "V",
+      "hint": "Create structure or array",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.mcp_health",
+      "label": "Engine Status",
+      "hint": "Check analysis MCP connection",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.more",
+      "label": "More tools",
+      "hint": "Additional CodeBrowser tools and layout toggles",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.nav_back",
+      "label": "Previous Location",
+      "hint": "Navigate back",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.nav_fwd",
+      "label": "Next Location",
+      "hint": "Navigate forward",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.redo",
+      "label": "Redo",
+      "hint": "Redo last edit",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.save",
+      "label": "Save Program",
+      "hint": "Save current program",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.start_mcp",
+      "label": "Restart Engine",
+      "hint": "Restart the program engine",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.swift",
+      "label": "Swift Classes",
+      "hint": "Show Swift namespaces",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.toolbar.undo",
+      "label": "Undo",
+      "hint": "Undo last edit",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.provider.version_tracking_implied_matches",
+      "label": "Version Tracking Implied Matches",
+      "hint": "Show Version Tracking Implied Matches",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.provider.version_tracking_markup_items",
+      "label": "Version Tracking Markup Items",
+      "hint": "Show Version Tracking Markup Items",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.provider.version_tracking_matches",
+      "label": "Version Tracking Matches",
+      "hint": "Show Version Tracking Matches",
+      "traits": [
+        "group"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.apply_markup",
+      "label": "Apply Markup",
+      "hint": "Apply Markup",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.create_session",
+      "label": "Create Session",
+      "hint": "Create Session",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.run_correlators",
+      "label": "Run Correlators",
+      "hint": "Run Correlators",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.version_tracking.toolbar.save_session",
+      "label": "Save Session",
+      "hint": "Save Session",
+      "traits": [
+        "button"
+      ],
+      "stock": true
+    },
+    {
+      "id": "ghidra.vibe.workspace",
+      "label": "Workspace picker",
+      "hint": "Select project or workspace",
+      "traits": [
+        "window"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.workspace.browse",
+      "label": "Browse",
+      "hint": "Browse for a project file",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.workspace.default",
+      "label": "Default workspace",
+      "hint": "Default workspace",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.workspace.new",
+      "label": "New Project",
+      "hint": "Create a new project",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.workspace.open_selected",
+      "label": "Open Selected",
+      "hint": "Open the selected recent project",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.workspace.recent_list",
+      "label": "Recent projects",
+      "hint": "List of recent projects",
+      "traits": [
+        "list"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.workspace.show_help",
+      "label": "Show Welcome / Help",
+      "hint": "Open Ghidra Help",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.workspace.skip",
+      "label": "Continue without project",
+      "hint": "Skip to Project Window",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.workspace.title",
+      "label": "Select Project / Workspace",
+      "hint": "Workspace chooser title",
+      "traits": [
+        "staticText"
+      ]
+    }
+  ]
+}

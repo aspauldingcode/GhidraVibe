@@ -1,0 +1,23 @@
+Vibe Ghidra
+Copyright 2026 Vibe Ghidra contributors
+
+This product includes software developed by others, redistributed under
+their respective licenses.
+
+-------------------------------------------------------------------------------
+Ghidra
+Copyright (c) National Security Agency
+
+Licensed under the Apache License, Version 2.0.
+https://github.com/NationalSecurityAgency/Ghidra
+
+Vibe Ghidra is a separate project and is not endorsed by the National
+Security Agency. "Ghidra" is used only to describe the origin of the
+bundled reverse-engineering platform.
+-------------------------------------------------------------------------------
+GhidraMCP (bethington)
+Copyright (c) bethington and contributors
+
+Licensed under the Apache License, Version 2.0.
+https://github.com/bethington/ghidra-mcp
+-------------------------------------------------------------------------------

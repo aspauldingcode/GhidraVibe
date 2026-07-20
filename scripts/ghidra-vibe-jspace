@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# JSpace — RE-oriented hybrid RAG (Rust binary).
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+resolve_bin() {
+  if [[ -n "${GHIDRA_VIBE_JSPACE_BIN:-}" && -x "${GHIDRA_VIBE_JSPACE_BIN}" ]]; then
+    echo "${GHIDRA_VIBE_JSPACE_BIN}"
+    return
+  fi
+  local c
+  for c in \
+    "$ROOT/rust/target/release/ghidra-vibe-jspace" \
+    "$ROOT/rust/target/debug/ghidra-vibe-jspace" \
+    "$(command -v ghidra-vibe-jspace 2>/dev/null || true)"; do
+    if [[ -n "$c" && -x "$c" && "$c" != "$0" ]]; then
+      echo "$c"
+      return
+    fi
+  done
+  return 1
+}
+
+if BIN="$(resolve_bin)"; then
+  exec "$BIN" "$@"
+fi
+
+# Dev fallback: build via cargo from nix shell
+if command -v cargo >/dev/null 2>&1; then
+  (cd "$ROOT/rust" && cargo build -q -p ghidra-vibe-tools --bin ghidra-vibe-jspace --release)
+  exec "$ROOT/rust/target/release/ghidra-vibe-jspace" "$@"
+fi
+
+echo "ghidra-vibe-jspace: Rust binary missing. Build: nix build .#ghidra-vibe-tools" >&2
+exit 1

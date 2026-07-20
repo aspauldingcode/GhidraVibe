@@ -1,0 +1,317 @@
+{
+  "version": 2,
+  "tool": "Project Window",
+  "stock": true,
+  "generated_by": "scripts/extract-stock-inventory.py",
+  "count": 19,
+  "counts": {
+    "wired": 19,
+    "disabled_honest": 0
+  },
+  "entries": [
+    {
+      "id": "ghidra.vibe.project.body.active_project",
+      "surface": "project_body",
+      "owner": "Project Window",
+      "label": "Active Project (Tree View | Table View + Filter)",
+      "hint": "Active Project (Tree View | Table View + Filter)",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.body.logpanel",
+      "surface": "project_body",
+      "owner": "Project Window",
+      "label": "LogPanel (status window)",
+      "hint": "LogPanel (status window)",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.body.running_tools_workspace_combo",
+      "surface": "project_body",
+      "owner": "Project Window",
+      "label": "Running Tools + Workspace combo",
+      "hint": "Running Tools + Workspace combo",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.body.tool_chest",
+      "surface": "project_body",
+      "owner": "Project Window",
+      "label": "Tool Chest",
+      "hint": "Tool Chest",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.tool.codebrowser",
+      "surface": "tool_chest",
+      "owner": "Tool Chest",
+      "label": "CodeBrowser",
+      "hint": "Open CodeBrowser",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.tool.debugger",
+      "surface": "tool_chest",
+      "owner": "Tool Chest",
+      "label": "Debugger",
+      "hint": "Open Debugger",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.tool.emulator",
+      "surface": "tool_chest",
+      "owner": "Tool Chest",
+      "label": "Emulator",
+      "hint": "Open Emulator",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.tool.version_tracking",
+      "surface": "tool_chest",
+      "owner": "Tool Chest",
+      "label": "Version Tracking",
+      "hint": "Open Version Tracking",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.refresh",
+      "surface": "project_toolbar",
+      "owner": "Project Window",
+      "label": "Refresh",
+      "hint": "Refresh",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_add",
+      "surface": "project_toolbar",
+      "owner": "Project Window",
+      "label": "Add to Version Control",
+      "hint": "Add to Version Control",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_checkin",
+      "surface": "project_toolbar",
+      "owner": "Project Window",
+      "label": "CheckIn",
+      "hint": "CheckIn",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_checkout",
+      "surface": "project_toolbar",
+      "owner": "Project Window",
+      "label": "CheckOut",
+      "hint": "CheckOut",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_find",
+      "surface": "project_toolbar",
+      "owner": "Project Window",
+      "label": "Find Checkouts",
+      "hint": "Find Checkouts",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_undo",
+      "surface": "project_toolbar",
+      "owner": "Project Window",
+      "label": "UndoCheckOut",
+      "hint": "UndoCheckOut",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.project.toolbar.vc_update",
+      "surface": "project_toolbar",
+      "owner": "Project Window",
+      "label": "Update",
+      "hint": "Update",
+      "mcp": null,
+      "stock": true,
+      "tier": "m3_engine",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.startup.tip_of_the_day",
+      "surface": "startup",
+      "owner": "Front End",
+      "label": "Tip of the Day",
+      "hint": "Tip of the Day",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.startup.user_agreement",
+      "surface": "startup",
+      "owner": "Front End",
+      "label": "User Agreement",
+      "hint": "User Agreement",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.startup.what_s_new_welcome_help",
+      "surface": "startup",
+      "owner": "Front End",
+      "label": "What's New / Welcome Help",
+      "hint": "What's New / Welcome Help",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    },
+    {
+      "id": "ghidra.vibe.startup.workspace_project",
+      "surface": "startup",
+      "owner": "Front End",
+      "label": "Workspace/Project",
+      "hint": "Workspace/Project",
+      "mcp": null,
+      "stock": true,
+      "tier": "m2_ui",
+      "depth": "stock",
+      "platforms": {
+        "macos": "wired",
+        "gtk": "wired"
+      },
+      "behavior": "wired"
+    }
+  ]
+}

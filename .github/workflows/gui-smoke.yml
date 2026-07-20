@@ -1,0 +1,84 @@
+name: gui-smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  ax-and-control:
+    runs-on: [self-hosted, macOS, tahoe, apple-silicon]
+    if: ${{ true }}
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package app
+        run: ./macos/GhidraVibe/scripts/package-app.sh
+      - name: Register app
+        run: |
+          mkdir -p "$HOME/Applications"
+          rm -rf "$HOME/Applications/GhidraVibe.app"
+          cp -R macos/GhidraVibe/.build/GhidraVibe.app "$HOME/Applications/"
+          /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$HOME/Applications/GhidraVibe.app"
+      - name: Agent / API config unit smokes
+        run: |
+          chmod +x gui-tests/*.sh scripts/*.sh
+          ./gui-tests/smoke-agent-api-config.sh
+          ./gui-tests/smoke-agent-welcome.sh
+          ./gui-tests/smoke-agent-sidebar.sh
+          ./gui-tests/smoke-agent-npu.sh
+      - name: Decompile binary smoke
+        run: |
+          chmod +x gui-tests/smoke-decompile.sh
+          ./gui-tests/smoke-decompile.sh
+      - name: Whoami decompile GUI smoke
+        run: |
+          chmod +x gui-tests/smoke-whoami-decompile.sh
+          ./gui-tests/smoke-whoami-decompile.sh
+      - name: Function Graph CFG GUI smoke
+        run: |
+          chmod +x gui-tests/smoke-function-graph.sh
+          GRAPH_REPACKAGE=0 ./gui-tests/smoke-function-graph.sh
+      - name: AppKit decompile GUI smoke
+        run: |
+          chmod +x gui-tests/smoke-appkit-decompile.sh scripts/ghidra-vibe-dyld
+          ./gui-tests/smoke-appkit-decompile.sh
+      - name: AppKit classes open+analyze GUI smoke
+        run: |
+          chmod +x gui-tests/smoke-appkit-classes.sh scripts/ghidra-vibe-dyld
+          ./gui-tests/smoke-appkit-classes.sh
+      - name: Stock capability matrix gate
+        run: |
+          chmod +x scripts/check-capability-matrix.sh gui-tests/run-stock-capability-suite.sh
+          ./scripts/check-capability-matrix.sh
+      - name: Stock capability suite
+        env:
+          GHIDRA_INSTALL_DIR: ${{ env.GHIDRA_INSTALL_DIR }}
+        run: |
+          if [[ -z "${GHIDRA_INSTALL_DIR:-}" ]]; then
+            if [[ -d result/lib/ghidra ]]; then
+              export GHIDRA_INSTALL_DIR="$PWD/result/lib/ghidra"
+            elif command -v nix >/dev/null 2>&1; then
+              export GHIDRA_INSTALL_DIR="$(nix build .#ghidra-vibe --print-out-paths)/lib/ghidra"
+            fi
+          fi
+          if [[ -z "${GHIDRA_VIBE_ENGINE_HOME:-}" ]] && command -v nix >/dev/null 2>&1; then
+            export GHIDRA_VIBE_ENGINE_HOME="$(nix build .#ghidra-vibe-engine --print-out-paths)"
+          fi
+          if [[ -z "${JAVA_HOME:-}" && -x /usr/libexec/java_home ]]; then
+            JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home)"
+            export JAVA_HOME
+          fi
+          ./gui-tests/run-stock-capability-suite.sh
+      - name: AX smoke
+        env:
+          AGENT_DEVICE_MACOS_HELPER_BIN: ${{ env.HOME }}/.agent-device/macos-helper/current/agent-device-macos-helper
+        run: |
+          export AGENT_DEVICE_MACOS_HELPER_BIN="${AGENT_DEVICE_MACOS_HELPER_BIN:-$HOME/.agent-device/macos-helper/current/agent-device-macos-helper}"
+          ./gui-tests/run-smoke.sh
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-smoke-artifacts
+          path: gui-tests/artifacts/

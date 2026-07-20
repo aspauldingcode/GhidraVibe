@@ -1,0 +1,13 @@
+# CodeBrowser parity smoke (agent-device) — run after packaging GhidraVibe.app
+# agent-device replay gui-tests/codebrowser-parity.ad --session vibe --platform macos
+
+open ./macos/GhidraVibe/.build/GhidraVibe.app --platform macos --relaunch --session vibe
+wait 2000
+snapshot -i --session vibe --platform macos
+is exists 'id="ghidra.vibe.codebrowser"' --session vibe --platform macos
+is exists 'id="ghidra.vibe.toolbar.save"' --session vibe --platform macos
+is exists 'id="ghidra.vibe.toolbar.listing_i"' --session vibe --platform macos
+is exists 'id="ghidra.vibe.toolbar.apple"' --session vibe --platform macos
+is exists 'id="ghidra.vibe.provider.program_tree"' --session vibe --platform macos
+is exists 'id="ghidra.vibe.provider.symbol_tree"' --session vibe --platform macos
+is exists 'id="ghidra.vibe.provider.data_types"' --session vibe --platform macos

@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "description": "Wave E / null tool-map / live TraceRmi \u2014 ratcheted runtime gaps",
+  "max_runtime_gaps": 10,
+  "gaps": [
+    {
+      "id": "ghidra.vibe.menu.bsim.overview",
+      "reason": "Wave E \u2014 BSim DB UI / live agent path not capability-proven",
+      "owner": "native-gui"
+    },
+    {
+      "id": "ghidra.vibe.menu.bsim.search",
+      "reason": "Wave E \u2014 BSim DB UI / live agent path not capability-proven",
+      "owner": "native-gui"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.cut",
+      "reason": "action edit_cut is null/Wave-E in tool-map",
+      "owner": "native-gui"
+    },
+    {
+      "id": "ghidra.vibe.menu.edit.paste",
+      "reason": "action edit_paste is null/Wave-E in tool-map",
+      "owner": "native-gui"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_dbgeng",
+      "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session",
+      "owner": "native-gui"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_drgn",
+      "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session",
+      "owner": "native-gui"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_gdb",
+      "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session",
+      "owner": "native-gui"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_lldb",
+      "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session",
+      "owner": "native-gui"
+    },
+    {
+      "id": "ghidra.vibe.module.debug.debugger_agent_x64dbg",
+      "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session",
+      "owner": "native-gui"
+    },
+    {
+      "id": "ghidra.vibe.module.features.pyghidra",
+      "reason": "Wave E \u2014 full PyGhidra IDE / live TraceRmi agent session",
+      "owner": "native-gui"
+    }
+  ]
+}
