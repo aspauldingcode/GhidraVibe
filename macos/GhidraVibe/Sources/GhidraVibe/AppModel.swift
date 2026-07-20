@@ -211,42 +211,48 @@ final class AppModel {
     }
 
     init() {
+        VibeRuntime.bootstrap()
         let env = ProcessInfo.processInfo.environment
-        mcpServerURL = env["GHIDRA_MCP_URL"] ?? env["GHIDRA_MCP_SERVER"] ?? "http://127.0.0.1:8089"
-        vibeMcpURL = env["GHIDRA_VIBE_MCP_EXT_URL"] ?? "http://127.0.0.1:8092"
-        vibeMcpExtBin = env["GHIDRA_VIBE_MCP_EXT"] ?? ""
-        debuggerURL = env["GHIDRA_MCP_DEBUGGER_URL"] ?? "http://127.0.0.1:8099"
-        ghidraBin = env["GHIDRA_VIBE_BIN"] ?? "ghidra"
-        headlessBin = env["GHIDRA_VIBE_HEADLESS"] ?? "ghidra-analyzeHeadless"
-        bridgePath = env["GHIDRA_VIBE_MCP_BRIDGE"] ?? ""
-        mcpHeadlessBin = env["GHIDRA_VIBE_MCP_HEADLESS"] ?? ""
-        extractBin = env["GHIDRA_VIBE_EXTRACT"] ?? ""
-        dyldHelper = env["GHIDRA_VIBE_DYLD"] ?? ""
-        appleHelper = env["GHIDRA_VIBE_APPLE"] ?? ""
-        jspaceBin = env["GHIDRA_VIBE_JSPACE"] ?? ""
-        apiKeyFilePath = env["GHIDRA_VIBE_API_KEY_FILE"] ?? ""
+        mcpServerURL = VibeRuntime.get("GHIDRA_MCP_URL")
+            ?? VibeRuntime.get("GHIDRA_MCP_SERVER")
+            ?? env["GHIDRA_MCP_URL"]
+            ?? env["GHIDRA_MCP_SERVER"]
+            ?? "http://127.0.0.1:8089"
+        vibeMcpURL = VibeRuntime.get("GHIDRA_VIBE_MCP_EXT_URL") ?? "http://127.0.0.1:8092"
+        vibeMcpExtBin = VibeRuntime.get("GHIDRA_VIBE_MCP_EXT") ?? ""
+        debuggerURL = VibeRuntime.get("GHIDRA_MCP_DEBUGGER_URL") ?? "http://127.0.0.1:8099"
+        ghidraBin = VibeRuntime.get("GHIDRA_VIBE_BIN") ?? "ghidra"
+        headlessBin = VibeRuntime.get("GHIDRA_VIBE_HEADLESS") ?? "ghidra-analyzeHeadless"
+        bridgePath = VibeRuntime.get("GHIDRA_VIBE_MCP_BRIDGE") ?? ""
+        mcpHeadlessBin = VibeRuntime.get("GHIDRA_VIBE_MCP_HEADLESS") ?? ""
+        extractBin = VibeRuntime.get("GHIDRA_VIBE_EXTRACT") ?? ""
+        dyldHelper = VibeRuntime.get("GHIDRA_VIBE_DYLD") ?? ""
+        appleHelper = VibeRuntime.get("GHIDRA_VIBE_APPLE") ?? ""
+        jspaceBin = VibeRuntime.get("GHIDRA_VIBE_JSPACE") ?? ""
+        apiKeyFilePath = VibeRuntime.get("GHIDRA_VIBE_API_KEY_FILE") ?? ""
         agentBaseURL = UserDefaults.standard.string(forKey: "ghidra.vibe.agent.baseURL")
-            ?? env["GHIDRA_VIBE_AI_BASE_URL"]
-            ?? env["AI_LOCAL_BASE_URL"]
-            ?? env["OLLAMA_HOST"]
+            ?? VibeRuntime.get("GHIDRA_VIBE_AI_BASE_URL")
+            ?? VibeRuntime.get("AI_LOCAL_BASE_URL")
+            ?? VibeRuntime.get("OLLAMA_HOST")
             ?? "http://127.0.0.1:11434"
         agentModel = UserDefaults.standard.string(forKey: "ghidra.vibe.agent.model")
-            ?? env["GHIDRA_VIBE_AI_MODEL"]
-            ?? env["AI_LOCAL_DEFAULT_MODEL"]
+            ?? VibeRuntime.get("GHIDRA_VIBE_AI_MODEL")
+            ?? VibeRuntime.get("AI_LOCAL_DEFAULT_MODEL")
             ?? "qwen2.5-coder:3b"
         if UserDefaults.standard.object(forKey: "ghidra.vibe.agent.useLocalOllama") != nil {
             agentUseLocalOllama = UserDefaults.standard.bool(forKey: "ghidra.vibe.agent.useLocalOllama")
         } else {
-            agentUseLocalOllama = env["GHIDRA_VIBE_AI_CLOUD"] != "1"
+            agentUseLocalOllama = VibeRuntime.get("GHIDRA_VIBE_AI_CLOUD") != "1"
         }
-        let ai = env["GHIDRA_VIBE_AI"] ?? "1"
+        let ai = VibeRuntime.get("GHIDRA_VIBE_AI") ?? "1"
         let optedOut = UserDefaults.standard.bool(forKey: "ghidra.vibe.agent.optOut") || ai == "0"
         let enabled = !optedOut
         let welcome = enabled && !UserDefaults.standard.bool(forKey: "ghidra.vibe.agent.welcomeDismissed")
         agentOptedOut = optedOut
         agentEnabled = enabled
         showAgentWelcome = welcome
-        agentMoE = AgentMoESettings.load(env: env, fallbackModel: agentModel)
+        // AgentMoESettings still accepts ProcessInfo env; bootstrap already setenv'd discoveries.
+        agentMoE = AgentMoESettings.load(env: ProcessInfo.processInfo.environment, fallbackModel: agentModel)
         let cfg = LocalAIConfig.resolve(
             userBaseURL: agentBaseURL,
             userModel: agentModel,
@@ -254,7 +260,7 @@ final class AppModel {
             preferCloud: !agentUseLocalOllama
         )
         agentBackend = cfg.backend.rawValue
-        if let install = env["GHIDRA_INSTALL_DIR"] {
+        if let install = VibeRuntime.get("GHIDRA_INSTALL_DIR") {
             statusMessage = "Ghidra install: \(install)"
         }
         if let last = UserDefaults.standard.string(forKey: "ghidra.vibe.lastProject"),
@@ -2852,8 +2858,7 @@ final class AppModel {
     }
 
     private var engineMode: String {
-        let env = ProcessInfo.processInfo.environment
-        let mode = (env["GHIDRA_VIBE_ENGINE"] ?? "inprocess").lowercased()
+        let mode = (VibeRuntime.get("GHIDRA_VIBE_ENGINE") ?? "inprocess").lowercased()
         if mode == "sidecar" || mode == "headless" || mode == "process" {
             return "sidecar"
         }
@@ -2941,10 +2946,13 @@ final class AppModel {
     }
 
     private func startSidecarEngine(loadProgram: Bool) async {
+        VibeRuntime.bootstrap()
         guard let engineBin = resolveMcpHeadlessBin() else {
-            mcpStatus = "Engine helper missing (GHIDRA_VIBE_MCP_HEADLESS)"
+            mcpStatus = "Engine helper missing"
             statusMessage = mcpStatus
-            consoleAppend("Engine: set GHIDRA_VIBE_MCP_HEADLESS (nix run passes this)")
+            consoleAppend(
+                "Engine: no in-process bridge and no headless helper — rebuild with package-app.sh or nix run"
+            )
             return
         }
         var args = ["--port", "\(mcpPort)"]
@@ -3052,10 +3060,14 @@ final class AppModel {
     }
 
     private func resolveMcpHeadlessBin() -> String? {
+        VibeRuntime.bootstrap()
         let candidates = [
             mcpHeadlessBin,
-            ProcessInfo.processInfo.environment["GHIDRA_VIBE_MCP_HEADLESS"] ?? "",
+            VibeRuntime.get("GHIDRA_VIBE_MCP_HEADLESS") ?? "",
+            Bundle.main.resourcePath.map { $0 + "/bin/ghidra-vibe-mcp-headless" } ?? "",
+            Bundle.main.resourcePath.map { $0 + "/Helpers/ghidra-vibe-mcp-headless" } ?? "",
             FileManager.default.currentDirectoryPath + "/scripts/ghidra-vibe-mcp-headless",
+            NSHomeDirectory() + "/GhidraMCP_Vibe_RSE/scripts/ghidra-vibe-mcp-headless",
         ]
         return candidates.first {
             !$0.isEmpty && FileManager.default.isExecutableFile(atPath: $0)

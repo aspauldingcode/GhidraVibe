@@ -34,7 +34,8 @@ enum InProcessEngineHost {
     }
 
     static var isAvailable: Bool {
-        resolveLibPath() != nil && resolveClasspath() != nil
+        VibeRuntime.bootstrap()
+        return resolveLibPath() != nil && resolveClasspath() != nil
     }
 
     static var isRunning: Bool {
@@ -59,11 +60,11 @@ enum InProcessEngineHost {
             return StartResult(ok: true, message: "already started")
         }
 
-        let env = ProcessInfo.processInfo.environment
+        VibeRuntime.bootstrap()
         guard let javaHome = resolveJavaHome() else {
             return StartResult(ok: false, message: "JAVA_HOME required (JDK with libjvm/libjli)")
         }
-        guard let install = env["GHIDRA_INSTALL_DIR"], !install.isEmpty else {
+        guard let install = VibeRuntime.get("GHIDRA_INSTALL_DIR"), !install.isEmpty else {
             return StartResult(ok: false, message: "GHIDRA_INSTALL_DIR required")
         }
         guard let classpath = resolveClasspath() else {
@@ -102,8 +103,8 @@ enum InProcessEngineHost {
         let argsJson = "{\(parts.joined(separator: ","))}"
 
         let mem = xmx
-            ?? env["GHIDRA_VIBE_MAXMEM"]
-            ?? env["MAXMEM"]
+            ?? VibeRuntime.get("GHIDRA_VIBE_MAXMEM")
+            ?? VibeRuntime.get("MAXMEM")
             ?? "4G"
 
         var outPtr: UnsafeMutablePointer<CChar>?
@@ -211,8 +212,7 @@ enum InProcessEngineHost {
 
     /// Prefer a JDK root that actually contains HotSpot (`libjli` / `libjvm`).
     private static func resolveJavaHome() -> String? {
-        let env = ProcessInfo.processInfo.environment
-        let raw = env["JAVA_HOME"] ?? ""
+        let raw = VibeRuntime.get("JAVA_HOME") ?? ""
         var candidates: [String] = []
         if !raw.isEmpty {
             candidates.append(raw)
@@ -239,11 +239,11 @@ enum InProcessEngineHost {
     }
 
     private static func resolveLibPath() -> String? {
-        let env = ProcessInfo.processInfo.environment
+        let home = VibeRuntime.get("GHIDRA_VIBE_ENGINE_HOME") ?? ""
         let candidates = [
-            env["GHIDRA_VIBE_ENGINE_LIB"] ?? "",
-            (env["GHIDRA_VIBE_ENGINE_HOME"] ?? "") + "/lib/libghidravibe_engine.dylib",
-            (env["GHIDRA_VIBE_ENGINE_HOME"] ?? "") + "/lib/libghidravibe_engine.so",
+            VibeRuntime.get("GHIDRA_VIBE_ENGINE_LIB") ?? "",
+            home + "/lib/libghidravibe_engine.dylib",
+            home + "/lib/libghidravibe_engine.so",
         ]
         return candidates.first {
             !$0.isEmpty && FileManager.default.isReadableFile(atPath: $0)
@@ -251,13 +251,13 @@ enum InProcessEngineHost {
     }
 
     private static func resolveClasspath() -> String? {
-        let env = ProcessInfo.processInfo.environment
-        if let cp = env["GHIDRA_VIBE_ENGINE_CP"], !cp.isEmpty {
+        if let cp = VibeRuntime.get("GHIDRA_VIBE_ENGINE_CP"), !cp.isEmpty {
             return cp
         }
+        let home = VibeRuntime.get("GHIDRA_VIBE_ENGINE_HOME") ?? ""
         let fileCandidates = [
-            env["GHIDRA_VIBE_ENGINE_CLASSPATH_FILE"] ?? "",
-            (env["GHIDRA_VIBE_ENGINE_HOME"] ?? "") + "/share/ghidra-vibe/engine/classpath.txt",
+            VibeRuntime.get("GHIDRA_VIBE_ENGINE_CLASSPATH_FILE") ?? "",
+            home + "/share/ghidra-vibe/engine/classpath.txt",
         ]
         for path in fileCandidates where !path.isEmpty {
             if let text = try? String(contentsOfFile: path, encoding: .utf8) {
