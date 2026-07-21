@@ -36,6 +36,11 @@ jobs:
         run: |
           nix build .#ghidra-vibe --print-build-logs
           echo "GHIDRA_INSTALL_DIR=$PWD/result/lib/ghidra" >> "$GITHUB_ENV"
+          # Also build the macOS app
+          nix build .#ghidra-vibe-app --print-build-logs -o result-app
+          # Copy the pre-built app for packaging
+          mkdir -p macos/GhidraVibe/.build
+          cp -R result-app/Applications/GhidraVibe.app macos/GhidraVibe/.build/GhidraVibe.app
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -51,6 +56,8 @@ jobs:
           echo "JAVA_HOME=$JAVA_HOME"
 
       - name: Package DMG
+        env:
+          SKIP_SWIFT_BUILD: "1"
         run: |
           chmod +x macos/GhidraVibe/scripts/package-app.sh \
                    macos/GhidraVibe/scripts/package-dmg.sh \

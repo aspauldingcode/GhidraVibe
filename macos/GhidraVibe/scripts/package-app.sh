@@ -22,12 +22,22 @@ cp -f "$REPO/native-ui/layout/CodeBrowser.tool.json" \
       "$REPO/native-ui/parity/VersionTracking.chrome.json" \
       "$ROOT/Sources/GhidraVibe/Resources/"
 
-xcrun swift build -c release --product GhidraVibe
+# If SKIP_SWIFT_BUILD is set (e.g., using pre-built nix binary), skip the Swift build
+if [[ "${SKIP_SWIFT_BUILD:-}" != "1" ]]; then
+  xcrun swift build -c release --product GhidraVibe
+fi
 
 rm -rf "$OUT"
 mkdir -p "$OUT/Contents/MacOS" "$RES"
-cp "$BIN_DIR/GhidraVibe" "$APP_BIN"
-chmod +x "$APP_BIN"
+
+# If using a pre-built app, just copy it
+if [[ "${SKIP_SWIFT_BUILD:-}" == "1" && -f "$ROOT/.build/GhidraVibe.app/Contents/MacOS/GhidraVibe" ]]; then
+  cp -R "$ROOT/.build/GhidraVibe.app/." "$OUT/"
+else
+  # Otherwise use the freshly built binary
+  cp "$BIN_DIR/GhidraVibe" "$APP_BIN"
+  chmod +x "$APP_BIN"
+fi
 
 # Official Ghidra dragon icon + UI catalogs (read via Bundle.main / file paths)
 if [[ -f "$REPO/native-ui/icons/AppIcon.icns" ]]; then
