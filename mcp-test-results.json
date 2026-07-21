@@ -1,0 +1,157 @@
+{
+  "summary": {
+    "total": 7,
+    "passed": 3,
+    "failed": 4,
+    "success_rate": 42.857142857142854
+  },
+  "by_server": {
+    "analysis": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "tests": [
+        {
+          "server": "analysis",
+          "url": "http://127.0.0.1:8089",
+          "test": "health_check",
+          "passed": false,
+          "details": {
+            "ok": false,
+            "error": "Connection failed: [Errno 111] Connection refused"
+          }
+        }
+      ]
+    },
+    "vibe": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "tests": [
+        {
+          "server": "vibe",
+          "url": "http://127.0.0.1:8092",
+          "test": "health_check",
+          "passed": false,
+          "details": {
+            "ok": false,
+            "error": "Connection failed: [Errno 111] Connection refused"
+          }
+        }
+      ]
+    },
+    "gui": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "tests": [
+        {
+          "server": "gui",
+          "url": "http://127.0.0.1:8091",
+          "test": "health_check",
+          "passed": false,
+          "details": {
+            "ok": false,
+            "error": "Connection failed: [Errno 111] Connection refused"
+          }
+        }
+      ]
+    },
+    "debugger": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "tests": [
+        {
+          "server": "debugger",
+          "url": "http://127.0.0.1:8099",
+          "test": "health_check",
+          "passed": false,
+          "details": {
+            "ok": false,
+            "error": "Connection failed: [Errno 111] Connection refused"
+          }
+        }
+      ]
+    },
+    "general": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "test": "bridge_script_exists",
+          "script": "./nix/share/bridge_mcp_gui.py",
+          "passed": true
+        },
+        {
+          "test": "bridge_script_exists",
+          "script": "./nix/share/bridge_mcp_vibe.py",
+          "passed": true
+        },
+        {
+          "test": "bridge_script_exists",
+          "script": "./nix/share/bridge_mcp_rag.py",
+          "passed": true
+        }
+      ]
+    }
+  },
+  "results": [
+    {
+      "server": "analysis",
+      "url": "http://127.0.0.1:8089",
+      "test": "health_check",
+      "passed": false,
+      "details": {
+        "ok": false,
+        "error": "Connection failed: [Errno 111] Connection refused"
+      }
+    },
+    {
+      "server": "vibe",
+      "url": "http://127.0.0.1:8092",
+      "test": "health_check",
+      "passed": false,
+      "details": {
+        "ok": false,
+        "error": "Connection failed: [Errno 111] Connection refused"
+      }
+    },
+    {
+      "server": "gui",
+      "url": "http://127.0.0.1:8091",
+      "test": "health_check",
+      "passed": false,
+      "details": {
+        "ok": false,
+        "error": "Connection failed: [Errno 111] Connection refused"
+      }
+    },
+    {
+      "server": "debugger",
+      "url": "http://127.0.0.1:8099",
+      "test": "health_check",
+      "passed": false,
+      "details": {
+        "ok": false,
+        "error": "Connection failed: [Errno 111] Connection refused"
+      }
+    },
+    {
+      "test": "bridge_script_exists",
+      "script": "./nix/share/bridge_mcp_gui.py",
+      "passed": true
+    },
+    {
+      "test": "bridge_script_exists",
+      "script": "./nix/share/bridge_mcp_vibe.py",
+      "passed": true
+    },
+    {
+      "test": "bridge_script_exists",
+      "script": "./nix/share/bridge_mcp_rag.py",
+      "passed": true
+    }
+  ]
+}

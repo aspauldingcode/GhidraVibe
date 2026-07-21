@@ -1,0 +1,323 @@
+#!/usr/bin/env python3
+"""
+GhidraVibe MCP Functionality Tester
+Tests all MCP servers and tools for GhidraVibe.
+"""
+from __future__ import annotations
+
+import json
+import sys
+import time
+import urllib.error
+import urllib.request
+from typing import Any
+
+# MCP Server URLs (from tool-map.json)
+SERVERS = {
+    "analysis": "http://127.0.0.1:8089",
+    "vibe": "http://127.0.0.1:8092",
+    "gui": "http://127.0.0.1:8091",
+    "debugger": "http://127.0.0.1:8099",
+}
+
+# Test results
+results: list[dict[str, Any]] = []
+
+
+def log(msg: str, level: str = "INFO") -> None:
+    """Log a message with level."""
+    colors = {
+        "INFO": "\033[0;36m",  # Cyan
+        "SUCCESS": "\033[0;32m",  # Green
+        "ERROR": "\033[0;31m",  # Red
+        "WARN": "\033[1;33m",  # Yellow
+    }
+    reset = "\033[0m"
+    print(f"{colors.get(level, '')}[{level}] {msg}{reset}")
+
+
+def http_request(url: str, method: str = "GET", body: dict | None = None, timeout: int = 10) -> dict:
+    """Make HTTP request to server."""
+    data = None if body is None else json.dumps(body).encode()
+    req = urllib.request.Request(
+        url,
+        data=data,
+        method=method,
+        headers={"Content-Type": "application/json"} if data else {},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            raw = resp.read().decode()
+            return {"ok": True, "status": resp.status, "data": json.loads(raw) if raw else {}}
+    except urllib.error.HTTPError as e:
+        return {"ok": False, "status": e.code, "error": e.read().decode() or str(e)}
+    except urllib.error.URLError as e:
+        return {"ok": False, "error": f"Connection failed: {e.reason}"}
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": str(e)}
+
+
+def test_server_health(server_name: str, url: str) -> dict:
+    """Test if a server is reachable and healthy."""
+    log(f"Testing {server_name} server at {url}")
+    
+    # Try health endpoint
+    result = http_request(f"{url}/health")
+    
+    test_result = {
+        "server": server_name,
+        "url": url,
+        "test": "health_check",
+        "passed": result.get("ok", False),
+        "details": result,
+    }
+    
+    if test_result["passed"]:
+        log(f"✓ {server_name} server is healthy", "SUCCESS")
+    else:
+        log(f"✗ {server_name} server failed: {result.get('error', 'Unknown error')}", "ERROR")
+    
+    results.append(test_result)
+    return test_result
+
+
+def test_gui_tools() -> None:
+    """Test GUI MCP tools."""
+    log("\n=== Testing GUI MCP Tools ===", "INFO")
+    
+    gui_url = SERVERS["gui"]
+    
+    # Test 1: Get state
+    log("Test: Get GUI state")
+    result = http_request(f"{gui_url}/state")
+    results.append({
+        "server": "gui",
+        "test": "get_state",
+        "passed": result.get("ok", False),
+        "details": result,
+    })
+    if result.get("ok"):
+        log("✓ Get state successful", "SUCCESS")
+    else:
+        log(f"✗ Get state failed: {result.get('error')}", "ERROR")
+    
+    # Test 2: Navigate (if server is running)
+    if result.get("ok"):
+        log("Test: Navigate to functions pane")
+        nav_result = http_request(f"{gui_url}/navigate", "POST", {"pane": "functions"})
+        results.append({
+            "server": "gui",
+            "test": "navigate",
+            "passed": nav_result.get("ok", False),
+            "details": nav_result,
+        })
+        if nav_result.get("ok"):
+            log("✓ Navigation successful", "SUCCESS")
+        else:
+            log(f"✗ Navigation failed: {nav_result.get('error')}", "ERROR")
+
+
+def test_analysis_tools() -> None:
+    """Test Analysis MCP tools (Ghidra engine)."""
+    log("\n=== Testing Analysis MCP Tools ===", "INFO")
+    
+    analysis_url = SERVERS["analysis"]
+    
+    # Test: Check connection
+    log("Test: Check connection")
+    result = http_request(f"{analysis_url}/health")
+    results.append({
+        "server": "analysis",
+        "test": "check_connection",
+        "passed": result.get("ok", False),
+        "details": result,
+    })
+    if result.get("ok"):
+        log("✓ Connection check successful", "SUCCESS")
+    else:
+        log(f"✗ Connection check failed: {result.get('error')}", "ERROR")
+
+
+def test_vibe_tools() -> None:
+    """Test Vibe MCP tools (extended functionality)."""
+    log("\n=== Testing Vibe MCP Tools ===", "INFO")
+    
+    vibe_url = SERVERS["vibe"]
+    
+    # Test 1: dyld find cache
+    log("Test: dyld find cache")
+    result = http_request(f"{vibe_url}/dyld/find-cache")
+    results.append({
+        "server": "vibe",
+        "test": "dyld_find_cache",
+        "passed": result.get("ok", False),
+        "details": result,
+    })
+    if result.get("ok"):
+        log("✓ dyld find cache successful", "SUCCESS")
+        # If cache found, try listing images
+        if result.get("data", {}).get("cache"):
+            log("Test: dyld list images")
+            list_result = http_request(f"{vibe_url}/dyld/list-images", "POST", {"query": ""})
+            results.append({
+                "server": "vibe",
+                "test": "dyld_list_images",
+                "passed": list_result.get("ok", False),
+                "details": list_result,
+            })
+            if list_result.get("ok"):
+                log("✓ dyld list images successful", "SUCCESS")
+            else:
+                log(f"✗ dyld list images failed: {list_result.get('error')}", "ERROR")
+    else:
+        log(f"✗ dyld find cache failed: {result.get('error')}", "ERROR")
+
+
+def test_mcp_bridge() -> None:
+    """Test MCP stdio bridge functionality."""
+    log("\n=== Testing MCP Stdio Bridge ===", "INFO")
+    
+    # Check if bridge scripts exist
+    import os
+    bridge_scripts = [
+        "./nix/share/bridge_mcp_gui.py",
+        "./nix/share/bridge_mcp_vibe.py",
+        "./nix/share/bridge_mcp_rag.py",
+    ]
+    
+    for script in bridge_scripts:
+        if os.path.exists(script):
+            log(f"✓ Bridge script found: {script}", "SUCCESS")
+            results.append({
+                "test": "bridge_script_exists",
+                "script": script,
+                "passed": True,
+            })
+        else:
+            log(f"✗ Bridge script not found: {script}", "ERROR")
+            results.append({
+                "test": "bridge_script_exists",
+                "script": script,
+                "passed": False,
+            })
+
+
+def print_summary() -> int:
+    """Print test summary and return exit code."""
+    log("\n" + "=" * 60, "INFO")
+    log("TEST SUMMARY", "INFO")
+    log("=" * 60, "INFO")
+    
+    total = len(results)
+    passed = sum(1 for r in results if r.get("passed", False))
+    failed = total - passed
+    
+    # Group by server
+    by_server: dict[str, dict] = {}
+    for result in results:
+        server = result.get("server", "general")
+        if server not in by_server:
+            by_server[server] = {"total": 0, "passed": 0, "failed": 0, "tests": []}
+        by_server[server]["total"] += 1
+        if result.get("passed"):
+            by_server[server]["passed"] += 1
+        else:
+            by_server[server]["failed"] += 1
+        by_server[server]["tests"].append(result)
+    
+    # Print by server
+    for server, stats in by_server.items():
+        log(f"\n{server.upper()} Server:", "INFO")
+        log(f"  Total: {stats['total']}", "INFO")
+        log(f"  Passed: {stats['passed']}", "SUCCESS" if stats['passed'] > 0 else "INFO")
+        log(f"  Failed: {stats['failed']}", "ERROR" if stats['failed'] > 0 else "INFO")
+        
+        # Print failed tests
+        if stats['failed'] > 0:
+            log(f"  Failed tests:", "ERROR")
+            for test in stats['tests']:
+                if not test.get("passed"):
+                    test_name = test.get("test", "unknown")
+                    error = test.get("details", {}).get("error", "Unknown error")
+                    log(f"    - {test_name}: {error}", "ERROR")
+    
+    # Overall summary
+    log(f"\nOVERALL:", "INFO")
+    log(f"Total Tests: {total}", "INFO")
+    log(f"Passed: {passed}", "SUCCESS" if passed > 0 else "INFO")
+    log(f"Failed: {failed}", "ERROR" if failed > 0 else "INFO")
+    log(f"Success Rate: {(passed / total * 100):.1f}%", "SUCCESS" if failed == 0 else "WARN")
+    
+    # Save results to file
+    output_file = "mcp-test-results.json"
+    with open(output_file, "w") as f:
+        json.dump({
+            "summary": {
+                "total": total,
+                "passed": passed,
+                "failed": failed,
+                "success_rate": (passed / total * 100) if total > 0 else 0,
+            },
+            "by_server": by_server,
+            "results": results,
+        }, f, indent=2)
+    log(f"\nResults saved to: {output_file}", "INFO")
+    
+    return 0 if failed == 0 else 1
+
+
+def main() -> int:
+    """Main test runner."""
+    log("=== GhidraVibe MCP Functionality Tester ===", "INFO")
+    log("", "INFO")
+    
+    # Phase 1: Test server connectivity
+    log("Phase 1: Server Health Checks", "INFO")
+    log("-" * 60, "INFO")
+    for server_name, url in SERVERS.items():
+        test_server_health(server_name, url)
+        time.sleep(0.5)
+    
+    # Phase 2: Test specific tools (only if servers are up)
+    any_server_up = any(r.get("passed") for r in results if r.get("test") == "health_check")
+    
+    if any_server_up:
+        # Test GUI tools
+        gui_up = any(r.get("passed") for r in results 
+                    if r.get("test") == "health_check" and r.get("server") == "gui")
+        if gui_up:
+            test_gui_tools()
+        
+        # Test Analysis tools
+        analysis_up = any(r.get("passed") for r in results 
+                         if r.get("test") == "health_check" and r.get("server") == "analysis")
+        if analysis_up:
+            test_analysis_tools()
+        
+        # Test Vibe tools
+        vibe_up = any(r.get("passed") for r in results 
+                     if r.get("test") == "health_check" and r.get("server") == "vibe")
+        if vibe_up:
+            test_vibe_tools()
+    else:
+        log("\n⚠ No servers are running. Start GhidraVibe to run full tests.", "WARN")
+        log("  Command: nix run .#ghidraVibe", "INFO")
+    
+    # Phase 3: Test MCP bridge scripts
+    test_mcp_bridge()
+    
+    # Print summary
+    return print_summary()
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        log("\n\nTest interrupted by user", "WARN")
+        sys.exit(130)
+    except Exception as e:
+        log(f"\n\nFatal error: {e}", "ERROR")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
