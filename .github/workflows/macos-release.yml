@@ -3,6 +3,11 @@ name: macos-release
 # Package GhidraVibe.dmg on push/tag.
 # - push to master/main → rolling GitHub Release "beta" (prerelease) + update releases branch
 # - tag v* → dedicated GitHub Release for that tag + update releases branch
+#
+# NOTE: GitHub-hosted macos-14 runners currently have Swift 5.10, but GhidraVibe requires Swift 6.2+.
+#       This workflow will check for Swift 6.2 and skip the build if not available.
+#       To create releases, either wait for GitHub to update runners, use a self-hosted runner with Swift 6.2+,
+#       or build locally with 'nix build .#ghidra-vibe-app'.
 on:
   push:
     branches: [master, main]
@@ -25,7 +30,34 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check Swift version
+        id: swift-check
+        run: |
+          SWIFT_VERSION=$(xcrun swift --version | head -1 || echo "not found")
+          echo "Swift version: $SWIFT_VERSION"
+          echo "swift_version=$SWIFT_VERSION" >> "$GITHUB_OUTPUT"
+          
+          # Check if Swift 6.2+ is available
+          if xcrun swift --version 2>/dev/null | grep -q "Swift version 6\.[2-9]"; then
+            echo "swift_62_available=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Swift 6.2+ is available"
+          else
+            echo "swift_62_available=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ Swift 6.2+ is not available (required for macOS app build)"
+            echo "   Current runner has: $SWIFT_VERSION"
+            echo "   This workflow will skip the macOS app build"
+          fi
+
+      - name: Skip build notice
+        if: steps.swift-check.outputs.swift_62_available != 'true'
+        run: |
+          echo "::warning title=macOS App Build Skipped::GitHub-hosted macos-14 runners currently have Swift 5.10, but GhidraVibe requires Swift 6.2+. The macOS .app/.dmg build is skipped. To create releases, either: (1) wait for GitHub to update runners, (2) use a self-hosted runner with Swift 6.2+, or (3) build locally with 'nix build .#ghidra-vibe-app'."
+          echo "ℹ️  This job will exit successfully to not block other CI workflows."
+          exit 0
+
+      # Remaining steps only run if Swift 6.2+ is available
       - name: Install Nix
+        if: steps.swift-check.outputs.swift_62_available == 'true'
         uses: DeterminateSystems/nix-installer-action@main
         with:
           extra-conf: |
@@ -33,6 +65,7 @@ jobs:
             substituters = https://cache.nixos.org https://nix-community.cachix.org
 
       - name: Build GhidraVibe with Nix
+        if: steps.swift-check.outputs.swift_62_available == 'true'
         run: |
           nix build .#ghidra-vibe --print-build-logs
           echo "GHIDRA_INSTALL_DIR=$PWD/result/lib/ghidra" >> "$GITHUB_ENV"
@@ -43,12 +76,14 @@ jobs:
           cp -R result-app/Applications/GhidraVibe.app macos/GhidraVibe/.build/GhidraVibe.app
 
       - name: Setup Java
+        if: steps.swift-check.outputs.swift_62_available == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
       - name: Resolve Ghidra install (for Help extract + runtime.env)
+        if: steps.swift-check.outputs.swift_62_available == 'true'
         run: |
           set -euo pipefail
           # Nix build already set GHIDRA_INSTALL_DIR
@@ -56,6 +91,7 @@ jobs:
           echo "JAVA_HOME=$JAVA_HOME"
 
       - name: Package DMG
+        if: steps.swift-check.outputs.swift_62_available == 'true'
         env:
           SKIP_SWIFT_BUILD: "1"
         run: |
@@ -66,6 +102,7 @@ jobs:
           ./macos/GhidraVibe/scripts/package-dmg.sh
 
       - name: Generate release notes
+        if: steps.swift-check.outputs.swift_62_available == 'true'
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             ./scripts/generate-release-notes.sh tag > dist/RELEASE_NOTES.md
@@ -96,6 +133,7 @@ jobs:
           PY
 
       - name: Publish GitHub Release
+        if: steps.swift-check.outputs.swift_62_available == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -130,6 +168,7 @@ jobs:
           fi
 
       - name: Update releases branch index
+        if: steps.swift-check.outputs.swift_62_available == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -172,6 +211,7 @@ jobs:
           git worktree remove --force "$WORK" || true
 
       - name: Upload workflow artifact
+        if: steps.swift-check.outputs.swift_62_available == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: GhidraVibe-dmg
