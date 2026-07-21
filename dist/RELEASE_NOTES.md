@@ -1,13 +1,13 @@
 ## GhidraVibe Beta
 
-Rolling prerelease from `master` (`e091d93`).
+Rolling prerelease from `master` (`800ce5f`).
 
-- **Commit:** `e091d93783ea02517dc598a6a855cf6db3901290`
-- **Range:** `beta..HEAD`
+- **Commit:** `800ce5ffcc7497bbc74da303db6486fe9788b81c`
+- **Range:** `HEAD`
 
 ### Changes
 
-- fix(nix): Detach Metal toolchain DMG mount before derivation exits (e091d93)
+- Initial packaging commit
 
 ### Install
 

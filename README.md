@@ -5,16 +5,16 @@ This branch only tracks the latest channel metadata.
 
 {
   "name": "GhidraVibe",
-  "version": "0.1.0-e091d93",
-  "sha": "e091d93",
-  "dmg": "GhidraVibe-0.1.0-e091d93.dmg",
+  "version": "0.1.0-800ce5f",
+  "sha": "800ce5f",
+  "dmg": "GhidraVibe-0.1.0-800ce5f.dmg",
   "dmg_latest": "GhidraVibe-latest.dmg",
   "app": "GhidraVibe.app",
-  "generated_at": "2026-07-21T10:02:16Z",
+  "generated_at": "2026-07-21T17:29:00Z",
   "channel": "beta",
   "tag": "beta",
   "release_url": "https://github.com/aspauldingcode/GhidraVibe/releases/tag/beta",
-  "dmg_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-0.1.0-e091d93.dmg",
+  "dmg_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-0.1.0-800ce5f.dmg",
   "dmg_latest_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-latest.dmg"
 }
 
@@ -22,14 +22,14 @@ This branch only tracks the latest channel metadata.
 
 ## GhidraVibe Beta
 
-Rolling prerelease from `master` (`e091d93`).
+Rolling prerelease from `master` (`800ce5f`).
 
-- **Commit:** `e091d93783ea02517dc598a6a855cf6db3901290`
-- **Range:** `beta..HEAD`
+- **Commit:** `800ce5ffcc7497bbc74da303db6486fe9788b81c`
+- **Range:** `HEAD`
 
 ### Changes
 
-- fix(nix): Detach Metal toolchain DMG mount before derivation exits (e091d93)
+- Initial packaging commit
 
 ### Install
 
