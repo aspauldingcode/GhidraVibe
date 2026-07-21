@@ -83,12 +83,13 @@ struct StockToolShellView: View {
                     }
                     if model.agentEnabled {
                         Divider()
-                        Button(
-                            model.dockLayout.agentSidebarVisible
-                                ? "Hide Agent sidebar"
-                                : "Show Agent sidebar"
-                        ) {
-                            model.toggleAgentSidebar()
+                        Button(model.agentChromeHelp) {
+                            model.agentChromeAction()
+                        }
+                        if model.dockLayout.agentDetached {
+                            Button("Reattach Agent sidebar") {
+                                model.reattachAgentChat(showSidebar: true)
+                            }
                         }
                     }
                 } label: {
@@ -99,16 +100,18 @@ struct StockToolShellView: View {
 
                 if model.agentEnabled {
                     Button {
-                        model.toggleAgentSidebar()
+                        model.agentChromeAction()
                     } label: {
-                        Image(systemName: "sidebar.trailing")
+                        Image(systemName: model.agentChromeSymbol)
                     }
-                    .help(
-                        model.dockLayout.agentSidebarVisible
-                            ? "Hide Agent sidebar"
-                            : "Show Agent sidebar"
-                    )
+                    .tint(model.agentChromeActive ? Color.vibeAccent : Color.secondary)
+                    .help(model.agentChromeHelp)
                     .a11yCatalog("ghidra.vibe.toolbar.agent_sidebar")
+                    .accessibilityValue(
+                        model.dockLayout.agentDetached
+                            ? "detached"
+                            : (model.agentChromeActive ? "sidebar" : "hidden")
+                    )
                 }
             }
         }

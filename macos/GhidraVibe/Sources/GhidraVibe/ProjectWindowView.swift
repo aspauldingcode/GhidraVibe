@@ -209,7 +209,8 @@ struct ProjectWindowView: View {
                                 }
                             ),
                             a11yId: "ghidra.vibe.project.tree",
-                            emptyLabel: "No programs"
+                            emptyLabel: "No programs",
+                            agentDrag: OutlineAgentDragSource { _ in .mention(.program) }
                         ) { node in
                             if let name = node.payload, !node.isFolder {
                                 model.selectedProjectProgram = name
@@ -227,6 +228,9 @@ struct ProjectWindowView: View {
                                 Text("Program").foregroundStyle(Color.vibeSecondary)
                             }
                             .font(.caption)
+                            .contentShape(Rectangle())
+                            .agentMentionDraggable(AgentMentionDrag.program, title: name)
+                            .help("Drag onto Agent to insert @Program")
                             .accessibilityIdentifier("ghidra.vibe.project.row.\(name)")
                         }
                         .listStyle(.inset)
@@ -241,29 +245,22 @@ struct ProjectWindowView: View {
                 .frame(minHeight: 80, maxHeight: .infinity)
                 .padding(VibeChrome.Space.xs)
                 .vibeProviderShell(radius: VibeChrome.Radius.panel)
-                .overlay {
-                    VibeChrome.rounded(VibeChrome.Radius.panel)
-                        .strokeBorder(VibeChrome.ProviderSurface.separator.opacity(0.55), lineWidth: 1)
-                }
                 .vibeContainer(radius: VibeChrome.Radius.panel)
 
                 LiquidGlass.Bar(spacing: VibeChrome.Space.md) {
                     HStack(spacing: VibeChrome.Space.md) {
                         Button("New Project...") { model.newProject() }
                             .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.project.new")
                         Button("Open Project...") { model.openProjectPicker() }
                             .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.project.open")
                         Button("Import File...") { model.importFilePicker() }
                             .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.project.import")
                         Button("Open Program") { model.openSelectedProgram() }
                             .buttonStyle(.borderedProminent)
-                    .tint(Color.vibeAccent)
+                            .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.project.open_program")
                         Spacer(minLength: 0)
                     }

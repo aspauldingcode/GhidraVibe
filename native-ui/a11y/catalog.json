@@ -1706,22 +1706,6 @@
       ]
     },
     {
-      "id": "ghidra.vibe.framework_open.progress",
-      "label": "Framework import progress",
-      "hint": "Live dyld shared cache import status",
-      "traits": [
-        "staticText"
-      ]
-    },
-    {
-      "id": "ghidra.vibe.framework_open.show_console",
-      "label": "Show Console",
-      "hint": "Open Console to watch the DSC import transcript",
-      "traits": [
-        "button"
-      ]
-    },
-    {
       "id": "ghidra.vibe.framework_open.search",
       "label": "Search frameworks",
       "hint": "Filter Shared Cache images",
@@ -4206,6 +4190,54 @@
       "id": "ghidra.vibe.tip.next",
       "label": "Next Tip",
       "hint": "Show the next tip",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.detach",
+      "label": "Detach Agent",
+      "hint": "Open Agent in its own window; close reattaches to sidebar",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.fullscreen",
+      "label": "Agent Full Screen",
+      "hint": "Toggle full screen for detached Agent",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.window",
+      "label": "Agent window",
+      "hint": "Detached Agent chat",
+      "traits": [
+        "window"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.float.reattach",
+      "label": "Dock Back",
+      "hint": "Reattach Agent to trailing sidebar",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.float.fullscreen",
+      "label": "Full Screen",
+      "hint": "Toggle Agent window full screen",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.float.close",
+      "label": "Close Agent window",
+      "hint": "Close and reattach Agent to sidebar",
       "traits": [
         "button"
       ]

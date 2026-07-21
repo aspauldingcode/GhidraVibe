@@ -220,18 +220,9 @@ struct AgentSetupPanel: View {
         .padding(12)
         .background(
             isTargeted
-                ? VibeChrome.ProviderSurface.accent.opacity(0.15)
+                ? VibeChrome.ProviderSurface.control.opacity(0.55)
                 : VibeChrome.ProviderSurface.control
         )
-        .overlay {
-            Rectangle()
-                .strokeBorder(
-                    isTargeted
-                        ? VibeChrome.ProviderSurface.accent
-                        : VibeChrome.ProviderSurface.secondary.opacity(0.35),
-                    style: StrokeStyle(lineWidth: 2, dash: isTargeted ? [] : [6, 4])
-                )
-        }
         .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in
             handleDrop(providers)
         }

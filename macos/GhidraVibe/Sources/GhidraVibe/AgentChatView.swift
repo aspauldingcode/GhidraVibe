@@ -14,6 +14,7 @@ struct AgentChatView: View {
     @State private var agentSidebarHeight: CGFloat = 560
     /// Intrinsic draft height measured from the NSTextView (before capping).
     @State private var composerContentHeight: CGFloat = AgentComposerField.minHeight
+    @State private var composerDropTargeted = false
 
     var body: some View {
         @Bindable var model = model
@@ -76,13 +77,7 @@ struct AgentChatView: View {
             }
             // Square dock column — no rounded provider shell / curved titlebar chrome.
             .background(t.vibeContent)
-            // Stroke-only overlays still hit-test their full bounds by default and steal
-            // clicks from SwiftUI Reply / transcript controls (AppKit composer can still work).
-            .overlay {
-                Rectangle()
-                    .stroke(t.vibeSelection, lineWidth: 1)
-                    .allowsHitTesting(false)
-            }
+            .focusEffectDisabled()
             .a11yContainerCatalog("ghidra.vibe.agent.sidebar")
             .frame(width: geo.size.width, height: geo.size.height)
             .onAppear { agentSidebarHeight = geo.size.height }
@@ -221,6 +216,16 @@ struct AgentChatView: View {
             .buttonStyle(.borderless)
             .help("Configure providers, API keys, and local GGUF models")
             .a11yCatalog("ghidra.vibe.agent.setup")
+            if !model.dockLayout.agentDetached {
+                Button {
+                    model.detachAgentChat()
+                } label: {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                }
+                .buttonStyle(.borderless)
+                .help("Detach Agent into its own window (traffic-light close reattaches)")
+                .a11yCatalog("ghidra.vibe.agent.detach")
+            }
             if model.agentBusy {
                 ProgressView()
                     .controlSize(.small)
@@ -323,7 +328,6 @@ struct AgentChatView: View {
                         .help("Pick a provider, API key file, or drop a GGUF")
                     Button("Start chatting") { model.dismissAgentWelcome() }
                         .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                         .controlSize(.regular)
                         .help("Dismiss welcome and open the agent composer")
                     Button("Opt out of Agent") { model.optOutAgent() }
@@ -579,10 +583,6 @@ struct AgentChatView: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
                 .background(Color.vibeAccent.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .strokeBorder(Color.vibeAccent.opacity(0.35), lineWidth: 1)
-                }
                 .a11yCatalog("ghidra.vibe.provider.agent.reply_chip")
             }
 
@@ -604,116 +604,136 @@ struct AgentChatView: View {
                 .help("Propose readability renames/comments for the selected function")
             }
 
-            if !model.agentAttachments.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        ForEach(model.agentAttachments) { att in
-                            HStack(spacing: 4) {
-                                Image(systemName: att.isText ? "doc.text" : "doc")
-                                    .font(.caption2)
-                                Text(att.chipLabel)
-                                    .font(.caption2)
-                                    .lineLimit(1)
-                                Button {
-                                    model.removeAgentAttachment(att.id)
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
+            // Expandable entry: [attachments?] [ + | text | send ] inside one message box.
+            VStack(alignment: .leading, spacing: 6) {
+                if !model.agentAttachments.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(alignment: .center, spacing: 6) {
+                            ForEach(model.agentAttachments) { att in
+                                HStack(alignment: .center, spacing: 5) {
+                                    Image(systemName: att.isText ? "doc.text" : "doc")
+                                        .font(.system(size: 11, weight: .medium))
+                                        .foregroundStyle(Color.vibeSecondary)
+                                        .frame(width: 14, height: 14)
+                                    Text(att.chipLabel)
                                         .font(.caption2)
+                                        .foregroundStyle(Color.vibeForeground)
+                                        .lineLimit(1)
+                                    Button {
+                                        model.removeAgentAttachment(att.id)
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.system(size: 11))
+                                            .foregroundStyle(Color.vibeMuted)
+                                            .frame(width: 14, height: 14)
+                                            .contentShape(Rectangle())
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 5)
+                                .frame(height: 24)
+                                .background(Capsule(style: .continuous).fill(Color.vibeSelection.opacity(0.16)))
                             }
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Capsule(style: .continuous).fill(Color.vibeSelection.opacity(0.16)))
                         }
                     }
+                    .frame(height: 24)
+                    .a11yCatalog("ghidra.vibe.provider.agent.attachments")
                 }
-                .a11yCatalog("ghidra.vibe.provider.agent.attachments")
-            }
 
-            // Expandable entry: [ + | text | send ]. Grows with draft up to
-            // min(20 lines, 20% of Agent sidebar); scrolls when content is taller.
-            HStack(alignment: .bottom, spacing: 6) {
-                Menu {
-                    Button("Attach File…") { pickAttachment() }
-                    Button("Mention…") { beginMentionFromButton() }
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(Color.vibeSecondary)
-                        .frame(width: 22, height: 22)
-                        .background(Circle().fill(Color.vibeSelection.opacity(0.14)))
-                }
-                .menuStyle(.borderlessButton)
-                .help("Attach a file or insert an @ mention")
-                .a11yCatalog("ghidra.vibe.provider.agent.plus")
-
-                AgentComposerField(
-                    text: $model.agentDraft,
-                    insertToken: $insertMentionToken,
-                    replaceStart: mentionReplaceStart,
-                    placeholder: "Message Agent…  (@ mention · + attach)",
-                    autofocus: false,
-                    onContentHeightChange: { h in
-                        if abs(h - composerContentHeight) > 0.5 {
-                            composerContentHeight = h
-                        }
+                // Bottom-align + / send with the growing text field; chips above stay centered.
+                HStack(alignment: .bottom, spacing: 6) {
+                    Menu {
+                        Button("Attach File…") { pickAttachment() }
+                        Button("Mention…") { beginMentionFromButton() }
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Color.vibeSecondary)
+                            .frame(width: 22, height: 22)
+                            .background(Circle().fill(Color.vibeSelection.opacity(0.14)))
                     }
-                ) {
-                    closeMentionPicker()
-                    model.sendAgentMessage(sendNow: false)
-                } onSendNow: {
-                    closeMentionPicker()
-                    model.sendAgentMessage(sendNow: true)
-                } onMentionQuery: { active in
-                    handleMentionQuery(active)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: composerFieldHeight)
-                .onChange(of: model.agentDraft) { _, _ in
-                    model.refreshAgentContextMeter()
-                }
+                    .menuStyle(.borderlessButton)
+                    .help("Attach a file or insert an @ mention")
+                    .a11yCatalog("ghidra.vibe.provider.agent.plus")
 
-                Button {
-                    closeMentionPicker()
-                    model.sendAgentMessage(sendNow: false)
-                } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(Color.vibeOnAccent)
-                        .frame(width: 22, height: 22)
-                        .background(
-                            Circle().fill(
-                                (model.agentDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                                    && model.agentAttachments.isEmpty)
-                                    ? Color.vibeSelection.opacity(0.35)
-                                    : themes.theme.vibeAccent
+                    AgentComposerField(
+                        text: $model.agentDraft,
+                        insertToken: $insertMentionToken,
+                        replaceStart: mentionReplaceStart,
+                        placeholder: "Message Agent…  (@ · drop files / functions)",
+                        autofocus: false,
+                        onContentHeightChange: { h in
+                            if abs(h - composerContentHeight) > 0.5 {
+                                composerContentHeight = h
+                            }
+                        }
+                    ) {
+                        closeMentionPicker()
+                        model.sendAgentMessage(sendNow: false)
+                    } onSendNow: {
+                        closeMentionPicker()
+                        model.sendAgentMessage(sendNow: true)
+                    } onMentionQuery: { active in
+                        handleMentionQuery(active)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: composerFieldHeight)
+                    .onChange(of: model.agentDraft) { _, _ in
+                        model.refreshAgentContextMeter()
+                    }
+
+                    Button {
+                        closeMentionPicker()
+                        model.sendAgentMessage(sendNow: false)
+                    } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(Color.vibeOnAccent)
+                            .frame(width: 22, height: 22)
+                            .background(
+                                Circle().fill(
+                                    (model.agentDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                                        && model.agentAttachments.isEmpty)
+                                        ? Color.vibeSelection.opacity(0.35)
+                                        : themes.theme.vibeAccent
+                                )
                             )
-                        )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(
+                        model.agentDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                            && model.agentAttachments.isEmpty
+                    )
+                    .a11yCatalog("ghidra.vibe.provider.agent.send")
+                    .help("Return sends · Shift+Return newline · ⌘Return send now")
                 }
-                .buttonStyle(.plain)
-                .disabled(
-                    model.agentDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                        && model.agentAttachments.isEmpty
-                )
-                .a11yCatalog("ghidra.vibe.provider.agent.send")
-                .help("Return sends · Shift+Return newline · ⌘Return send now")
             }
             .padding(.horizontal, 8)
-            .padding(.vertical, 5)
+            .padding(.vertical, 6)
             .background {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .fill(themes.theme.vibeContent)
             }
+            // Drop target: soft fill wash only — no accent/blue stroke ring.
             .overlay {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(themes.theme.vibeSelection, lineWidth: 1)
-                    .allowsHitTesting(false)
+                if composerDropTargeted {
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(themes.theme.vibeSelection.opacity(0.35))
+                        .allowsHitTesting(false)
+                }
             }
+            .help("Drop files to attach, or drag functions / providers / classes / @ mentions here")
             .a11yCatalog("ghidra.vibe.provider.agent.composer")
         }
         .padding(.horizontal, VibeChrome.Space.md)
         .padding(.vertical, VibeChrome.Space.sm)
+        .onDrop(
+            of: [.fileURL, .json, .plainText],
+            isTargeted: $composerDropTargeted
+        ) { providers in
+            model.handleAgentComposerDrop(providers: providers)
+        }
         .onAppear { model.refreshAgentContextMeter() }
     }
 
@@ -794,18 +814,7 @@ struct AgentChatView: View {
             return
         }
         insertMentionToken = item.token + " "
-        // Side effects for RE context
-        if item.token.hasPrefix("@Functions:") {
-            let name = String(item.token.dropFirst("@Functions:".count))
-            model.selectFunction(name: name, address: nil, id: nil)
-        } else if item.token.hasPrefix("@Providers:"),
-                  let raw = item.token.split(separator: ":").last,
-                  let kind = ProviderKind(rawValue: String(raw))
-        {
-            model.showProvider(kind)
-        } else if item.token == "@Selection", let sel = model.selectedFunction {
-            model.selectFunction(name: sel.name, address: sel.address, id: sel.id)
-        }
+        model.applyAgentMentionSideEffects(for: item.token)
         closeMentionPicker()
     }
 }
@@ -897,11 +906,6 @@ private struct AgentBubble: View {
                 .background {
                     RoundedRectangle(cornerRadius: VibeChrome.Radius.nestMin, style: .continuous)
                         .fill(isUser ? t.vibeAccent.opacity(0.20) : t.vibeContentAlt)
-                }
-                .overlay {
-                    RoundedRectangle(cornerRadius: VibeChrome.Radius.nestMin, style: .continuous)
-                        .strokeBorder(isUser ? t.vibeAccent.opacity(0.35) : t.vibeSelection, lineWidth: 1)
-                        .allowsHitTesting(false)
                 }
                 .clipped()
             }
@@ -1104,6 +1108,10 @@ private struct AgentMentionPicker: View {
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
+                        .agentMentionDraggable(
+                            item.token.isEmpty ? nil : AgentMentionDrag(token: item.token),
+                            title: item.title
+                        )
                     }
                     if rows.isEmpty {
                         Text("No matches")
@@ -1117,10 +1125,6 @@ private struct AgentMentionPicker: View {
         }
         .background(VibeChrome.ProviderSurface.control)
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(VibeChrome.ProviderSurface.separator, lineWidth: 1)
-        }
         .shadow(color: .black.opacity(0.18), radius: 10, y: 4)
         .a11yCatalog("ghidra.vibe.provider.agent.mention_picker")
     }

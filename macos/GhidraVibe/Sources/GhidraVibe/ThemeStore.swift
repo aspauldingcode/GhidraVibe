@@ -217,15 +217,17 @@ extension View {
             .foregroundStyle(Color.vibeForeground)
             .scrollContentBackground(.hidden)
             .background(Color.vibeContent)
+            .focusEffectDisabled()
     }
 
-    /// Themed list / outline (hide system list fill).
+    /// Themed list / outline (hide system list fill + blue focus rings).
     func vibeThemedList() -> some View {
         self
             .scrollContentBackground(.hidden)
             .listRowBackground(Color.vibeContent)
             .foregroundStyle(Color.vibeForeground)
             .background(Color.vibeContent)
+            .focusEffectDisabled()
     }
 
     /// Themed TextEditor / form field surface.
@@ -234,7 +236,7 @@ extension View {
             .scrollContentBackground(.hidden)
             .foregroundStyle(Color.vibeForeground)
             .background(Color.vibeContent)
-            .tint(Color.vibeAccent)
+            .focusEffectDisabled()
     }
 }
 
@@ -243,20 +245,29 @@ private struct VibeGlobalThemeModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         let t = store.theme
-        let themed = content
-            .environment(\.vibeTheme, store)
-            // Default themes use controlAccentColor via TintedThemingSwift; custom themes use base0D.
-            .tint(t.usesApplePlatformChrome ? Color.accentColor : t.vibeAccent)
-            .foregroundStyle(t.vibeForeground)
-            .background(
-                (t.usesApplePlatformChrome ? Color(nsColor: .windowBackgroundColor) : t.vibeContent)
-                    .ignoresSafeArea()
-            )
-            .id("ghidra-theme-\(store.revision)-\(t.name)-\(store.followSystemAppearance)")
-            .onAppear { store.applyToApp() }
-            .onChange(of: store.revision) { _, _ in
-                store.applyToApp()
+        // Apple platform chrome: do NOT set environment `.tint(Color.accentColor)`.
+        // That painted system-blue borders on every `.bordered` button/list focus ring.
+        // Custom Base16 themes still tint from base0D. Focus rings stay off either way.
+        let themed = Group {
+            if t.usesApplePlatformChrome {
+                content
+                    .environment(\.vibeTheme, store)
+                    .foregroundStyle(t.vibeForeground)
+                    .background(Color(nsColor: .windowBackgroundColor).ignoresSafeArea())
+            } else {
+                content
+                    .environment(\.vibeTheme, store)
+                    .tint(t.vibeAccent)
+                    .foregroundStyle(t.vibeForeground)
+                    .background(t.vibeContent.ignoresSafeArea())
             }
+        }
+        .focusEffectDisabled()
+        .id("ghidra-theme-\(store.revision)-\(t.name)-\(store.followSystemAppearance)")
+        .onAppear { store.applyToApp() }
+        .onChange(of: store.revision) { _, _ in
+            store.applyToApp()
+        }
         // Platform defaults: do not override color scheme — stock buttons/backgrounds follow macOS.
         if t.usesApplePlatformChrome, store.followSystemAppearance {
             themed.preferredColorScheme(nil)
@@ -271,6 +282,8 @@ extension Color {
     static var vibeForeground: Color { ThemeStore.shared.theme.vibeForeground }
     static var vibeSecondary: Color { ThemeStore.shared.theme.vibeSecondary }
     static var vibeMuted: Color { ThemeStore.shared.theme.vibeMuted }
+    /// Accent fill/label color. For Apple platform chrome this is still the system accent
+    /// (used sparingly on primary CTAs) — never applied as a global control tint.
     static var vibeAccent: Color {
         let t = ThemeStore.shared.theme
         return t.usesApplePlatformChrome ? Color.accentColor : t.vibeAccent

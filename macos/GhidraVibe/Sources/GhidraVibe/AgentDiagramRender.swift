@@ -148,10 +148,6 @@ struct AgentDiagramView: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(t.vibeContentAlt)
         )
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(t.vibeSelection, lineWidth: 1)
-        }
         .onAppear { render() }
         .a11yCatalog("ghidra.vibe.agent.diagram")
     }

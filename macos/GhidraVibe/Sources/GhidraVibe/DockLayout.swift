@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import UniformTypeIdentifiers
 import CoreTransferable
@@ -158,6 +159,8 @@ struct DockLayoutState: Codable, Equatable {
     var leftSidebarVisible: Bool
     /// Xcode-style trailing Agent chat column (not a dockable provider module).
     var agentSidebarVisible: Bool
+    /// Agent chat floated into its own window (sidebar column hidden until reattach).
+    var agentDetached: Bool
     var agentSidebarWidthRatio: Double
 
     static let persistenceKey = "ghidra.vibe.dock.layout.v1"
@@ -165,7 +168,7 @@ struct DockLayoutState: Codable, Equatable {
     enum CodingKeys: String, CodingKey {
         case stacks, active, hidden, floating, home
         case leftWidthRatio, rightWidthRatio, consoleHeightRatio, bottomStripHeightRatio
-        case leftSidebarVisible, agentSidebarVisible, agentSidebarWidthRatio
+        case leftSidebarVisible, agentSidebarVisible, agentDetached, agentSidebarWidthRatio
     }
 
     init(from decoder: Decoder) throws {
@@ -181,6 +184,7 @@ struct DockLayoutState: Codable, Equatable {
         bottomStripHeightRatio = try c.decodeIfPresent(Double.self, forKey: .bottomStripHeightRatio) ?? 0.12
         leftSidebarVisible = try c.decodeIfPresent(Bool.self, forKey: .leftSidebarVisible) ?? true
         agentSidebarVisible = try c.decodeIfPresent(Bool.self, forKey: .agentSidebarVisible) ?? true
+        agentDetached = try c.decodeIfPresent(Bool.self, forKey: .agentDetached) ?? false
         agentSidebarWidthRatio = try c.decodeIfPresent(Double.self, forKey: .agentSidebarWidthRatio) ?? 0.22
     }
 
@@ -197,6 +201,7 @@ struct DockLayoutState: Codable, Equatable {
         try c.encode(bottomStripHeightRatio, forKey: .bottomStripHeightRatio)
         try c.encode(leftSidebarVisible, forKey: .leftSidebarVisible)
         try c.encode(agentSidebarVisible, forKey: .agentSidebarVisible)
+        try c.encode(agentDetached, forKey: .agentDetached)
         try c.encode(agentSidebarWidthRatio, forKey: .agentSidebarWidthRatio)
     }
 
@@ -213,6 +218,7 @@ struct DockLayoutState: Codable, Equatable {
         bottomStripHeightRatio: Double,
         leftSidebarVisible: Bool,
         agentSidebarVisible: Bool,
+        agentDetached: Bool = false,
         agentSidebarWidthRatio: Double
     ) {
         self.stacks = stacks
@@ -226,6 +232,7 @@ struct DockLayoutState: Codable, Equatable {
         self.bottomStripHeightRatio = bottomStripHeightRatio
         self.leftSidebarVisible = leftSidebarVisible
         self.agentSidebarVisible = agentSidebarVisible
+        self.agentDetached = agentDetached
         self.agentSidebarWidthRatio = agentSidebarWidthRatio
     }
 
@@ -279,6 +286,7 @@ struct DockLayoutState: Codable, Equatable {
             bottomStripHeightRatio: 0.12,
             leftSidebarVisible: true,
             agentSidebarVisible: true,
+            agentDetached: false,
             agentSidebarWidthRatio: 0.22
         )
         .withDefaultHomes()
@@ -546,9 +554,27 @@ struct ProviderDockDrag: Codable, Transferable, Hashable {
     static var transferRepresentation: some TransferRepresentation {
         CodableRepresentation(contentType: .json)
     }
+
+    /// Prefer `onDrag` + this provider over SwiftUI `.draggable` (avoids blue focus rings).
+    func itemProvider() -> NSItemProvider {
+        let provider = NSItemProvider()
+        if let data = try? JSONEncoder().encode(self) {
+            provider.registerDataRepresentation(
+                forTypeIdentifier: UTType.json.identifier,
+                visibility: .all
+            ) { completion in
+                completion(data, nil)
+                return nil
+            }
+        }
+        return provider
+    }
 }
 
 extension Notification.Name {
     static let ghidraVibeFloatProvider = Notification.Name("ghidra.vibe.dock.float")
     static let ghidraVibeUnfloatProvider = Notification.Name("ghidra.vibe.dock.unfloat")
+    static let ghidraVibeDetachAgent = Notification.Name("ghidra.vibe.agent.detach")
+    static let ghidraVibeAttachAgent = Notification.Name("ghidra.vibe.agent.attach")
+    static let ghidraVibeFocusAgent = Notification.Name("ghidra.vibe.agent.focus")
 }

@@ -82,10 +82,7 @@ struct ModulePaletteSidebar: View {
         .onTapGesture {
             toggleModule(kind)
         }
-        .draggable(ProviderDockDrag(kindRaw: kind.rawValue)) {
-            Label(kind.title, systemImage: "macwindow")
-                .padding(8)
-        }
+        .onDrag { ProviderDockDrag(kindRaw: kind.rawValue).itemProvider() }
         .simultaneousGesture(
             DragGesture(minimumDistance: 4)
                 .onChanged { _ in

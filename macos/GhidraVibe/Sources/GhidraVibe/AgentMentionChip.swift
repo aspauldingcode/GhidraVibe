@@ -25,10 +25,6 @@ struct AgentMentionChip: View {
             Capsule(style: .continuous)
                 .fill(t.vibeAccent.opacity(0.14))
         )
-        .overlay {
-            Capsule(style: .continuous)
-                .strokeBorder(t.vibeAccent.opacity(0.45), lineWidth: 1)
-        }
 
         Group {
             if let action {

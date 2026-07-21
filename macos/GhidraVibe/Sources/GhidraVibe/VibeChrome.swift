@@ -144,6 +144,7 @@ extension View {
             .background(VibeChrome.ProviderSurface.content, ignoresSafeAreaEdges: [])
             .clipShape(VibeChrome.rounded(radius))
             .containerShape(.rect(cornerRadius: radius))
+            .focusEffectDisabled()
     }
 
     /// Glass / material plate that nests concentrically inside the nearest container.

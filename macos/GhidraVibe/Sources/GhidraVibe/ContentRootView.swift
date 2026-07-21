@@ -5,6 +5,8 @@ import SwiftUI
 struct ContentRootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.vibeTheme) private var themes
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
 
     private var restoreSize: CGSize {
         switch model.toolMode {
@@ -39,6 +41,26 @@ struct ContentRootView: View {
                 restoreSize: NSSize(width: restoreSize.width, height: restoreSize.height),
                 windowTitle: stockWindowTitle
             )
+            .onAppear {
+                if model.dockLayout.agentDetached {
+                    FloatingAgentRouter.open(openWindow: openWindow)
+                } else if !FloatingAgentRouter.agentWindows().isEmpty {
+                    // Leaked Agent window(s) while dock says attached — close without reattach loop.
+                    FloatingAgentRouter.dismiss(dismissWindow: dismissWindow)
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .ghidraVibeDetachAgent)) { _ in
+                FloatingAgentRouter.open(openWindow: openWindow)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .ghidraVibeAttachAgent)) { _ in
+                FloatingAgentRouter.dismiss(dismissWindow: dismissWindow)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .ghidraVibeFocusAgent)) { _ in
+                // Focus only — never openWindow (that was spawning hundreds of windows).
+                if !FloatingAgentRouter.focusExisting() {
+                    FloatingAgentRouter.open(openWindow: openWindow)
+                }
+            }
     }
 
     private var mainChrome: some View {
@@ -261,7 +283,6 @@ struct ProviderSheetHost: View {
                     Spacer()
                     Button("Close") { model.sheetProvider = nil }
                         .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.sheet.close")
                 }
                 .padding(.horizontal, 4)

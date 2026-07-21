@@ -117,10 +117,6 @@ struct AgentPlanCard: View {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(t.vibeContentAlt)
         )
-        .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(t.vibeSelection, lineWidth: 1)
-        }
         .a11yCatalog("ghidra.vibe.agent.plan_card")
     }
 }

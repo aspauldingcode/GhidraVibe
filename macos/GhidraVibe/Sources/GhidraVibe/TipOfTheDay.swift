@@ -59,12 +59,10 @@ struct TipOfTheDayAlert: ViewModifier {
                                 isPresented = false
                             }
                             .buttonStyle(.bordered)
-                            .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.tip.dont_show")
                             Spacer()
                             Button("Next Tip") { tip = TipOfTheDay.nextTip() }
                                 .buttonStyle(.bordered)
-                                .tint(Color.vibeAccent)
                                 .a11yCatalog("ghidra.vibe.tip.next")
                             Button("Close") { isPresented = false }
                                 .buttonStyle(.borderedProminent)

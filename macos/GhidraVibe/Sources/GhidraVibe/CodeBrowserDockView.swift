@@ -64,7 +64,6 @@ struct CodeBrowserDockView: View {
                 // Own capsule: shared toolbar plate is hidden below so this
                 // does not melt into the window-controls group.
                 .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                 .a11yCatalog("ghidra.vibe.toolbar.modules_sidebar")
                 .help(
                     model.dockLayout.leftSidebarVisible
@@ -120,20 +119,21 @@ struct CodeBrowserDockView: View {
 
             ToolbarSpacer(.fixed, placement: .primaryAction)
 
-            // Agent: own glass grouping — not merged with More….
+            // Agent: own glass grouping — syncs with attached/detached state machine.
             ToolbarItem(id: "ghidra.vibe.toolbar.agent_sidebar", placement: .primaryAction) {
                 Button {
-                    model.toggleAgentSidebar()
+                    model.agentChromeAction()
                 } label: {
-                    Image(systemName: "sidebar.trailing")
+                    Image(systemName: model.agentChromeSymbol)
                 }
                 .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
+                .tint(model.agentChromeActive ? Color.vibeAccent : Color.secondary)
                 .a11yCatalog("ghidra.vibe.toolbar.agent_sidebar")
-                .help(
-                    model.dockLayout.agentSidebarVisible && model.agentEnabled
-                        ? "Hide Agent sidebar"
-                        : "Show Agent sidebar"
+                .help(model.agentChromeHelp)
+                .accessibilityValue(
+                    model.dockLayout.agentDetached
+                        ? "detached"
+                        : (model.agentChromeActive ? "sidebar" : "hidden")
                 )
             }
             .sharedBackgroundVisibility(.hidden)
@@ -262,14 +262,15 @@ struct CodeBrowserDockView: View {
             model.toggleLeftSidebar()
         }
         .help("Toggle the leading Modules palette")
-        Button(
-            model.dockLayout.agentSidebarVisible && model.agentEnabled
-                ? "Hide Agent sidebar"
-                : "Show Agent sidebar"
-        ) {
-            model.toggleAgentSidebar()
+        Button(model.agentChromeHelp) {
+            model.agentChromeAction()
         }
-        .help("Toggle the trailing Agent sidebar")
+        .help(model.agentChromeHelp)
+        if model.dockLayout.agentDetached {
+            Button("Reattach Agent sidebar") {
+                model.reattachAgentChat(showSidebar: true)
+            }
+        }
         Divider()
         Button("Reset Dock Layout") { model.resetDockLayoutToStock() }
             .help("Restore stock CodeBrowser dock regions")
@@ -283,7 +284,6 @@ struct CodeBrowserDockView: View {
                 ForEach([ProviderKind.entropy, .overview], id: \.id) { kind in
                     Button(kind.title) { model.showProvider(kind) }
                         .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                         .font(.caption2)
                         .a11yCatalog("ghidra.vibe.codebrowser.header.\(kind.rawValue)")
                 }

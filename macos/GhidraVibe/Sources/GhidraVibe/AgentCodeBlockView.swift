@@ -92,11 +92,6 @@ struct AgentCodeBlockView: View {
         }
         .background(t.vibeContentAlt)
         .clipShape(shape)
-        .overlay {
-            shape
-                .strokeBorder(t.vibeSelection, lineWidth: 1)
-                .allowsHitTesting(false)
-        }
         .a11yCatalog("ghidra.vibe.agent.codeblock")
     }
 }

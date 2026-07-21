@@ -137,19 +137,8 @@ struct DockedProviderChrome<Toolbar: View, Content: View>: View {
                     .frame(height: 1)
             }
             .contentShape(Rectangle())
-            .draggable(ProviderDockDrag(kindRaw: kind.rawValue)) {
-                Label(title, systemImage: "arrow.up.and.down.and.arrow.left.and.right")
-                    .font(.caption.weight(.semibold))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(VibeChrome.ProviderSurface.content)
-                    .overlay {
-                        ZStack {
-                            VibeChrome.ProviderSurface.titleBarWash
-                            Rectangle().stroke(VibeChrome.ProviderSurface.accent, lineWidth: 2)
-                        }
-                    }
-            }
+            // AppKit onDrag — SwiftUI `.draggable` paints blue focus rings on every module.
+            .onDrag { ProviderDockDrag(kindRaw: kind.rawValue).itemProvider() }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 4)
                     .onChanged { _ in
@@ -175,13 +164,10 @@ struct DockedProviderChrome<Toolbar: View, Content: View>: View {
                 .zIndex(0)
         }
         // One content fill for the module — do not stack windowBackground under title+body.
+        // No outline stroke: separator/accent borders read as “blue boxes” under Apple chrome.
         .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
         .background(VibeChrome.ProviderSurface.content)
-        .overlay {
-            Rectangle()
-                .stroke(VibeChrome.ProviderSurface.separator, lineWidth: 1)
-                .allowsHitTesting(false)
-        }
+        .focusEffectDisabled()
     }
 
     @ViewBuilder
@@ -360,7 +346,19 @@ struct DecompilerProvider: View {
             }
         } content: {
             VStack(spacing: 0) {
-                if model.selectedFunction == nil && model.decompiledText.contains("Select a function") {
+                if let fn = model.selectedFunction {
+                    Text("\(fn.name)\(fn.address.isEmpty ? "" : "  \(fn.address)")")
+                        .font(.caption.monospaced())
+                        .foregroundStyle(Color.vibeSecondary)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.vibeContentAlt)
+                        .contentShape(Rectangle())
+                        .agentMentionDraggable(AgentMentionDrag.function(fn.name), title: fn.name)
+                        .a11yCatalog("ghidra.vibe.provider.decompiler.fn_drag")
+                } else if model.decompiledText.contains("Select a function") {
                     Text("No Function")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.vibeSecondary)
@@ -411,7 +409,20 @@ struct ProgramTreeProvider: View {
                 roots: programTreeRoots,
                 selection: $model.selectedProgramTreeNodeId,
                 a11yId: "ghidra.vibe.provider.program_tree.tree",
-                emptyLabel: "No Program"
+                emptyLabel: "No Program",
+                agentDrag: OutlineAgentDragSource { node in
+                    if node.id == "ghidra.vibe.provider.program_tree.root"
+                        || node.id == "ghidra.vibe.provider.program_tree.bundle"
+                    {
+                        return .mention(.program)
+                    }
+                    guard !node.isFolder, let payload = node.payload else { return nil }
+                    let url = URL(fileURLWithPath: payload)
+                    if payload.hasPrefix("/"), FileManager.default.fileExists(atPath: url.path) {
+                        return .file(url)
+                    }
+                    return .mention(.program)
+                }
             ) { node in
                 guard let payload = node.payload, !node.isFolder else {
                     model.statusMessage = node.title
@@ -486,7 +497,18 @@ struct SymbolTreeProvider: View {
                     roots: symbolTreeRoots,
                     selection: $model.selectedSymbolTreeNodeId,
                     a11yId: "ghidra.vibe.provider.symbol_tree.tree",
-                    emptyLabel: "No symbols"
+                    emptyLabel: "No symbols",
+                    agentDrag: OutlineAgentDragSource { node in
+                        guard !node.isFolder, let payload = node.payload else { return nil }
+                        let name: String
+                        if payload.contains("\t") {
+                            let parts = payload.split(separator: "\t", maxSplits: 1).map(String.init)
+                            name = parts.count == 2 ? parts[1] : payload
+                        } else {
+                            name = payload
+                        }
+                        return .mention(.function(name))
+                    }
                 ) { node in
                     guard let payload = node.payload, !node.isFolder else {
                         model.statusMessage = node.title
@@ -665,7 +687,6 @@ struct ConsoleProvider: View {
                         .onSubmit { model.submitConsoleInput() }
                     Button("Run") { model.submitConsoleInput() }
                         .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                         .help("Submit console input")
                 }
                 .padding(4)
@@ -689,6 +710,10 @@ struct FunctionsProvider: View {
                 }, id: \.id, selection: $model.selectedFunction) { fn in
                     Text("\(fn.name)  \(fn.address)")
                         .font(.caption.monospaced())
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                        .agentMentionDraggable(AgentMentionDrag.function(fn.name), title: fn.name)
+                        .help("Drag onto Agent to insert @Functions:\(fn.name)")
                 }
                 .a11yCatalog("ghidra.vibe.provider.functions.list")
             }
@@ -780,7 +805,6 @@ struct ScriptManagerProvider: View {
             VStack(alignment: .leading) {
                 Button("Refresh scripts") { model.refreshScripts() }
                     .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                     .padding(4)
                     .a11yCatalog("ghidra.vibe.provider.script_manager.refresh")
                 List(model.scriptRows, id: \.self) { row in
@@ -838,7 +862,6 @@ struct FunctionGraphProvider: View {
                 HStack(spacing: 8) {
                     Button("Refresh Graph") { model.refreshFunctionGraph() }
                         .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.function_graph.refresh")
                     if !model.functionGraphModel.isEmpty {
                         Text("\(model.functionGraphModel.function) · \(model.functionGraphModel.nodes.count) blocks · \(model.functionGraphModel.edges.count) edges")
@@ -1186,7 +1209,6 @@ struct DSCProvider: View {
                 HStack(spacing: VibeChrome.Space.related) {
                     Button("Rescan") { model.openDyldCache() }
                         .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.dsc.refresh")
                         .disabled(model.dyldListingBusy || model.dyldImportBusy)
                     Button("Open selected") {
@@ -1283,7 +1305,6 @@ struct SwiftClassesProvider: View {
                         model.refreshMalimiteClasses()
                     }
                     .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.provider.swift_classes.refresh")
                     Button("App Bundle…") { model.showProvider(.appleBundle) }
                         .help("Open App Bundle analysis (resources, refs, translate)")
@@ -1323,7 +1344,13 @@ struct SwiftClassesProvider: View {
                     .buttonStyle(.plain)
                     .font(.caption.monospaced())
                     .a11yCatalog("ghidra.vibe.provider.swift_classes.go")
-                    .help("Go to \(row)")
+                    .help(row.hasPrefix("(")
+                          ? row
+                          : "Click to go · drag onto Agent for @Classes:\(row)")
+                    .agentMentionDraggable(
+                        row.hasPrefix("(") ? nil : AgentMentionDrag.className(row),
+                        title: row
+                    )
                 }
                 .a11yCatalog("ghidra.vibe.provider.swift_classes.list")
             }
@@ -1398,7 +1425,6 @@ struct VersionTrackingProvider: View {
                     .a11yCatalog("ghidra.vibe.provider.version_tracking.create")
                     Button("Open CodeBrowser") { model.openCodeBrowser() }
                         .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.version_tracking.open_codebrowser")
                 }
 

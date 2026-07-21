@@ -59,7 +59,8 @@ enum A11yCatalog {
         else {
             return [:]
         }
-        return Dictionary(uniqueKeysWithValues: root.entries.map { ($0.id, $0) })
+        // Keep last entry on duplicate ids — never crash launch over catalog drift.
+        return Dictionary(root.entries.map { ($0.id, $0) }, uniquingKeysWith: { _, last in last })
     }
 
     private struct CatalogRoot: Codable {

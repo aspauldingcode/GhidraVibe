@@ -190,6 +190,8 @@ final class GuiControlServer {
                 "agentEnabled": model.agentEnabled,
                 "leftSidebarVisible": model.dockLayout.leftSidebarVisible,
                 "agentSidebarVisible": model.dockLayout.agentSidebarVisible,
+                "agentDetached": model.dockLayout.agentDetached,
+                "agentChromeActive": model.agentChromeActive,
                 "agentBusy": model.agentBusy,
                 "agentBackend": model.agentBackend,
                 "agentModel": model.agentModel,

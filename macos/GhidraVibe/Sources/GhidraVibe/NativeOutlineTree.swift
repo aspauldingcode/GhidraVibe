@@ -37,7 +37,9 @@ struct NativeOutlineTree: View {
     @Binding var selection: String?
     var a11yId: String
     var emptyLabel: String = "No items"
-    var onSelect: ((OutlineTreeNode) -> Void)?
+    /// Optional drag payload for Agent composer drops (`@` mention or file attachment).
+    var agentDrag: OutlineAgentDragSource? = nil
+    var onSelect: ((OutlineTreeNode) -> Void)? = nil
 
     var body: some View {
         Group {
@@ -77,6 +79,7 @@ struct NativeOutlineTree: View {
                     .help(node.payload ?? node.title)
                     .tag(node.id)
                     .accessibilityIdentifier(node.id)
+                    .outlineAgentDraggable(agentDrag?.resolve(node))
                 }
                 .listStyle(.sidebar)
                 .vibeThemedList()

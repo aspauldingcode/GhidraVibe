@@ -57,16 +57,13 @@ struct WorkspacePickerView: View {
                             .a11yCatalog("ghidra.vibe.workspace.open_selected")
                         Button("Browse…") { model.openProjectPicker() }
                             .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.workspace.browse")
                         Button("New Project…") { model.newProject() }
                             .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.workspace.new")
                         Spacer()
                         Button("Continue without project") { model.enterProjectWindow() }
                             .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.workspace.skip")
                     }
                 }
@@ -93,7 +90,6 @@ struct WorkspacePickerView: View {
                 Spacer()
                 Button("Show Welcome / Help") { model.showWelcomeHelp() }
                     .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.workspace.show_help")
             }
             .padding(24)

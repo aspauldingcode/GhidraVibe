@@ -1682,14 +1682,6 @@
       ]
     },
     {
-      "id": "ghidra.vibe.framework_open.open",
-      "label": "Open",
-      "hint": "Open selected framework",
-      "traits": [
-        "button"
-      ]
-    },
-    {
       "id": "ghidra.vibe.framework_open.progress",
       "label": "Framework import progress",
       "hint": "Live dyld shared cache import status",
@@ -1701,6 +1693,14 @@
       "id": "ghidra.vibe.framework_open.show_console",
       "label": "Show Console",
       "hint": "Open Console to watch the DSC import transcript",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.framework_open.open",
+      "label": "Open",
+      "hint": "Open selected framework",
       "traits": [
         "button"
       ]
@@ -1775,6 +1775,54 @@
       "hint": "Table of contents",
       "traits": [
         "list"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.help.search",
+      "label": "Search Help",
+      "hint": "Filter stock Help articles",
+      "traits": [
+        "textField"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.help.search_results",
+      "label": "Help search results",
+      "hint": "Matching Help articles",
+      "traits": [
+        "list"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.help.back",
+      "label": "Help Back",
+      "hint": "Previous Help page",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.help.forward",
+      "label": "Help Forward",
+      "hint": "Next Help page",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.menu.help.context",
+      "label": "Context Help",
+      "hint": "F1 — Help for focused provider",
+      "traits": [
+        "menuItem"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.status.cancel_dsc",
+      "label": "Cancel DSC Import",
+      "hint": "Stop in-flight shared-cache import",
+      "traits": [
+        "button"
       ]
     },
     {
@@ -2318,6 +2366,86 @@
       ]
     },
     {
+      "id": "ghidra.vibe.agent.tool.approval",
+      "label": "Tool permission card",
+      "hint": "Cursor-style Allow once / Session / Always / Deny for Agent tools",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.tool.allow_once",
+      "label": "Allow once",
+      "hint": "Allow this Agent tool call once",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.tool.allow_session",
+      "label": "Allow for session",
+      "hint": "Allow this Agent tool until quit",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.tool.allow_always",
+      "label": "Always allow",
+      "hint": "Remember Always Allow for this Agent tool",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.tool.deny",
+      "label": "Deny tool",
+      "hint": "Deny this Agent tool call",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.setup.tool_profile",
+      "label": "Tool permission profile",
+      "hint": "Ask every time / allow reads / session / always",
+      "traits": [
+        "popUpButton"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.setup.tool_sandbox",
+      "label": "Sandbox tool calls",
+      "hint": "Network allowlist and write-class gui_action gating",
+      "traits": [
+        "checkBox"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.setup.tool_summary",
+      "label": "Tool permission summary",
+      "hint": "Remembered Always Allow / Deny / session allows",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.setup.completion_sound",
+      "label": "Play sound when Agent finishes",
+      "hint": "Toggle Agent completion sounds",
+      "traits": [
+        "checkBox"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.setup.tool_reset",
+      "label": "Reset tool permissions",
+      "hint": "Clear remembered tool permissions and restore defaults",
+      "traits": [
+        "button"
+      ]
+    },
+    {
       "id": "ghidra.vibe.provider.agent.apply",
       "label": "Apply pending edits",
       "hint": "Apply agent rename/comment proposals",
@@ -2395,6 +2523,62 @@
       "hint": "Agent conversation",
       "traits": [
         "textArea"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.memory_chip",
+      "label": "Conversation memory",
+      "hint": "Earlier turns remembered via rolling summary",
+      "traits": [
+        "staticText"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.provider.agent.reply_chip",
+      "label": "Reply chip",
+      "hint": "Composer quote for the message being replied to",
+      "traits": [
+        "group"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.bubble.reply",
+      "label": "Reply to bubble",
+      "hint": "Reply to this transcript message",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.bubble.copy",
+      "label": "Copy message",
+      "hint": "Copy this Agent message to the pasteboard",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.bubble.share",
+      "label": "Share message",
+      "hint": "Open the system share sheet for this message",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.history.share",
+      "label": "Share chat",
+      "hint": "Share the current Agent conversation",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.history.copy",
+      "label": "Copy chat",
+      "hint": "Copy the current Agent conversation to the pasteboard",
+      "traits": [
+        "button"
       ]
     },
     {
@@ -4006,6 +4190,54 @@
       "id": "ghidra.vibe.tip.next",
       "label": "Next Tip",
       "hint": "Show the next tip",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.detach",
+      "label": "Detach Agent",
+      "hint": "Open Agent in its own window; close reattaches to sidebar",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.fullscreen",
+      "label": "Agent Full Screen",
+      "hint": "Toggle full screen for detached Agent",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.window",
+      "label": "Agent window",
+      "hint": "Detached Agent chat",
+      "traits": [
+        "window"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.float.reattach",
+      "label": "Dock Back",
+      "hint": "Reattach Agent to trailing sidebar",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.float.fullscreen",
+      "label": "Full Screen",
+      "hint": "Toggle Agent window full screen",
+      "traits": [
+        "button"
+      ]
+    },
+    {
+      "id": "ghidra.vibe.agent.float.close",
+      "label": "Close Agent window",
+      "hint": "Close and reattach Agent to sidebar",
       "traits": [
         "button"
       ]

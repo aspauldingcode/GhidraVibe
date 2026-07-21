@@ -22,7 +22,6 @@ struct DebugUniqueProviderView: View {
                 Spacer()
                 Button("Refresh") { reload() }
                     .buttonStyle(.bordered)
-                        .tint(Color.vibeAccent)
                     .a11yCatalog("\(a11yId).refresh")
             }
             .padding(8)

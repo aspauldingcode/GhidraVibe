@@ -332,17 +332,13 @@ struct GhidraVibeApp: App {
                 .help("Toggle the leading Modules palette (Window providers)")
                 Toggle(
                     "Agent",
-                    systemImage: "sidebar.trailing",
+                    systemImage: model.agentChromeSymbol,
                     isOn: Binding(
-                        get: { model.dockLayout.agentSidebarVisible },
-                        set: { want in
-                            if want != model.dockLayout.agentSidebarVisible {
-                                model.toggleAgentSidebar()
-                            }
-                        }
+                        get: { model.agentChromeActive },
+                        set: { model.setAgentChromeActive($0) }
                     )
                 )
-                .help("Toggle the trailing Agent sidebar")
+                .help(model.agentChromeHelp)
                 Divider()
                 WindowModuleToggles(model: model, kinds: ProviderKind.defaultDocked)
                 Divider()
@@ -389,6 +385,17 @@ struct GhidraVibeApp: App {
             }
         }
         .defaultSize(width: 520, height: 420)
+        .windowToolbarStyle(.unified)
+        .defaultLaunchBehavior(.suppressed)
+
+        // Detached Agent chat — singular `Window` (not WindowGroup) so openWindow
+        // cannot spawn hundreds of copies. Close / Cmd-W reattaches to sidebar.
+        Window("Agent", id: FloatingAgentRouter.windowID) {
+            FloatingAgentRoot()
+                .environment(model)
+                .vibeGlobalTheme()
+        }
+        .defaultSize(width: 560, height: 720)
         .windowToolbarStyle(.unified)
         .defaultLaunchBehavior(.suppressed)
 

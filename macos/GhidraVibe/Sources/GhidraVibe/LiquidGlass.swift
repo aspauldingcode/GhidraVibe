@@ -66,7 +66,6 @@ struct GlassToolbarButton: View {
                 .foregroundStyle(Color.vibeForeground)
         }
         .buttonStyle(.bordered)
-        .tint(Color.vibeAccent)
         .help(tip)
         .accessibilityIdentifier(id)
         .accessibilityLabel(e.label == id ? label : e.label)
@@ -117,7 +116,6 @@ struct GlassMnemonicButton: View {
                 .frame(minWidth: 18, minHeight: 18)
         }
         .buttonStyle(.bordered)
-        .tint(Color.vibeAccent)
         .disabled(!enabled)
         .help(tip)
         .accessibilityIdentifier(id)
@@ -162,7 +160,8 @@ struct GlassTabStyle: ViewModifier {
         if prominent {
             content.buttonStyle(.borderedProminent).tint(Color.vibeAccent)
         } else {
-            content.buttonStyle(.bordered).tint(Color.vibeAccent)
+            // No accent tint — bordered + accent draws a blue outline under Apple chrome.
+            content.buttonStyle(.bordered)
         }
     }
 }

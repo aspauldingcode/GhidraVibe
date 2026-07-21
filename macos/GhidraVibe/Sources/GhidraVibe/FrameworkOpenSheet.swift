@@ -94,10 +94,6 @@ struct FrameworkOpenSheet: View {
             .scrollContentBackground(.visible)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipShape(RoundedRectangle(cornerRadius: VibeChrome.Radius.nestMin, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: VibeChrome.Radius.nestMin, style: .continuous)
-                    .stroke(VibeChrome.ProviderSurface.separator, lineWidth: 1)
-            }
             .disabled(model.dyldImportBusy)
             .padding(.horizontal, VibeChrome.Space.margin)
             // Space between list and footer actions (related group → button row).

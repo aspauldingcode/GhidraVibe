@@ -158,10 +158,6 @@ struct AgentCFGEmbedView: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(t.vibeContentAlt)
         )
-        .overlay {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(t.vibeSelection, lineWidth: 1)
-        }
         .a11yCatalog("ghidra.vibe.agent.cfg_embed")
     }
 }

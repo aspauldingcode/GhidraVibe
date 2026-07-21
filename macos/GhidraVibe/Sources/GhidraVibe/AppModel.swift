@@ -548,6 +548,8 @@ final class AppModel {
             "agentEnabled": agentEnabled,
             "leftSidebarVisible": dockLayout.leftSidebarVisible,
             "agentSidebarVisible": dockLayout.agentSidebarVisible,
+            "agentDetached": dockLayout.agentDetached,
+            "agentChromeActive": agentChromeActive,
             "agentBusy": agentBusy,
             "agentQueueCount": agentSendQueue.count,
             "agentMode": agentInteractionMode.rawValue,
@@ -755,9 +757,13 @@ final class AppModel {
         helpFocusProvider = kind
         if kind == .agent {
             enableAgentSidebar()
-            dockLayout.agentSidebarVisible = true
-            persistDock()
-            statusMessage = "Agent sidebar shown"
+            if dockLayout.agentDetached {
+                focusAgentWindow()
+            } else {
+                dockLayout.agentSidebarVisible = true
+                persistDock()
+                statusMessage = "Agent sidebar shown"
+            }
             return
         }
         toolMode = .codeBrowser
@@ -777,9 +783,14 @@ final class AppModel {
 
     func closeProvider(_ kind: ProviderKind) {
         if kind == .agent {
-            dockLayout.agentSidebarVisible = false
-            persistDock()
-            statusMessage = "Agent sidebar hidden"
+            if dockLayout.agentDetached {
+                // Closing detached Agent always reattaches to the trailing sidebar.
+                reattachAgentChat(showSidebar: true)
+            } else {
+                dockLayout.agentSidebarVisible = false
+                persistDock()
+                statusMessage = "Agent sidebar hidden"
+            }
             return
         }
         let wasFloating = dockLayout.isFloating(kind)
@@ -800,14 +811,14 @@ final class AppModel {
 
     /// Window menu / Modules palette: provider is on when docked-visible or floating.
     func isProviderMenuOn(_ kind: ProviderKind) -> Bool {
-        if kind == .agent { return dockLayout.agentSidebarVisible }
+        if kind == .agent { return agentChromeActive }
         return isProviderVisible(kind) || dockLayout.isFloating(kind)
     }
 
     /// Toggle provider visibility for Window → module items (checkmark Toggle).
     func toggleProvider(_ kind: ProviderKind) {
         if kind == .agent {
-            toggleAgentSidebar()
+            setAgentChromeActive(!agentChromeActive)
             return
         }
         if dockLayout.isFloating(kind) {
@@ -1066,11 +1077,21 @@ final class AppModel {
         case "show_mcp": showProvider(.mcp)
         case "show_agent":
             enableAgentSidebar()
-            dockLayout.agentSidebarVisible = true
-            persistDock()
-            statusMessage = "Agent sidebar shown"
+            if dockLayout.agentDetached {
+                focusAgentWindow()
+            } else {
+                dockLayout.agentSidebarVisible = true
+                persistDock()
+                statusMessage = "Agent sidebar shown"
+            }
         case "toggle_agent_sidebar", "agent_sidebar":
-            toggleAgentSidebar()
+            agentChromeAction()
+        case "detach_agent", "agent_detach":
+            detachAgentChat()
+        case "reattach_agent", "agent_reattach":
+            reattachAgentChat(showSidebar: true)
+        case "focus_agent", "agent_focus":
+            focusAgentWindow()
         case "toggle_left_sidebar", "modules_sidebar", "left_sidebar":
             toggleLeftSidebar()
         case "agent_playbook", "autonomous_re":
@@ -3877,10 +3898,14 @@ final class AppModel {
     }
 
     func optOutAgent() {
+        if dockLayout.agentDetached {
+            reattachAgentChat(showSidebar: false)
+        }
         agentOptedOut = true
         agentEnabled = false
         showAgentWelcome = false
         dockLayout.agentSidebarVisible = false
+        dockLayout.agentDetached = false
         persistDock()
         UserDefaults.standard.set(true, forKey: "ghidra.vibe.agent.optOut")
         UserDefaults.standard.set(true, forKey: "ghidra.vibe.agent.welcomeDismissed")
@@ -3897,7 +3922,44 @@ final class AppModel {
         UserDefaults.standard.set(false, forKey: "ghidra.vibe.agent.optOut")
     }
 
+    /// Toolbar / menu “on” while Agent is shown in the sidebar **or** detached.
+    var agentChromeActive: Bool {
+        agentEnabled && (dockLayout.agentDetached || dockLayout.agentSidebarVisible)
+    }
+
+    /// Toolbar Agent control: toggle sidebar when attached; focus window when detached.
+    func agentChromeAction() {
+        if dockLayout.agentDetached {
+            focusAgentWindow()
+            return
+        }
+        toggleAgentSidebar()
+    }
+
+    /// Window-menu Toggle setter — syncs attached/detached state machine.
+    func setAgentChromeActive(_ want: Bool) {
+        enableAgentSidebar()
+        if dockLayout.agentDetached {
+            if want {
+                focusAgentWindow()
+            } else {
+                // Dismiss while detached → reattach, then hide column.
+                reattachAgentChat(showSidebar: false)
+            }
+            return
+        }
+        if want != dockLayout.agentSidebarVisible {
+            dockLayout.agentSidebarVisible = want
+            persistDock()
+            statusMessage = want ? "Agent sidebar shown" : "Agent sidebar hidden"
+        }
+    }
+
     func toggleAgentSidebar() {
+        if dockLayout.agentDetached {
+            focusAgentWindow()
+            return
+        }
         if !agentEnabled {
             enableAgentSidebar()
             dockLayout.agentSidebarVisible = true
@@ -3906,6 +3968,54 @@ final class AppModel {
         }
         persistDock()
         statusMessage = dockLayout.agentSidebarVisible ? "Agent sidebar shown" : "Agent sidebar hidden"
+    }
+
+    /// Float Agent chat into its own window (hides trailing sidebar column).
+    func detachAgentChat() {
+        enableAgentSidebar()
+        guard !dockLayout.agentDetached else {
+            focusAgentWindow()
+            return
+        }
+        dockLayout.agentDetached = true
+        dockLayout.agentSidebarVisible = false
+        persistDock()
+        statusMessage = "Agent detached"
+        NotificationCenter.default.post(name: .ghidraVibeDetachAgent, object: nil)
+    }
+
+    /// Return Agent to the trailing sidebar. Closing the detached window always reattaches.
+    func reattachAgentChat(showSidebar: Bool = true) {
+        dockLayout.agentDetached = false
+        if showSidebar {
+            enableAgentSidebar()
+            dockLayout.agentSidebarVisible = true
+        }
+        persistDock()
+        // Always dismiss the Agent scene — dock state and SwiftUI Window can desync
+        // (e.g. close suppressed while culling), leaving an orphaned Agent window.
+        NotificationCenter.default.post(name: .ghidraVibeAttachAgent, object: nil)
+        statusMessage = showSidebar ? "Agent reattached to sidebar" : "Agent window closed"
+    }
+
+    /// Key / order the detached Agent window (no-op if attached).
+    func focusAgentWindow() {
+        guard dockLayout.agentDetached else { return }
+        enableAgentSidebar()
+        NotificationCenter.default.post(name: .ghidraVibeFocusAgent, object: nil)
+        statusMessage = "Agent window focused"
+    }
+
+    /// Toolbar help / symbol for the Agent chrome control.
+    var agentChromeHelp: String {
+        if dockLayout.agentDetached {
+            return "Focus Agent window (detached)"
+        }
+        return agentChromeActive ? "Hide Agent sidebar" : "Show Agent sidebar"
+    }
+
+    var agentChromeSymbol: String {
+        dockLayout.agentDetached ? "bubble.left.and.bubble.right" : "sidebar.trailing"
     }
 
     func persistAgentAISettings() {
@@ -4141,6 +4251,114 @@ final class AppModel {
         ))
         refreshAgentContextMeter()
         statusMessage = "Attached \(name)"
+    }
+
+    /// Insert an `@` mention token into the Agent composer (same path as the picker / drag-drop).
+    func insertAgentMentionToken(_ token: String, applySideEffects: Bool = true) {
+        let tok = token.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !tok.isEmpty else { return }
+        if agentDraft.isEmpty || agentDraft.hasSuffix(" ") || agentDraft.hasSuffix("\n") {
+            agentDraft += tok + " "
+        } else {
+            agentDraft += " " + tok + " "
+        }
+        if applySideEffects {
+            applyAgentMentionSideEffects(for: tok)
+        }
+        refreshAgentContextMeter()
+        statusMessage = "Mention \(tok)"
+    }
+
+    /// Side effects shared by mention picker select and drag-drop (select fn / show provider).
+    func applyAgentMentionSideEffects(for token: String) {
+        if token.hasPrefix("@Functions:") {
+            let name = String(token.dropFirst("@Functions:".count))
+            selectFunction(name: name, address: nil, id: nil)
+        } else if token.hasPrefix("@Providers:"),
+                  let raw = token.split(separator: ":").last,
+                  let kind = ProviderKind(rawValue: String(raw))
+        {
+            showProvider(kind)
+        } else if token == "@Selection", let sel = selectedFunction {
+            selectFunction(name: sel.name, address: sel.address, id: sel.id)
+        }
+    }
+
+    /// Drop files (attachments) or mention / provider drag payloads onto the Agent composer.
+    @discardableResult
+    func handleAgentComposerDrop(providers: [NSItemProvider]) -> Bool {
+        var accepted = false
+        for provider in providers {
+            if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+                accepted = true
+                provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
+                    let url: URL?
+                    if let data = item as? Data {
+                        url = URL(dataRepresentation: data, relativeTo: nil)
+                    } else if let u = item as? URL {
+                        url = u
+                    } else {
+                        url = nil
+                    }
+                    guard let url else { return }
+                    Task { @MainActor in
+                        self.addAgentAttachment(url: url)
+                    }
+                }
+                continue
+            }
+            if provider.hasItemConformingToTypeIdentifier(UTType.json.identifier) {
+                accepted = true
+                provider.loadDataRepresentation(forTypeIdentifier: UTType.json.identifier) { data, _ in
+                    guard let data else { return }
+                    Task { @MainActor in
+                        if let mention = AgentMentionDrag.decode(from: data) {
+                            self.insertAgentMentionToken(mention.token)
+                        } else if let dock = try? JSONDecoder().decode(ProviderDockDrag.self, from: data),
+                                  let kind = dock.kind
+                        {
+                            self.insertAgentMentionToken(AgentMentionDrag.provider(kind).token)
+                        }
+                    }
+                }
+                continue
+            }
+            if provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier) {
+                accepted = true
+                provider.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { item, _ in
+                    let text: String?
+                    if let s = item as? String {
+                        text = s
+                    } else if let data = item as? Data {
+                        text = String(data: data, encoding: .utf8)
+                    } else {
+                        text = nil
+                    }
+                    guard let raw = text?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty
+                    else { return }
+                    Task { @MainActor in
+                        if raw.hasPrefix("@") {
+                            self.insertAgentMentionToken(raw)
+                        } else if FileManager.default.fileExists(atPath: raw) {
+                            self.addAgentAttachment(url: URL(fileURLWithPath: raw))
+                        } else if let fn = self.functions.first(where: {
+                            $0.name == raw || $0.address == raw
+                        }) {
+                            self.insertAgentMentionToken(AgentMentionDrag.function(fn.name).token)
+                        } else {
+                            // Free-form text drop → append as draft prose.
+                            if self.agentDraft.isEmpty || self.agentDraft.hasSuffix(" ") {
+                                self.agentDraft += raw
+                            } else {
+                                self.agentDraft += " " + raw
+                            }
+                            self.refreshAgentContextMeter()
+                        }
+                    }
+                }
+            }
+        }
+        return accepted
     }
 
     func removeAgentAttachment(_ id: UUID) {

@@ -72,8 +72,11 @@ struct DockWorkspaceView: View {
                         .layoutPriority(1)
                     }
 
-                // Trailing Agent column only — not a modular dock provider.
-                if model.agentEnabled, model.dockLayout.agentSidebarVisible {
+                // Trailing Agent column only — hidden while chat is detached to its own window.
+                if model.agentEnabled,
+                   model.dockLayout.agentSidebarVisible,
+                   !model.dockLayout.agentDetached
+                {
                     AgentChatView()
                         .frame(
                             minWidth: narrow ? 140 : 180,
@@ -609,10 +612,6 @@ struct DockDropBanner: View {
         }
         .padding(12)
         .background(VibeChrome.ProviderSurface.control)
-        .overlay {
-            Rectangle()
-                .stroke(VibeChrome.ProviderSurface.accent.opacity(0.55), lineWidth: 2)
-        }
         .shadow(color: .black.opacity(0.35), radius: 12, y: 4)
         .padding(.horizontal, 12)
         .padding(.top, 8)
