@@ -33,7 +33,13 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - name: Build macOS SwiftUI frontend
         run: |
-          nix build .#ghidra-vibe-app -L
+          # --option sandbox false works around a known macOS Nix sandbox issue:
+          # Xcode's on-demand Metal toolchain download mounts a read-only DMG
+          # under $HOME/Library/Developer/DVTDownloads/MetalToolchain/mounts/,
+          # and the sandboxed build's post-build cleanup can't unlink files on
+          # it, intermittently failing with "cannot unlink ...: Read-only
+          # file system" even though the actual build itself succeeded.
+          nix build .#ghidra-vibe-app -L --option sandbox false
       - name: Check macOS app bundle
         run: |
           if [ -d result/Applications/GhidraVibe.app ]; then
