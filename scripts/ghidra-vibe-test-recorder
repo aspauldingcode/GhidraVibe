@@ -6,15 +6,35 @@ Records and plays back GUI test scenarios.
 from __future__ import annotations
 
 import argparse
+import importlib.machinery
+import importlib.util
 import json
 import sys
 import time
 from pathlib import Path
 from typing import Any
 
-# Import the device agent
-sys.path.insert(0, str(Path(__file__).parent))
-from ghidra_vibe_device_agent import DeviceAgent
+
+def _load_device_agent_module():
+    """Load the sibling ghidra-vibe-device-agent script as a module.
+
+    It can't be a normal `import` target: its filename is hyphenated and
+    has no .py extension, so Python's import machinery can never find it
+    via sys.path (spec_from_file_location won't infer a loader for an
+    unrecognized suffix either). Load it directly via SourceFileLoader.
+    """
+    agent_path = Path(__file__).resolve().parent / "ghidra-vibe-device-agent"
+    loader = importlib.machinery.SourceFileLoader("ghidra_vibe_device_agent", str(agent_path))
+    spec = importlib.util.spec_from_file_location("ghidra_vibe_device_agent", agent_path, loader=loader)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load device agent module from {agent_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+DeviceAgent = _load_device_agent_module().DeviceAgent
 
 
 class TestRecorder:

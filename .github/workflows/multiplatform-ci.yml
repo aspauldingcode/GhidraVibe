@@ -14,7 +14,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - name: Build Linux GTK frontend
         run: |
-          nix build .#ghidraVibeGtk -L
+          nix build .#ghidra-vibe-gtk -L
       - name: Check GTK binary
         run: |
           if [ -f result/bin/ghidra-vibe ]; then
@@ -33,7 +33,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - name: Build macOS SwiftUI frontend
         run: |
-          nix build .#ghidraVibeApp -L
+          nix build .#ghidra-vibe-app -L
       - name: Check macOS app bundle
         run: |
           if [ -d result/Applications/GhidraVibe.app ]; then
@@ -52,7 +52,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - name: Build Rust tools
         run: |
-          nix build .#ghidraVibeTools -L
+          nix build .#ghidra-vibe-tools -L
       - name: Check DSC indexer
         run: |
           if [ -f result/bin/ghidra-vibe-dsc-index ]; then
@@ -71,7 +71,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - name: Build Ghidra engine
         run: |
-          nix build .#ghidraVibe -L --max-jobs 4
+          nix build .#ghidra-vibe -L --max-jobs 4
       - name: Verify engine artifacts
         run: |
           ls -la result/lib/ghidra/
