@@ -5,16 +5,16 @@ This branch only tracks the latest channel metadata.
 
 {
   "name": "GhidraVibe",
-  "version": "0.1.0-db13160",
-  "sha": "db13160",
-  "dmg": "GhidraVibe-0.1.0-db13160.dmg",
+  "version": "0.1.0-e3ef632",
+  "sha": "e3ef632",
+  "dmg": "GhidraVibe-0.1.0-e3ef632.dmg",
   "dmg_latest": "GhidraVibe-latest.dmg",
   "app": "GhidraVibe.app",
-  "generated_at": "2026-07-21T09:26:04Z",
+  "generated_at": "2026-07-21T09:38:30Z",
   "channel": "beta",
   "tag": "beta",
   "release_url": "https://github.com/aspauldingcode/GhidraVibe/releases/tag/beta",
-  "dmg_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-0.1.0-db13160.dmg",
+  "dmg_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-0.1.0-e3ef632.dmg",
   "dmg_latest_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-latest.dmg"
 }
 
@@ -22,14 +22,14 @@ This branch only tracks the latest channel metadata.
 
 ## GhidraVibe Beta
 
-Rolling prerelease from `master` (`db13160`).
+Rolling prerelease from `master` (`e3ef632`).
 
-- **Commit:** `db1316031e65873259feedc2b04f2efdb55108a3`
+- **Commit:** `e3ef632192fcad187280a3fc91435322219d0f94`
 - **Range:** `beta..HEAD`
 
 ### Changes
 
-- fix(ci): Correct flake attribute names and test-recorder import (db13160)
+- Initial packaging commit
 
 ### Install
 

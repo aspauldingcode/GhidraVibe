@@ -1,13 +1,13 @@
 ## GhidraVibe Beta
 
-Rolling prerelease from `master` (`db13160`).
+Rolling prerelease from `master` (`e3ef632`).
 
-- **Commit:** `db1316031e65873259feedc2b04f2efdb55108a3`
+- **Commit:** `e3ef632192fcad187280a3fc91435322219d0f94`
 - **Range:** `beta..HEAD`
 
 ### Changes
 
-- fix(ci): Correct flake attribute names and test-recorder import (db13160)
+- Initial packaging commit
 
 ### Install
 
