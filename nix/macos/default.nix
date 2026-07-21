@@ -1,8 +1,15 @@
-# Native macOS GhidraVibe UI — built with Xcode's SwiftPM into the Nix store.
+# Native macOS GhidraVibe UI — host Xcode (`xcrun swift`) + offline SwiftPM deps.
 # Never `swift run` from the flake source tree at runtime (store is read-only).
+#
+# Deps fetched like swiftpm2nix (macos/GhidraVibe/nix/), then rewritten to path
+# packages: Xcode SwiftPM 6.2 (workspace-state v7) still tries to git-clone
+# remoteSourceControl deps even when checkouts are seeded.
+# Compiler: host Xcode (SwiftUI / macOS 26); not pkgs.swift.
 {
   lib,
   stdenvNoCC,
+  fetchgit,
+  callPackage,
 }:
 
 assert stdenvNoCC.isDarwin;
@@ -17,6 +24,9 @@ let
   emulatorChromeJson = ../../native-ui/parity/Emulator.chrome.json;
   vtChromeJson = ../../native-ui/parity/VersionTracking.chrome.json;
   ghidraIconPng = ../../native-ui/icons/png/GhidraIcon256.png;
+
+  swiftpm2nixHelpers = callPackage ./swiftpm2nix-helpers.nix { inherit fetchgit; };
+  generated = swiftpm2nixHelpers.helpers ../../macos/GhidraVibe/nix;
 in
 stdenvNoCC.mkDerivation rec {
   pname = "ghidra-vibe-app";
@@ -36,20 +46,157 @@ stdenvNoCC.mkDerivation rec {
       );
   };
 
-  # Needs host Xcode (`xcrun swift`) + AppKit/SwiftUI; not pkgs.swift.
-  # Build with: nix build .#ghidra-vibe-app --option sandbox false
-  # (SwiftPM nested sandbox-exec is incompatible with the Nix builder sandbox.)
   preferLocalBuild = true;
   allowSubstitutes = false;
   __noChroot = true;
 
-  dontConfigure = true;
   dontStrip = true;
+
+  configurePhase = ''
+    runHook preConfigure
+    ${generated.configure}
+
+    # Force offline path deps (Xcode SPM will not honor seeded remotes alone).
+    # -L: checkouts are symlinks into the store; copy the referent and make writable.
+    mkdir -p Vendor
+    for name in TintedThemingSwift textual swift-concurrency-extras swiftui-math Yams; do
+      rm -rf "Vendor/$name"
+      cp -R -L ".build/checkouts/$name" "Vendor/$name"
+      chmod -R u+w "Vendor/$name"
+    done
+
+    cat > Package.swift <<'EOF'
+// swift-tools-version: 6.2
+import PackageDescription
+
+let package = Package(
+    name: "GhidraVibe",
+    platforms: [
+        .macOS(.v26)
+    ],
+    products: [
+        .executable(name: "GhidraVibe", targets: ["GhidraVibe"])
+    ],
+    dependencies: [
+        .package(path: "Vendor/TintedThemingSwift"),
+        .package(path: "Vendor/textual"),
+    ],
+    targets: [
+        .executableTarget(
+            name: "GhidraVibe",
+            dependencies: [
+                .product(name: "TintedThemingSwift", package: "TintedThemingSwift"),
+                .product(name: "Textual", package: "textual"),
+            ],
+            path: "Sources/GhidraVibe",
+            exclude: ["Resources"]
+        )
+    ]
+)
+EOF
+
+    cat > Vendor/TintedThemingSwift/Package.swift <<'EOF'
+// swift-tools-version: 5.9
+import PackageDescription
+
+let package = Package(
+    name: "TintedThemingSwift",
+    platforms: [
+        .iOS(.v15),
+        .macOS(.v12),
+        .watchOS(.v8),
+        .tvOS(.v15)
+    ],
+    products: [
+        .library(name: "TintedThemingSwift", targets: ["TintedThemingSwift"]),
+    ],
+    dependencies: [
+        .package(path: "../Yams"),
+    ],
+    targets: [
+        .target(name: "TintedThemingSwift", dependencies: ["Yams"]),
+    ]
+)
+EOF
+
+    cat > Vendor/textual/Package.swift <<'EOF'
+// swift-tools-version: 6.0
+import PackageDescription
+
+let package = Package(
+  name: "textual",
+  platforms: [
+    .macOS(.v15),
+    .iOS(.v18),
+    .tvOS(.v18),
+    .watchOS(.v11),
+    .visionOS(.v2),
+  ],
+  products: [
+    .library(name: "Textual", targets: ["Textual"])
+  ],
+  dependencies: [
+    .package(path: "../swift-concurrency-extras"),
+    .package(path: "../swiftui-math"),
+  ],
+  targets: [
+    .target(
+      name: "Textual",
+      dependencies: [
+        .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
+        .product(name: "SwiftUIMath", package: "swiftui-math"),
+      ],
+      resources: [
+        .process("Internal/Highlighter/Prism")
+      ],
+      swiftSettings: [
+        .define(
+          "TEXTUAL_ENABLE_LINKS",
+          .when(platforms: [.macOS, .macCatalyst, .iOS, .watchOS, .visionOS])),
+        .define(
+          "TEXTUAL_ENABLE_TEXT_SELECTION",
+          .when(platforms: [.macOS, .macCatalyst, .iOS, .visionOS])),
+      ]
+    ),
+  ]
+)
+EOF
+
+    cat > Vendor/swiftui-math/Package.swift <<'EOF'
+// swift-tools-version: 6.0
+import PackageDescription
+
+let package = Package(
+  name: "swiftui-math",
+  platforms: [
+    .macOS(.v14),
+    .iOS(.v17),
+    .tvOS(.v17),
+    .watchOS(.v10),
+    .visionOS(.v1),
+  ],
+  products: [
+    .library(name: "SwiftUIMath", targets: ["SwiftUIMath"])
+  ],
+  targets: [
+    .target(
+      name: "SwiftUIMath",
+      dependencies: [],
+      resources: [.copy("mathFonts.bundle")]
+    ),
+  ]
+)
+EOF
+
+    rm -f Package.resolved
+    rm -rf .build
+    runHook postConfigure
+  '';
 
   buildPhase = ''
     runHook preBuild
-    # SwiftPM / swiftc use $HOME and nested sandbox-exec; keep everything under the build tree.
     export HOME="$NIX_BUILD_TOP/home"
+    export CFFIXED_USER_HOME="$HOME"
     export TMPDIR="$NIX_BUILD_TOP/tmp"
     export TMP="$TMPDIR"
     export TEMP="$TMPDIR"
@@ -67,24 +214,23 @@ stdenvNoCC.mkDerivation rec {
       "$CLANG_MODULE_CACHE_PATH" \
       "$SWIFT_MODULE_CACHE_PATH"
 
-    BUILD_DIR="$NIX_BUILD_TOP/swift-build"
     /usr/bin/xcrun swift build -c release --product GhidraVibe \
-      --build-path "$BUILD_DIR" \
       --disable-sandbox
-    test -x "$BUILD_DIR/release/GhidraVibe"
+    BIN="$(/usr/bin/xcrun swift build -c release --product GhidraVibe --show-bin-path --disable-sandbox)"
+    test -x "$BIN/GhidraVibe"
     runHook postBuild
   '';
 
   installPhase = ''
     runHook preInstall
-    BUILD_DIR="$NIX_BUILD_TOP/swift-build"
+    BIN="$(/usr/bin/xcrun swift build -c release --product GhidraVibe --show-bin-path --disable-sandbox)"
     mkdir -p \
       "$out/bin" \
       "$out/Applications/GhidraVibe.app/Contents/MacOS" \
       "$out/Applications/GhidraVibe.app/Contents/Resources"
 
-    install -m755 "$BUILD_DIR/release/GhidraVibe" "$out/bin/GhidraVibe"
-    install -m755 "$BUILD_DIR/release/GhidraVibe" \
+    install -m755 "$BIN/GhidraVibe" "$out/bin/GhidraVibe"
+    install -m755 "$BIN/GhidraVibe" \
       "$out/Applications/GhidraVibe.app/Contents/MacOS/GhidraVibe"
 
     if [[ -f Resources/AppIcon.icns ]]; then
@@ -92,7 +238,6 @@ stdenvNoCC.mkDerivation rec {
     else
       cp ${appIcon} "$out/Applications/GhidraVibe.app/Contents/Resources/AppIcon.icns"
     fi
-    # Explicit basenames — nix store paths are hash-prefixed.
     cp ${a11yCatalog} "$out/Applications/GhidraVibe.app/Contents/Resources/catalog.json"
     cp ${actionsJson} "$out/Applications/GhidraVibe.app/Contents/Resources/actions.json"
     cp ${layoutJson} "$out/Applications/GhidraVibe.app/Contents/Resources/CodeBrowser.tool.json"

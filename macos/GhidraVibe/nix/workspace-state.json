@@ -1,0 +1,94 @@
+{
+  "object": {
+    "artifacts": [],
+    "dependencies": [
+      {
+        "basedOn": null,
+        "packageRef": {
+          "identity": "swift-concurrency-extras",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/pointfreeco/swift-concurrency-extras",
+          "name": "swift-concurrency-extras"
+        },
+        "state": {
+          "checkoutState": {
+            "revision": "a90e2e40a7a840a853dd29e57cbef5dbb72c9d5b",
+            "version": "1.4.0"
+          },
+          "name": "sourceControlCheckout"
+        },
+        "subpath": "swift-concurrency-extras"
+      },
+      {
+        "basedOn": null,
+        "packageRef": {
+          "identity": "swiftui-math",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/gonzalezreal/swiftui-math",
+          "name": "swiftui-math"
+        },
+        "state": {
+          "checkoutState": {
+            "revision": "0b5c2cfaaec8d6193db206f675048eeb5ce95f71",
+            "version": "0.1.0"
+          },
+          "name": "sourceControlCheckout"
+        },
+        "subpath": "swiftui-math"
+      },
+      {
+        "basedOn": null,
+        "packageRef": {
+          "identity": "textual",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/gonzalezreal/textual.git",
+          "name": "textual"
+        },
+        "state": {
+          "checkoutState": {
+            "revision": "01b51875a5406eefc95f52a058cb059e7bc94dc4",
+            "version": "0.5.0"
+          },
+          "name": "sourceControlCheckout"
+        },
+        "subpath": "textual"
+      },
+      {
+        "basedOn": null,
+        "packageRef": {
+          "identity": "tintedthemingswift",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/aspauldingcode/TintedThemingSwift.git",
+          "name": "TintedThemingSwift"
+        },
+        "state": {
+          "checkoutState": {
+            "branch": "main",
+            "revision": "597e08987162ed2f951aaa06e35736d17a5817c1"
+          },
+          "name": "sourceControlCheckout"
+        },
+        "subpath": "TintedThemingSwift"
+      },
+      {
+        "basedOn": null,
+        "packageRef": {
+          "identity": "yams",
+          "kind": "remoteSourceControl",
+          "location": "https://github.com/jpsim/Yams.git",
+          "name": "Yams"
+        },
+        "state": {
+          "checkoutState": {
+            "revision": "3d6871d5b4a5cd519adf233fbb576e0a2af71c17",
+            "version": "5.4.0"
+          },
+          "name": "sourceControlCheckout"
+        },
+        "subpath": "Yams"
+      }
+    ],
+    "prebuilts": []
+  },
+  "version": 7
+}
