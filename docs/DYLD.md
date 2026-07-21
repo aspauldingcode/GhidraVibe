@@ -53,8 +53,19 @@ Ghidra’s `SplitDyldCache` reads them automatically.
 ```bash
 ghidra-vibe-dyld list --query AppKit
 ghidra-vibe-dyld import --image AppKit
-gui-tests/smoke-appkit-decompile.sh
+gui-tests/acceptance-dsc-import.sh          # CI CLI gate
+gui-tests/smoke-appkit-decompile.sh         # GUI GuiControl decompile gate
 ```
+
+### Import failures (“See log”)
+
+Headless DSC import cannot open a project the live GhidraVibe in-process engine
+already has locked. The GUI always stages imports under
+`~/Documents/GhidraVibe/projects/dsc/` (unique `DSCImport-*` name when needed),
+and `ghidra-vibe-dyld` retries in a fresh project directory on
+`Unable to lock project`. Failure logs are kept at:
+
+`~/Library/Logs/GhidraVibe/dsc-import-latest.log`
 
 ## Apple symbols
 

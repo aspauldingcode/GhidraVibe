@@ -222,47 +222,105 @@ cmd_import() {
   # Default off for IDA-like snappy module load (UI / MCP); CLI opt-in via --analyze 1.
   export GHIDRA_VIBE_ANALYZE="${GHIDRA_VIBE_ANALYZE:-0}"
 
-  echo "DSC open: $cache"
-  echo "Select image: $resolved"
-  echo "Import via DyldCacheFileSystem → project=$project/$proj_name program=$prog"
-  echo "scriptPath: $GHIDRA_SCRIPTS"
-  echo "Apple symbols: $GHIDRA_VIBE_APPLE_SYMBOLS  analyze: $GHIDRA_VIBE_ANALYZE"
+  local log_dir="${GHIDRA_VIBE_DSC_LOG_DIR:-$HOME/Library/Logs/GhidraVibe}"
+  mkdir -p "$log_dir"
+  local log="$log_dir/dsc-import-latest.log"
+  local stamp
+  stamp="$(date +%Y%m%d-%H%M%S 2>/dev/null || echo now)"
+  local log_keep="$log_dir/dsc-import-${stamp}.log"
+
+  # Fresh log so the GUI Console tailer starts clean (IDA-like import transcript).
+  : >"$log"
+
+  dsc_log() {
+    # stdout (captured by vibe MCP) + live tee for GhidraVibe Console.
+    echo "$@" | tee -a "$log"
+  }
+
+  dsc_log "PHASE: resolve — Resolving dyld shared cache and framework image…"
+  dsc_log "DSC open: $cache"
+  dsc_log "Select image: $resolved"
+  dsc_log "Import via DyldCacheFileSystem → project=$project/$proj_name program=$prog"
+  dsc_log "scriptPath: $GHIDRA_SCRIPTS"
+  dsc_log "Apple symbols: $GHIDRA_VIBE_APPLE_SYMBOLS  analyze: $GHIDRA_VIBE_ANALYZE"
 
   # Heap: honor override, else let analyzeHeadless auto-detect from RAM.
   if [[ -n "${GHIDRA_VIBE_MAXMEM:-${MAXMEM:-}}" ]]; then
     export GHIDRA_VIBE_MAXMEM="${GHIDRA_VIBE_MAXMEM:-$MAXMEM}"
     export MAXMEM="$GHIDRA_VIBE_MAXMEM"
-    echo "MAXMEM=$MAXMEM (explicit)"
+    dsc_log "MAXMEM=$MAXMEM (explicit)"
   else
-    echo "MAXMEM=auto (detect-maxmem.sh via ghidra-vibe-analyzeHeadless)"
+    dsc_log "MAXMEM=auto (detect-maxmem.sh via ghidra-vibe-analyzeHeadless)"
   fi
 
-  local log
-  log="$(mktemp)"
+  dsc_log "PHASE: launch_headless — Starting Ghidra analyzeHeadless importer (stock DyldCacheFileSystem)…"
+  dsc_log "DSC log: $log"
+
+  run_headless_import() {
+    local proj_dir="$1" name="$2" out_log="$3"
+    set +e
+    # Line-buffer headless output when stdbuf is available so the Console updates live.
+    if command -v stdbuf >/dev/null 2>&1; then
+      stdbuf -oL -eL "$headless" "$proj_dir" "$name" \
+        -scriptPath "$GHIDRA_SCRIPTS" \
+        -preScript ImportDyldCacheImage.java "$cache" "$resolved" "$prog" \
+        -overwrite \
+        -max-cpu "${GHIDRA_VIBE_MAX_CPU:-2}" \
+        2>&1 | tee -a "$out_log"
+    else
+      "$headless" "$proj_dir" "$name" \
+        -scriptPath "$GHIDRA_SCRIPTS" \
+        -preScript ImportDyldCacheImage.java "$cache" "$resolved" "$prog" \
+        -overwrite \
+        -max-cpu "${GHIDRA_VIBE_MAX_CPU:-2}" \
+        2>&1 | tee -a "$out_log"
+    fi
+    local rc=${PIPESTATUS[0]}
+    set -e
+    return "$rc"
+  }
+
   # Headless: create/open project, run ImportDyldCacheImage (no whole-cache -import).
-  set +e
-  "$headless" "$project" "$proj_name" \
-    -scriptPath "$GHIDRA_SCRIPTS" \
-    -preScript ImportDyldCacheImage.java "$cache" "$resolved" "$prog" \
-    -overwrite \
-    -max-cpu "${GHIDRA_VIBE_MAX_CPU:-2}" \
-    2>&1 | tee "$log"
-  local rc=${PIPESTATUS[0]}
-  set -e
+  local rc=0
+  run_headless_import "$project" "$proj_name" "$log" || rc=$?
+  cp -f "$log" "$log_keep" 2>/dev/null || true
+
+  # Live GUI / another headless often holds the project write lock — retry in a fresh project.
+  if ! log_has 'OK: imported' "$log" && log_has 'Unable to lock project|LockException|already open' "$log"; then
+    local alt_project alt_name
+    alt_project="${project%/}/import-${stamp}-$$"
+    alt_name="$proj_name"
+    mkdir -p "$alt_project"
+    dsc_log "WARN: project locked — retrying in $alt_project/$alt_name (log: $log_keep)"
+    project="$alt_project"
+    log="$log_dir/dsc-import-latest.log"
+    log_keep="$log_dir/dsc-import-${stamp}-retry.log"
+    rc=0
+    run_headless_import "$project" "$proj_name" "$log" || rc=$?
+    cp -f "$log" "$log_keep" 2>/dev/null || true
+  fi
 
   if ! log_has 'OK: imported' "$log"; then
-    echo "FAIL: DyldCacheFileSystem import did not complete (rc=$rc). See log." >&2
+    dsc_log "FAIL: DyldCacheFileSystem import did not complete (rc=$rc). See log: $log_keep"
     if log_has 'Java heap space|OutOfMemoryError' "$log"; then
-      echo "Hint: raise heap — MAXMEM=24G or GHIDRA_VIBE_MAXMEM=24G" >&2
+      dsc_log "Hint: raise heap — MAXMEM=24G or GHIDRA_VIBE_MAXMEM=24G"
     fi
     if log_has 'Script not found|Invalid script' "$log"; then
-      echo "Hint: GHIDRA_VIBE_SCRIPT_PATH must point at ghidra_scripts/ (got: $GHIDRA_SCRIPTS)" >&2
+      dsc_log "Hint: GHIDRA_VIBE_SCRIPT_PATH must point at ghidra_scripts/ (got: $GHIDRA_SCRIPTS)"
     fi
-    rm -f "$log"
+    if log_has 'Unable to lock project|LockException' "$log"; then
+      dsc_log "Hint: close GhidraVibe / other headless using this project, or import into a new --project DIR"
+    fi
+    # Keep latest log for GUI “See log” — do not delete.
     exit 1
   fi
-  rm -f "$log"
-  echo "OK: project=$project project_name=$proj_name project_gpr=$project/${proj_name}.gpr program=$prog image=$resolved cache=$cache"
+
+  # Prefer the actual DomainFile leaf (avoids AppKit.2 mismatch).
+  local actual
+  actual="$(grep -E '^OK: imported ' "$log" | tail -1 | sed -E 's/^OK: imported[[:space:]]+//' | awk '{print $1}')"
+  [[ -n "$actual" ]] || actual="$prog"
+
+  echo "OK: project=$project project_name=$proj_name project_gpr=$project/${proj_name}.gpr program=$actual image=$resolved cache=$cache log=$log_keep"
 }
 
 cmd_accept() {

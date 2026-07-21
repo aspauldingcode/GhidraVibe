@@ -27,6 +27,10 @@ jobs:
           ./gui-tests/smoke-agent-welcome.sh
           ./gui-tests/smoke-agent-sidebar.sh
           ./gui-tests/smoke-agent-npu.sh
+      - name: Stock Help corpus smoke
+        run: |
+          chmod +x gui-tests/smoke-help.sh scripts/check-stock-help.sh
+          ./gui-tests/smoke-help.sh
       - name: Decompile binary smoke
         run: |
           chmod +x gui-tests/smoke-decompile.sh
@@ -40,8 +44,24 @@ jobs:
           chmod +x gui-tests/smoke-function-graph.sh
           GRAPH_REPACKAGE=0 ./gui-tests/smoke-function-graph.sh
       - name: AppKit decompile GUI smoke
+        env:
+          APPKIT_FORCE_IMPORT: "1"
         run: |
-          chmod +x gui-tests/smoke-appkit-decompile.sh scripts/ghidra-vibe-dyld
+          chmod +x gui-tests/smoke-appkit-decompile.sh scripts/ghidra-vibe-dyld scripts/ghidra-vibe-analyzeHeadless
+          export GHIDRA_VIBE_DYLD="$PWD/scripts/ghidra-vibe-dyld"
+          export GHIDRA_VIBE_SCRIPT_PATH="$PWD/ghidra_scripts"
+          export GHIDRA_VIBE_HEADLESS="$PWD/scripts/ghidra-vibe-analyzeHeadless"
+          if [[ -z "${GHIDRA_INSTALL_DIR:-}" ]]; then
+            if [[ -d result/lib/ghidra ]]; then
+              export GHIDRA_INSTALL_DIR="$PWD/result/lib/ghidra"
+            elif command -v nix >/dev/null 2>&1; then
+              export GHIDRA_INSTALL_DIR="$(nix build .#ghidra-vibe --no-link --print-out-paths | head -1)/lib/ghidra"
+            fi
+          fi
+          if [[ -z "${JAVA_HOME:-}" && -x /usr/libexec/java_home ]]; then
+            JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home)"
+            export JAVA_HOME
+          fi
           ./gui-tests/smoke-appkit-decompile.sh
       - name: AppKit classes open+analyze GUI smoke
         run: |

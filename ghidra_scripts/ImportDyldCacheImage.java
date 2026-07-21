@@ -11,6 +11,8 @@ import ghidra.app.util.importer.AutoImporter;
 import ghidra.app.util.importer.MessageLog;
 import ghidra.app.util.opinion.LoadResults;
 import ghidra.app.util.opinion.Loaded;
+import ghidra.framework.model.DomainFile;
+import ghidra.framework.model.DomainFolder;
 import ghidra.framework.options.Options;
 import ghidra.formats.gfilesystem.FSRL;
 import ghidra.formats.gfilesystem.FileSystemProbeConflictResolver;
@@ -43,10 +45,17 @@ public class ImportDyldCacheImage extends GhidraScript {
 			!"0".equals(System.getenv().getOrDefault("GHIDRA_VIBE_APPLE_SYMBOLS", "1"));
 		boolean runAnalysis = !"0".equals(System.getenv().getOrDefault("GHIDRA_VIBE_ANALYZE", "1"));
 
+		phase("probe_cache", "Probing dyld shared cache as a filesystem…");
+		println("DSC: cache=" + cacheFile.getAbsolutePath());
+		println("DSC: image=" + imagePath + " program=" + programName);
+		println("DSC: apple_symbols=" + (appleSymbols ? "on" : "off") + " analyze=" +
+			(runAnalysis ? "on" : "off"));
+
 		FSRL container = FSRL.fromString("file://" + cacheFile.getAbsolutePath());
 		FileSystemService fsService = FileSystemService.getInstance();
 		MessageLog log = new MessageLog();
 
+		phase("open_filesystem", "Opening DyldCacheFileSystem (stock Ghidra DSC loader)…");
 		try (FileSystemRef fsRef = fsService.probeFileForFilesystem(container, monitor,
 			FileSystemProbeConflictResolver.CHOOSEFIRST)) {
 			if (fsRef == null) {
@@ -56,13 +65,21 @@ public class ImportDyldCacheImage extends GhidraScript {
 			GFileSystem fs = fsRef.getFilesystem();
 			println("Opened DSC filesystem: " + fs.getName() + " type=" + fs.getType());
 
+			phase("locate_image", "Locating framework image in shared cache index…");
 			GFile image = lookupImage(fs, imagePath);
 			if (image == null) {
 				printerr("Image not in cache FS: " + imagePath);
 				return;
 			}
+			println("DSC: found image path=" + image.getPath());
+
+			// Avoid AppKit → AppKit.2 on re-import (GUI/MCP open the requested leaf name).
+			removeExistingProgram(programName);
 
 			FSRL nested = image.getFSRL();
+			phase("import_program",
+				"Importing " + programName +
+					" (slide fixups + Apple local symbols — IDA-like module open)…");
 			println("Importing FSRL: " + nested);
 			// DyldCacheFileSystem.getByteProvider applies slide fixups + local symbols.
 			try (LoadResults<Program> results = AutoImporter.importByUsingBestGuess(nested,
@@ -75,10 +92,17 @@ public class ImportDyldCacheImage extends GhidraScript {
 
 				Loaded<Program> primary = results.getPrimary();
 				Program program = primary.getDomainObject(this);
+				println("DSC: loaded domain object " + program.getName());
+
 				if (appleSymbols) {
+					phase("enable_analyzers",
+						"Enabling Apple-oriented analyzers (DWARF / ObjC / Swift / Demangler)…");
 					enableAppleSymbolAnalyzers(program);
 				}
 				if (runAnalysis) {
+					phase("analyze",
+						"Running Auto Analysis on " + program.getName() +
+							" (stock analyzers — may take several minutes)…");
 					println("Analyzing with Apple/DWARF/ObjC/Swift options…");
 					// Headless preScript must open an explicit DB transaction.
 					int txId = program.startTransaction("Vibe analyze");
@@ -90,13 +114,48 @@ public class ImportDyldCacheImage extends GhidraScript {
 					finally {
 						program.endTransaction(txId, ok);
 					}
+					println("DSC: Auto Analysis finished for " + program.getName());
 				}
+				else {
+					println("DSC: skipping Auto Analysis (open module first — run Analysis later)");
+				}
+
+				phase("save", "Saving imported program to project…");
 				results.save(monitor);
-				println("OK: imported " + program.getName() + " as " + programName +
-					" from " + imagePath);
+				String actual = program.getName();
+				// Machine-parseable: scripts/MCP open this leaf name.
+				println("OK: imported " + actual);
+				println("OK_DETAIL: program=" + actual + " requested=" + programName +
+					" image=" + imagePath);
 				println("APPLE_SYMBOLS=" + (appleSymbols ? "on" : "off"));
-				println("SWIFT_ANALYZERS=" + (appleSymbols ? "Demangler Swift + Type Metadata" : "off"));
+				println("SWIFT_ANALYZERS=" +
+					(appleSymbols ? "Demangler Swift + Type Metadata" : "off"));
+				phase("done", "Import complete — " + actual);
 			}
+		}
+	}
+
+	/** Stock Task Monitor message + console PHASE line for GUI log tailing. */
+	private void phase(String id, String message) {
+		monitor.setMessage(message);
+		println("PHASE: " + id + " — " + message);
+	}
+
+	private void removeExistingProgram(String name) {
+		if (name == null || name.isEmpty() || state.getProject() == null) {
+			return;
+		}
+		try {
+			DomainFolder root = state.getProject().getProjectData().getRootFolder();
+			DomainFile existing = root.getFile(name);
+			if (existing == null) {
+				return;
+			}
+			println("Removing existing program before re-import: " + name);
+			existing.delete();
+		}
+		catch (Exception e) {
+			printerr("Could not delete existing program " + name + ": " + e.getMessage());
 		}
 	}
 

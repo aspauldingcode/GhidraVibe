@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Default CodeBrowser.tool spatial layout — modular dock regions (stock DockingWindowManager).
-/// Navigation chrome uses Liquid Glass; listing/decompiler stay opaque content.
+/// Primary tools live in the macOS Tahoe unified titlebar/toolbar (Liquid Glass); listing/decompiler stay opaque.
 struct CodeBrowserDockView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
@@ -35,13 +35,108 @@ struct CodeBrowserDockView: View {
     var body: some View {
         @Bindable var model = model
         return VStack(spacing: 0) {
-            codeBrowserToolbar
-            Divider()
-            if showHeaderStrip || model.dockLayout.hasVisibleHeader {
+            if showHeaderStrip || model.dockLayout.hasVisibleHeader || model.dockDragKind != nil {
                 headerInactiveStrip
                 Divider()
             }
             DockWorkspaceView()
+        }
+        .toolbarRole(.editor)
+        // Left controls · system window title (middle) · right listing/tools. Do not inject a
+        // second title Text — ContentRootView `.navigationTitle` owns the macOS title.
+        .toolbar {
+            // Dense CodeBrowser chrome. On macOS 26, NSToolbar can clip items when the
+            // window is narrow — there is no `.visibilityPriority` / `ToolbarOverflowMenu`
+            // until the macOS 27 SDK. Keep glass groups, and mirror every stock action in
+            // the trailing More… menu so nothing is unreachable at small sizes.
+            // ToolbarContentBuilder max is 10 children (spacers count).
+
+            // ── Modules: own glass grouping (not shared with window controls) ──
+            // Tahoe merges adjacent `.navigation` items onto one plate unless the
+            // item is forced into its own grouping via `sharedBackgroundVisibility`.
+            // See Apple: ToolbarContent.sharedBackgroundVisibility(_:).
+            ToolbarItem(id: "ghidra.vibe.toolbar.modules_sidebar", placement: .navigation) {
+                Button {
+                    model.toggleLeftSidebar()
+                } label: {
+                    Image(systemName: "sidebar.leading")
+                }
+                // Own capsule: shared toolbar plate is hidden below so this
+                // does not melt into the window-controls group.
+                .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
+                .a11yCatalog("ghidra.vibe.toolbar.modules_sidebar")
+                .help(
+                    model.dockLayout.leftSidebarVisible
+                        ? "Hide Modules sidebar"
+                        : "Show Modules sidebar"
+                )
+            }
+            .sharedBackgroundVisibility(.hidden)
+
+            ToolbarSpacer(.fixed, placement: .navigation)
+
+            // ── Window controls (nav + edit share one plate) ──
+            ToolbarItemGroup(placement: .navigation) {
+                ForEach(Self.chromeToolbar.prefix(5), id: \.0) { id, symbol, label in
+                    UnifiedToolbarButton(id: id, systemImage: symbol, label: label) {
+                        toolbarAction(id)
+                    }
+                }
+            }
+
+            // ── RIGHT: I/D/U/L/F/V/B · tools · More · Agent ──
+            ToolbarItemGroup(placement: .primaryAction) {
+                ForEach(Self.listingMnemonics, id: \.0) { id, letter, label, _ in
+                    UnifiedToolbarButton(
+                        id: id,
+                        systemImage: "\(letter.lowercased()).circle",
+                        label: label,
+                        helpTip: A11yCatalog.hoverTip(for: id, fallback: "\(letter) — \(label)")
+                    ) {
+                        toolbarAction(id)
+                    }
+                }
+            }
+
+            ToolbarSpacer(.fixed, placement: .primaryAction)
+
+            ToolbarItemGroup(placement: .primaryAction) {
+                ForEach(Self.chromeToolbar.dropFirst(5), id: \.0) { id, symbol, label in
+                    UnifiedToolbarButton(id: id, systemImage: symbol, label: label) {
+                        toolbarAction(id)
+                    }
+                }
+            }
+
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    overflowMenuContent
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+                .a11yCatalog("ghidra.vibe.toolbar.more")
+            }
+
+            ToolbarSpacer(.fixed, placement: .primaryAction)
+
+            // Agent: own glass grouping — not merged with More….
+            ToolbarItem(id: "ghidra.vibe.toolbar.agent_sidebar", placement: .primaryAction) {
+                Button {
+                    model.toggleAgentSidebar()
+                } label: {
+                    Image(systemName: "sidebar.trailing")
+                }
+                .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
+                .a11yCatalog("ghidra.vibe.toolbar.agent_sidebar")
+                .help(
+                    model.dockLayout.agentSidebarVisible && model.agentEnabled
+                        ? "Hide Agent sidebar"
+                        : "Show Agent sidebar"
+                )
+            }
+            .sharedBackgroundVisibility(.hidden)
         }
         .onChange(of: model.sheetProvider) { _, kind in
             if kind == .entropy || kind == .overview {
@@ -68,103 +163,6 @@ struct CodeBrowserDockView: View {
         }
     }
 
-    private var codeBrowserToolbar: some View {
-        LiquidGlass.Bar(spacing: 6) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    ForEach(Self.chromeToolbar.prefix(5), id: \.0) { id, symbol, label in
-                        GlassToolbarButton(id: id, systemImage: symbol, label: label) {
-                            toolbarAction(id)
-                        }
-                    }
-                    Divider().frame(height: 18)
-                    ForEach(Self.listingMnemonics, id: \.0) { id, letter, label, action in
-                        GlassMnemonicButton(
-                            id: id,
-                            letter: letter,
-                            label: label,
-                            enabled: true
-                        ) {
-                            model.runAction(id: action)
-                        }
-                    }
-                    Divider().frame(height: 18)
-                    ForEach(Self.chromeToolbar.dropFirst(5), id: \.0) { id, symbol, label in
-                        GlassToolbarButton(id: id, systemImage: symbol, label: label) {
-                            toolbarAction(id)
-                        }
-                    }
-                    Menu {
-                        Button("Fetch Functions") { model.fetchFunctionsViaMCP() }
-                            .help("Reload function list from the program engine")
-                        Button("Decompile") { model.decompileSelected() }
-                            .help("Decompile the selected function")
-                        Button("Classes") {
-                            model.showProvider(.swiftClasses)
-                            model.refreshObjcClassesFromFunctions()
-                            model.refreshSwiftClasses()
-                        }
-                        .help("ObjC / Swift class browser (left dock)")
-                        Button("Open Framework…") { model.presentFrameworkOpenSheet() }
-                            .help("Open a framework from the dyld shared cache")
-                        Divider()
-                        Button(showHeaderStrip ? "Hide Entropy / Overview" : "Show Entropy / Overview") {
-                            showHeaderStrip.toggle()
-                            if showHeaderStrip {
-                                model.showProvider(.entropy)
-                                model.showProvider(.overview)
-                            } else {
-                                model.closeProvider(.entropy)
-                                model.closeProvider(.overview)
-                            }
-                        }
-                        .help("Toggle inactive header stack (Entropy / Overview)")
-                        Button(model.bottomStripVisible ? "Hide Bottom Strip" : "Show Bottom Strip") {
-                            model.bottomStripVisible.toggle()
-                        }
-                        .help("Toggle Data Type Preview / Disassembled View")
-                        Button(model.consoleStackVisible ? "Hide Console" : "Show Console") {
-                            if model.consoleStackVisible {
-                                model.closeConsoleStack()
-                            } else {
-                                model.showProvider(.console)
-                            }
-                        }
-                        .help("Toggle Console / Bookmarks stack")
-                        Divider()
-                        Button("Reset Dock Layout") { model.resetDockLayoutToStock() }
-                            .help("Restore stock CodeBrowser dock regions")
-                        Button("Project Window") { model.enterProjectWindow() }
-                            .help("Return to Front End / Project Window")
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                    .buttonStyle(.glass)
-                    .help("More CodeBrowser tools")
-                    .accessibilityIdentifier("ghidra.vibe.toolbar.more")
-                    Spacer(minLength: 8)
-                    if model.agentEnabled {
-                        Button {
-                            model.toggleAgentSidebar()
-                        } label: {
-                            Image(systemName: "sidebar.trailing")
-                        }
-                        .buttonStyle(.glass)
-                        .help(
-                            model.dockLayout.agentSidebarVisible
-                                ? "Hide Agent sidebar"
-                                : "Show Agent sidebar"
-                        )
-                        .a11yCatalog("ghidra.vibe.toolbar.agent_sidebar")
-                    }
-                }
-                .vibeGlassBarBackground()
-            }
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-    }
-
     private func toolbarAction(_ id: String) {
         switch id {
         case "ghidra.vibe.toolbar.save": model.saveProgram()
@@ -179,16 +177,113 @@ struct CodeBrowserDockView: View {
         case "ghidra.vibe.toolbar.dsc":
             model.presentFrameworkOpenSheet()
         case "ghidra.vibe.toolbar.apple": model.openAppBundlePicker()
+        case "ghidra.vibe.toolbar.listing_i": model.runAction(id: "listing_disassemble")
+        case "ghidra.vibe.toolbar.listing_d": model.runAction(id: "listing_define_data")
+        case "ghidra.vibe.toolbar.listing_u": model.runAction(id: "listing_clear_code")
+        case "ghidra.vibe.toolbar.listing_l": model.runAction(id: "listing_create_label")
+        case "ghidra.vibe.toolbar.listing_f": model.runAction(id: "listing_create_function")
+        case "ghidra.vibe.toolbar.listing_v": model.runAction(id: "listing_create_structure")
+        case "ghidra.vibe.toolbar.listing_b": model.runAction(id: "listing_add_bookmark")
         default: break
         }
     }
 
+    /// Trailing More… — full stock toolbar mirror + secondary chrome (narrow-window safety net).
+    @ViewBuilder
+    private var overflowMenuContent: some View {
+        Section("Navigate") {
+            ForEach(Self.chromeToolbar.prefix(2), id: \.0) { id, _, label in
+                Button(label) { toolbarAction(id) }
+            }
+        }
+        Section("Edit") {
+            ForEach(Self.chromeToolbar.dropFirst(2).prefix(3), id: \.0) { id, _, label in
+                Button(label) { toolbarAction(id) }
+            }
+        }
+        Section("Listing") {
+            ForEach(Self.listingMnemonics, id: \.0) { _, letter, label, action in
+                Button("\(letter) — \(label)") { model.runAction(id: action) }
+            }
+        }
+        Section("Analysis") {
+            ForEach(Self.chromeToolbar.dropFirst(5), id: \.0) { id, _, label in
+                Button(label) { toolbarAction(id) }
+            }
+        }
+        Divider()
+        moreMenuContent
+    }
+
+    @ViewBuilder
+    private var moreMenuContent: some View {
+        Button("Fetch Functions") { model.fetchFunctionsViaMCP() }
+            .help("Reload function list from the program engine")
+        Button("Decompile") { model.decompileSelected() }
+            .help("Decompile the selected function")
+        Button("Classes") {
+            model.showProvider(.swiftClasses)
+            model.refreshObjcClassesFromFunctions()
+            model.refreshSwiftClasses()
+        }
+        .help("ObjC / Swift class browser (left dock)")
+        Button("Open Framework…") { model.presentFrameworkOpenSheet() }
+            .help("Open a framework from the dyld shared cache")
+        Divider()
+        Button(showHeaderStrip ? "Hide Entropy / Overview" : "Show Entropy / Overview") {
+            showHeaderStrip.toggle()
+            if showHeaderStrip {
+                model.showProvider(.entropy)
+                model.showProvider(.overview)
+            } else {
+                model.closeProvider(.entropy)
+                model.closeProvider(.overview)
+            }
+        }
+        .help("Toggle inactive header stack (Entropy / Overview)")
+        Button(model.bottomStripVisible ? "Hide Bottom Strip" : "Show Bottom Strip") {
+            model.bottomStripVisible.toggle()
+        }
+        .help("Toggle Data Type Preview / Disassembled View")
+        Button(model.consoleStackVisible ? "Hide Console" : "Show Console") {
+            if model.consoleStackVisible {
+                model.closeConsoleStack()
+            } else {
+                model.showProvider(.console)
+            }
+        }
+        .help("Toggle Console / Bookmarks stack")
+        Divider()
+        Button(
+            model.dockLayout.leftSidebarVisible
+                ? "Hide Modules sidebar"
+                : "Show Modules sidebar"
+        ) {
+            model.toggleLeftSidebar()
+        }
+        .help("Toggle the leading Modules palette")
+        Button(
+            model.dockLayout.agentSidebarVisible && model.agentEnabled
+                ? "Hide Agent sidebar"
+                : "Show Agent sidebar"
+        ) {
+            model.toggleAgentSidebar()
+        }
+        .help("Toggle the trailing Agent sidebar")
+        Divider()
+        Button("Reset Dock Layout") { model.resetDockLayoutToStock() }
+            .help("Restore stock CodeBrowser dock regions")
+        Button("Project Window") { model.enterProjectWindow() }
+            .help("Return to Front End / Project Window")
+    }
+
     private var headerInactiveStrip: some View {
-        LiquidGlass.Bar(spacing: 4) {
-            HStack(spacing: 4) {
+        LiquidGlass.Bar(spacing: VibeChrome.Space.xs) {
+            HStack(spacing: VibeChrome.Space.xs) {
                 ForEach([ProviderKind.entropy, .overview], id: \.id) { kind in
                     Button(kind.title) { model.showProvider(kind) }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .font(.caption2)
                         .a11yCatalog("ghidra.vibe.codebrowser.header.\(kind.rawValue)")
                 }
@@ -204,12 +299,21 @@ struct CodeBrowserDockView: View {
                 .help("Hide Entropy / Overview header")
                 .font(.caption2)
             }
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
+            .padding(.horizontal, VibeChrome.Space.sm)
+            .padding(.vertical, VibeChrome.Space.xxs)
             .vibeGlassBarBackground()
         }
         .frame(height: 36)
-        .onDrop(of: [.json], isTargeted: nil) { providers in
+        .onDrop(of: [.json], isTargeted: Binding(
+            get: { model.dockDropHighlight == .header },
+            set: { hovering in
+                if hovering {
+                    model.setDockDropHighlight(.header)
+                } else if model.dockDropHighlight == .header {
+                    model.setDockDropHighlight(nil)
+                }
+            }
+        )) { providers in
             guard let provider = providers.first else { return false }
             _ = provider.loadDataRepresentation(for: .json) { data, _ in
                 guard let data,
@@ -221,6 +325,16 @@ struct CodeBrowserDockView: View {
                 }
             }
             return true
+        }
+        .overlay {
+            if model.dockDragKind != nil {
+                DockRegionDropOverlay(
+                    region: .header,
+                    highlighted: model.dockDropHighlight == .header,
+                    emptyPlaceholder: true,
+                    movingTitle: model.dockDragKind?.title
+                )
+            }
         }
     }
 }

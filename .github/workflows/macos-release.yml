@@ -1,0 +1,172 @@
+name: macos-release
+
+# Package GhidraVibe.dmg on push/tag.
+# - push to master/main → rolling GitHub Release "beta" (prerelease) + update releases branch
+# - tag v* → dedicated GitHub Release for that tag + update releases branch
+on:
+  push:
+    branches: [master, main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: macos-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package-dmg:
+    runs-on: [self-hosted, macOS, tahoe, apple-silicon]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve Ghidra install (for Help extract + runtime.env)
+        run: |
+          set -euo pipefail
+          if [[ -z "${GHIDRA_INSTALL_DIR:-}" ]]; then
+            if [[ -d result/lib/ghidra ]]; then
+              export GHIDRA_INSTALL_DIR="$PWD/result/lib/ghidra"
+            elif command -v nix >/dev/null 2>&1; then
+              export GHIDRA_INSTALL_DIR="$(nix build .#ghidra-vibe --no-link --print-out-paths | head -1)/lib/ghidra"
+            else
+              cand="$(ls -dt /nix/store/*-ghidra-vibe-*+native-*/lib/ghidra 2>/dev/null | head -1 || true)"
+              [[ -n "$cand" ]] && export GHIDRA_INSTALL_DIR="$cand"
+            fi
+          fi
+          echo "GHIDRA_INSTALL_DIR=${GHIDRA_INSTALL_DIR:-}"
+          echo "GHIDRA_INSTALL_DIR=${GHIDRA_INSTALL_DIR:-}" >>"$GITHUB_ENV"
+          if [[ -z "${JAVA_HOME:-}" && -x /usr/libexec/java_home ]]; then
+            JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home)"
+            export JAVA_HOME
+            echo "JAVA_HOME=$JAVA_HOME" >>"$GITHUB_ENV"
+          fi
+
+      - name: Package DMG
+        run: |
+          chmod +x macos/GhidraVibe/scripts/package-app.sh \
+                   macos/GhidraVibe/scripts/package-dmg.sh \
+                   scripts/generate-release-notes.sh \
+                   scripts/extract-stock-help.py
+          ./macos/GhidraVibe/scripts/package-dmg.sh
+
+      - name: Generate release notes
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            ./scripts/generate-release-notes.sh tag > dist/RELEASE_NOTES.md
+          else
+            ./scripts/generate-release-notes.sh beta > dist/RELEASE_NOTES.md
+          fi
+          # Enrich latest.json with channel + download URL placeholders.
+          python3 <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path("dist/latest.json")
+          data = json.loads(p.read_text())
+          ref = os.environ.get("GITHUB_REF", "")
+          repo = os.environ.get("GITHUB_REPOSITORY", "aspauldingcode/GhidraVibe")
+          if ref.startswith("refs/tags/"):
+              tag = os.environ["GITHUB_REF_NAME"]
+              channel = "stable"
+          else:
+              tag = "beta"
+              channel = "beta"
+          data["channel"] = channel
+          data["tag"] = tag
+          data["release_url"] = f"https://github.com/{repo}/releases/tag/{tag}"
+          data["dmg_url"] = f"https://github.com/{repo}/releases/download/{tag}/{data['dmg']}"
+          data["dmg_latest_url"] = f"https://github.com/{repo}/releases/download/{tag}/GhidraVibe-latest.dmg"
+          p.write_text(json.dumps(data, indent=2) + "\n")
+          print(p.read_text())
+          PY
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          NOTES=dist/RELEASE_NOTES.md
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF_NAME}"
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              gh release upload "$TAG" dist/GhidraVibe-*.dmg dist/latest.json --clobber
+              gh release edit "$TAG" --notes-file "$NOTES" --latest
+            else
+              gh release create "$TAG" \
+                dist/GhidraVibe-*.dmg dist/latest.json \
+                --title "GhidraVibe ${TAG}" \
+                --notes-file "$NOTES" \
+                --latest
+            fi
+          else
+            # Rolling beta: move lightweight tag to this commit, replace prerelease assets.
+            git tag -f beta "${GITHUB_SHA}"
+            git push origin refs/tags/beta --force
+            if gh release view beta >/dev/null 2>&1; then
+              gh release upload beta dist/GhidraVibe-*.dmg dist/latest.json --clobber
+              gh release edit beta --notes-file "$NOTES" --prerelease --title "GhidraVibe Beta"
+            else
+              gh release create beta \
+                dist/GhidraVibe-*.dmg dist/latest.json \
+                --title "GhidraVibe Beta" \
+                --notes-file "$NOTES" \
+                --prerelease
+            fi
+          fi
+
+      - name: Update releases branch index
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Lightweight branch: latest.json + RELEASE_NOTES only (DMG lives on Releases page).
+          WORK="$(mktemp -d)"
+          git fetch origin releases 2>/dev/null || true
+          if git show-ref --verify --quiet refs/remotes/origin/releases; then
+            git worktree add "$WORK" origin/releases
+          else
+            git worktree add --detach "$WORK"
+            git -C "$WORK" checkout --orphan releases
+            git -C "$WORK" rm -rf . >/dev/null 2>&1 || true
+          fi
+          mkdir -p "$WORK/dist"
+          cp -f dist/latest.json "$WORK/dist/latest.json"
+          cp -f dist/RELEASE_NOTES.md "$WORK/dist/RELEASE_NOTES.md"
+          # Keep a short rolling changelog on the branch.
+          {
+            echo "# GhidraVibe releases index"
+            echo
+            echo "Artifacts are published on the [GitHub Releases](https://github.com/${GITHUB_REPOSITORY}/releases) page."
+            echo "This branch only tracks the latest channel metadata."
+            echo
+            cat dist/latest.json
+            echo
+            echo "---"
+            echo
+            cat dist/RELEASE_NOTES.md
+          } >"$WORK/README.md"
+          git -C "$WORK" add dist/latest.json dist/RELEASE_NOTES.md README.md
+          if git -C "$WORK" diff --cached --quiet; then
+            echo "releases branch already up to date"
+          else
+            git -C "$WORK" -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "release: ${GITHUB_REF_NAME} (${GITHUB_SHA:0:7})"
+            git -C "$WORK" push origin HEAD:releases
+          fi
+          git worktree remove --force "$WORK" || true
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GhidraVibe-dmg
+          path: |
+            dist/*.dmg
+            dist/latest.json
+            dist/RELEASE_NOTES.md
+          if-no-files-found: error
+          retention-days: 14

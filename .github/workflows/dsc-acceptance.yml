@@ -13,11 +13,24 @@ jobs:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
         continue-on-error: true
-      - name: Acceptance DSC generic import
+      - name: Acceptance DSC AppKit import (+ MCP decompile if engine up)
         run: |
-          chmod +x gui-tests/acceptance-dsc-import.sh scripts/ghidra-vibe-dyld
+          chmod +x gui-tests/acceptance-dsc-import.sh scripts/ghidra-vibe-dyld scripts/ghidra-vibe-analyzeHeadless
           export GHIDRA_VIBE_DYLD="$PWD/scripts/ghidra-vibe-dyld"
+          export GHIDRA_VIBE_SCRIPT_PATH="$PWD/ghidra_scripts"
+          export GHIDRA_VIBE_HEADLESS="$PWD/scripts/ghidra-vibe-analyzeHeadless"
           export DSC_ACCEPT_IMAGE="${DSC_ACCEPT_IMAGE:-AppKit}"
+          if [[ -z "${GHIDRA_INSTALL_DIR:-}" ]]; then
+            if [[ -d result/lib/ghidra ]]; then
+              export GHIDRA_INSTALL_DIR="$PWD/result/lib/ghidra"
+            elif command -v nix >/dev/null 2>&1; then
+              export GHIDRA_INSTALL_DIR="$(nix build .#ghidra-vibe --no-link --print-out-paths | head -1)/lib/ghidra"
+            fi
+          fi
+          if [[ -z "${JAVA_HOME:-}" && -x /usr/libexec/java_home ]]; then
+            JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home)"
+            export JAVA_HOME
+          fi
           ./gui-tests/acceptance-dsc-import.sh
       - name: Upload logs
         if: always()

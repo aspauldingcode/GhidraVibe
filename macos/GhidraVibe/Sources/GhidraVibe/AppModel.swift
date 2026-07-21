@@ -128,26 +128,81 @@ final class AppModel {
     var dyldRunAnalysisOnImport: Bool = false
     var dyldImportBusy: Bool = false
     var dyldListingBusy: Bool = false
+    /// Live phase line for DSC import (IDA / stock Task Monitor style).
+    var dyldImportPhase: String = ""
     var dyldFilterTask: Task<Void, Never>?
+    var dyldLogTailTask: Task<Void, Never>?
+    var dyldImportTickerTask: Task<Void, Never>?
+    /// In-flight DSC import Task (cancelled via Task Monitor).
+    var dyldImportTask: Task<Void, Never>?
+    /// Headless CLI process for DSC import (terminated on Cancel).
+    var dyldImportProcess: Process?
+    /// Pending JavaHelp mapID when opening Help (F1 / context).
+    var helpPendingMapId: String?
+    /// Last modular provider shown — used for F1 context Help.
+    var helpFocusProvider: ProviderKind?
     var agentEnabled: Bool
     var showAgentWelcome: Bool
     var agentOptedOut: Bool
     var apiKeyFilePath: String
     var agentMessages: [AgentMessage] = []
+    /// Active durable conversation id (Application Support `agent-chats/`).
+    var agentSessionId: UUID = UUID()
+    /// Cached History menu rows (this project + cross-project recent).
+    var agentHistoryThisProject: [AgentChatStore.SessionMeta] = []
+    var agentHistoryRecent: [AgentChatStore.SessionMeta] = []
     var agentDraft: String = ""
-    /// Display label: ollama | openai_compat | anemll_stub
+    /// Files staged for the next Agent send (cleared after send).
+    var agentAttachments: [AgentAttachment] = []
+    /// Rolling summary after auto-renew (Cursor-style context compression).
+    var agentContextSummary: String = ""
+    /// Message the user is replying to (composer quote chip). Cleared on send/cancel.
+    var agentReplyTo: AgentMessage?
+    /// Turns archived from the live transcript on context renew (still in History).
+    private var agentArchivedMessages: [AgentChatStore.PersistedMessage] = []
+    private var agentChatSaveTask: Task<Void, Never>?
+    /// Estimated tokens for the next LLM payload (system + history + turn).
+    var agentContextUsedTokens: Int = 0
+    /// Model context window size used for the radial meter.
+    var agentContextWindowTokens: Int = 16_000
+    /// True while a context auto-renew / summarize pass is running.
+    var agentContextRenewing: Bool = false
+    /// Display label: ollama | openai_compat | anthropic | google | …
     var agentBackend: String = "ollama"
+    /// Active proprietary / local provider (Agent Setup).
+    var agentProvider: AgentProviderKind = .ollama
+    /// OpenAI-compatible gateway preset id (OpenRouter, Groq, …).
+    var agentCompatPresetId: String = "custom"
     /// Local Ollama / OpenAI-compat base (Settings + env).
     var agentBaseURL: String = ""
     var agentModel: String = ""
     var agentUseLocalOllama: Bool = true
+    /// Sheet for simplified Agent Setup.
+    var showAgentSetup: Bool = false
+    /// Play a system sound when an Agent turn finishes (not on interrupt).
+    var agentCompletionSoundEnabled: Bool = true
     var agentBusy: Bool = false
+    /// Cursor-style outbound queue — user can keep chatting while a turn runs.
+    var agentSendQueue: [AgentQueueItem] = []
+    /// Ask / Agent / Plan / Debug / Multitask.
+    var agentInteractionMode: AgentInteractionMode = .agent
+    /// Active plan artifact (Plan mode / Build).
+    var agentPlan: AgentPlan?
+    /// In-flight agent turn (cancellable via ⌘Return interrupt).
+    private var agentTurnTask: Task<Void, Never>?
     var agentPendingEdits: [AgentPendingEdit] = []
+    /// Cursor-style tool approval card (pauses the tool loop until resolved).
+    var agentToolApproval: AgentToolApprovalRequest?
+    private var agentToolApprovalContinuation: CheckedContinuation<AgentToolUserDecision, Never>?
+    /// Bumped when tool permission settings change (Setup panel refresh).
+    var agentToolPermissionEpoch: Int = 0
     var agentModelPicker: [String] = []
     /// Mixture-of-experts routing (local experts + optional API escalation).
     var agentMoE: AgentMoESettings = AgentMoESettings()
     /// Last MoE route label for status / GuiControl.
     var agentMoELastRoute: String = ""
+    /// Compact last-turn diagnostics (shown in composer status, not under chat bubbles).
+    var agentLastTurnStatus: String = ""
     var jspaceStatus: String = "JSpace idle"
     var ragQuery: String = ""
     var ragResult: String = ""
@@ -230,19 +285,24 @@ final class AppModel {
         appleHelper = VibeRuntime.get("GHIDRA_VIBE_APPLE") ?? ""
         jspaceBin = VibeRuntime.get("GHIDRA_VIBE_JSPACE") ?? ""
         apiKeyFilePath = VibeRuntime.get("GHIDRA_VIBE_API_KEY_FILE") ?? ""
-        agentBaseURL = UserDefaults.standard.string(forKey: "ghidra.vibe.agent.baseURL")
+        let resolvedProvider = AgentProviderKind.from(
+            raw: UserDefaults.standard.string(forKey: "ghidra.vibe.agent.provider")
+                ?? VibeRuntime.get("GHIDRA_VIBE_AI_PROVIDER")
+        )
+        let resolvedBase = UserDefaults.standard.string(forKey: "ghidra.vibe.agent.baseURL")
             ?? VibeRuntime.get("GHIDRA_VIBE_AI_BASE_URL")
             ?? VibeRuntime.get("AI_LOCAL_BASE_URL")
             ?? VibeRuntime.get("OLLAMA_HOST")
-            ?? "http://127.0.0.1:11434"
-        agentModel = UserDefaults.standard.string(forKey: "ghidra.vibe.agent.model")
+            ?? resolvedProvider.defaultBaseURL
+        let resolvedModel = UserDefaults.standard.string(forKey: "ghidra.vibe.agent.model")
             ?? VibeRuntime.get("GHIDRA_VIBE_AI_MODEL")
             ?? VibeRuntime.get("AI_LOCAL_DEFAULT_MODEL")
-            ?? "qwen2.5-coder:3b"
+            ?? resolvedProvider.defaultModel
+        let resolvedLocal: Bool
         if UserDefaults.standard.object(forKey: "ghidra.vibe.agent.useLocalOllama") != nil {
-            agentUseLocalOllama = UserDefaults.standard.bool(forKey: "ghidra.vibe.agent.useLocalOllama")
+            resolvedLocal = UserDefaults.standard.bool(forKey: "ghidra.vibe.agent.useLocalOllama")
         } else {
-            agentUseLocalOllama = VibeRuntime.get("GHIDRA_VIBE_AI_CLOUD") != "1"
+            resolvedLocal = resolvedProvider == .ollama || resolvedProvider == .llamaCpp
         }
         let ai = VibeRuntime.get("GHIDRA_VIBE_AI") ?? "1"
         let optedOut = UserDefaults.standard.bool(forKey: "ghidra.vibe.agent.optOut") || ai == "0"
@@ -251,15 +311,32 @@ final class AppModel {
         agentOptedOut = optedOut
         agentEnabled = enabled
         showAgentWelcome = welcome
+        agentProvider = resolvedProvider
+        agentCompatPresetId = UserDefaults.standard.string(forKey: "ghidra.vibe.agent.compatPreset")
+            ?? "custom"
+        agentBaseURL = resolvedBase
+        agentModel = resolvedModel
+        agentUseLocalOllama = resolvedLocal
+        if UserDefaults.standard.object(forKey: "ghidra.vibe.agent.completionSound") != nil {
+            agentCompletionSoundEnabled = UserDefaults.standard.bool(
+                forKey: "ghidra.vibe.agent.completionSound"
+            )
+        } else {
+            agentCompletionSoundEnabled = true
+        }
         // AgentMoESettings still accepts ProcessInfo env; bootstrap already setenv'd discoveries.
-        agentMoE = AgentMoESettings.load(env: ProcessInfo.processInfo.environment, fallbackModel: agentModel)
+        agentMoE = AgentMoESettings.load(env: ProcessInfo.processInfo.environment, fallbackModel: resolvedModel)
         let cfg = LocalAIConfig.resolve(
-            userBaseURL: agentBaseURL,
-            userModel: agentModel,
+            provider: resolvedProvider,
+            userBaseURL: resolvedBase,
+            userModel: resolvedModel,
             apiKeyFile: apiKeyFilePath,
-            preferCloud: !agentUseLocalOllama
+            preferCloud: !resolvedLocal && resolvedProvider.needsKeyFile
         )
         agentBackend = cfg.backend.rawValue
+        agentProvider = cfg.provider
+        try? AgentLocalModels.ensureDirectory()
+        try? AgentChatStore.ensureDirectory()
         if let install = VibeRuntime.get("GHIDRA_INSTALL_DIR") {
             statusMessage = "Ghidra install: \(install)"
         }
@@ -282,6 +359,7 @@ final class AppModel {
         if !projectPath.isEmpty {
             refreshProjectPrograms()
         }
+        restoreAgentChatForCurrentProject()
     }
 
     func finishSplash() {
@@ -335,6 +413,23 @@ final class AppModel {
         statusMessage = "Ghidra Help"
     }
 
+    /// F1 / context Help — open stock article for `mapId` (or current focus).
+    func openContextHelp(mapId: String? = nil) {
+        let raw: String
+        if let mapId, !mapId.isEmpty {
+            raw = mapId
+        } else if let focus = helpFocusProvider ?? sheetProvider {
+            raw = HelpContext.mapId(for: focus)
+        } else if toolMode == .projectWindow {
+            raw = "FrontEndPlugin_Project_Window"
+        } else {
+            raw = HelpContext.fallbackMapId
+        }
+        helpPendingMapId = HelpContext.resolve(raw)
+        showWelcomeHelp()
+        statusMessage = "Help: \(helpPendingMapId ?? raw)"
+    }
+
     func dismissWelcomeHelp() {
         UserDefaults.standard.set(true, forKey: "ghidra.vibe.welcomeHelpSeen")
         switch modeBeforeHelp {
@@ -373,6 +468,10 @@ final class AppModel {
     }
 
     func rememberProject(_ path: String) {
+        let previous = projectPath
+        if previous != path {
+            persistAgentChatNow()
+        }
         projectPath = path
         UserDefaults.standard.set(path, forKey: "ghidra.vibe.lastProject")
         var recent = UserDefaults.standard.stringArray(forKey: "ghidra.vibe.recentProjects") ?? []
@@ -380,6 +479,9 @@ final class AppModel {
         recent.insert(path, at: 0)
         UserDefaults.standard.set(Array(recent.prefix(20)), forKey: "ghidra.vibe.recentProjects")
         refreshRecentProjects()
+        if previous != path {
+            restoreAgentChatForCurrentProject()
+        }
     }
 
     func openSelectedRecentProject() {
@@ -444,8 +546,11 @@ final class AppModel {
             "taskMonitorTitle": taskMonitorTitle,
             "taskMonitorElapsedSeconds": Int(taskMonitorElapsed),
             "agentEnabled": agentEnabled,
+            "leftSidebarVisible": dockLayout.leftSidebarVisible,
             "agentSidebarVisible": dockLayout.agentSidebarVisible,
             "agentBusy": agentBusy,
+            "agentQueueCount": agentSendQueue.count,
+            "agentMode": agentInteractionMode.rawValue,
             "agentBackend": agentBackend,
             "agentModel": agentModel,
             "agentBaseURL": agentBaseURL,
@@ -454,6 +559,8 @@ final class AppModel {
             "apiBackendAvailable": apiBackendAvailable,
             "jspaceStatus": jspaceStatus,
             "agentPendingEditCount": agentPendingEdits.count,
+            "agentToolPermissions": AgentToolPermissionStore.shared.controlState(),
+            "agentToolApprovalPending": agentToolApproval != nil,
             // Long enough for GuiControl smokes to assert real C (e.g. whoami entry).
             "decompilePreview": String(decompiledText.prefix(4000)),
             "functionGraphFunction": functionGraphModel.function,
@@ -513,7 +620,10 @@ final class AppModel {
         case .listing: toolMode = .codeBrowser
         case .xrefs: showProvider(.strings)
         case .inspector: showProvider(.mcp)
-        case .agent: showProvider(.agent)
+        case .agent:
+            enableAgentSidebar()
+            dockLayout.agentSidebarVisible = true
+            persistDock()
         }
     }
 
@@ -591,6 +701,7 @@ final class AppModel {
     }
 
     func moveProvider(_ kind: ProviderKind, to region: DockRegion) {
+        guard kind.isModularDockProvider else { return }
         toolMode = .codeBrowser
         dockLayout.move(kind, to: region, activate: true)
         if region == .right {
@@ -599,14 +710,17 @@ final class AppModel {
             sheetProvider = nil
         }
         persistDock()
-        statusMessage = "Docked \(kind.title) to \(region.title)"
+        clearProviderDockDrag()
+        statusMessage = region.dockedStatus(moving: kind.title)
     }
 
     func floatProvider(_ kind: ProviderKind) {
+        guard kind.isModularDockProvider else { return }
         toolMode = .codeBrowser
         dockLayout.float(kind)
         if kind == sheetProvider { sheetProvider = nil }
         persistDock()
+        clearProviderDockDrag()
         statusMessage = "Floating \(kind.title)"
         NotificationCenter.default.post(
             name: .ghidraVibeFloatProvider,
@@ -638,6 +752,14 @@ final class AppModel {
     }
 
     func showProvider(_ kind: ProviderKind) {
+        helpFocusProvider = kind
+        if kind == .agent {
+            enableAgentSidebar()
+            dockLayout.agentSidebarVisible = true
+            persistDock()
+            statusMessage = "Agent sidebar shown"
+            return
+        }
         toolMode = .codeBrowser
         ensureProgramEngineRunning(loadProgram: false)
         if dockLayout.isFloating(kind) {
@@ -654,6 +776,12 @@ final class AppModel {
     }
 
     func closeProvider(_ kind: ProviderKind) {
+        if kind == .agent {
+            dockLayout.agentSidebarVisible = false
+            persistDock()
+            statusMessage = "Agent sidebar hidden"
+            return
+        }
         let wasFloating = dockLayout.isFloating(kind)
         dockLayout.close(kind)
         if kind == sheetProvider {
@@ -670,13 +798,68 @@ final class AppModel {
         statusMessage = "Closed \(kind.title) — Window → \(kind.title) to reopen"
     }
 
+    /// Window menu / Modules palette: provider is on when docked-visible or floating.
+    func isProviderMenuOn(_ kind: ProviderKind) -> Bool {
+        if kind == .agent { return dockLayout.agentSidebarVisible }
+        return isProviderVisible(kind) || dockLayout.isFloating(kind)
+    }
+
+    /// Toggle provider visibility for Window → module items (checkmark Toggle).
+    func toggleProvider(_ kind: ProviderKind) {
+        if kind == .agent {
+            toggleAgentSidebar()
+            return
+        }
+        if dockLayout.isFloating(kind) {
+            reattachProvider(kind)
+            return
+        }
+        if isProviderVisible(kind) {
+            closeProvider(kind)
+        } else {
+            showProvider(kind)
+        }
+    }
+
+    func toggleLeftSidebar() {
+        dockLayout.leftSidebarVisible.toggle()
+        persistDock()
+        statusMessage = dockLayout.leftSidebarVisible
+            ? "Modules sidebar shown"
+            : "Modules sidebar hidden"
+    }
+
     func closeConsoleStack() {
         closeProvider(.console)
     }
 
     func beginProviderDockDrag(_ kind: ProviderKind) {
+        guard kind.isModularDockProvider else { return }
         dockDragKind = kind
-        statusMessage = "Dragging \(kind.title) — drop on a dock region"
+        dockDropHighlight = nil
+        statusMessage =
+            "Dragging \(kind.title) — hover Top / Left / Right / Bottom to preview where it tiles"
+    }
+
+    /// Hover feedback while a modular provider is mid-drag.
+    func setDockDropHighlight(_ region: DockRegion?) {
+        guard dockDragKind != nil else {
+            dockDropHighlight = nil
+            return
+        }
+        if dockDropHighlight == region { return }
+        dockDropHighlight = region
+        if let kind = dockDragKind, let region {
+            statusMessage = region.hoverPlacementHint(moving: kind.title)
+        } else if let kind = dockDragKind {
+            statusMessage =
+                "Dragging \(kind.title) — hover Top / Left / Right / Bottom to preview where it tiles"
+        }
+    }
+
+    func clearProviderDockDrag() {
+        dockDragKind = nil
+        dockDropHighlight = nil
     }
 
     /// Stock provider local-toolbar actions (inventory / chrome.json ids).
@@ -804,6 +987,8 @@ final class AppModel {
         case "show_project": enterProjectWindow()
         case "show_workspace": toolMode = .workspacePicker
         case "show_help", "welcome_help": showWelcomeHelp()
+        case "context_help", "help_f1": openContextHelp()
+        case "cancel_dsc_import", "cancel_dyld_import": cancelDyldImport()
         case "extract": runDyldExtract()
         case "start_bridge", "start_mcp": startMCPBridge()
         case "rag_index", "jspace_index": indexJSpace()
@@ -827,8 +1012,19 @@ final class AppModel {
         case "refresh_symbols":
             refreshSymbolTable()
         case "goto": promptGoTo()
-        case "undo": undoAction()
-        case "redo": redoAction()
+        case "undo":
+            // Prefer the focused text field (Agent composer, search, etc.) over program undo.
+            if performFocusedTextUndoRedo(redo: false) {
+                statusMessage = "Undo"
+            } else {
+                undoAction()
+            }
+        case "redo":
+            if performFocusedTextUndoRedo(redo: true) {
+                statusMessage = "Redo"
+            } else {
+                redoAction()
+            }
         case "nav_back": navBack()
         case "nav_fwd", "nav_forward": navForward()
         case "clear_selection": clearSelection()
@@ -872,9 +1068,11 @@ final class AppModel {
             enableAgentSidebar()
             dockLayout.agentSidebarVisible = true
             persistDock()
-            showProvider(.agent)
+            statusMessage = "Agent sidebar shown"
         case "toggle_agent_sidebar", "agent_sidebar":
             toggleAgentSidebar()
+        case "toggle_left_sidebar", "modules_sidebar", "left_sidebar":
+            toggleLeftSidebar()
         case "agent_playbook", "autonomous_re":
             runAutonomousREPlaybook()
         case "show_rag": showProvider(.rag)
@@ -894,18 +1092,36 @@ final class AppModel {
         case "bsim_search", "bsim_overview":
             openBSim()
         case "edit_cut":
-            runListingWrite("listing_clear_code")
-            copyListingOrDecompileToClipboard()
-            statusMessage = "Cut — cleared code bytes + copied to clipboard"
+            if cutFocusedTextSelection() {
+                statusMessage = "Cut"
+            } else {
+                runListingWrite("listing_clear_code")
+                copyListingOrDecompileToClipboard()
+                statusMessage = "Cut — cleared code bytes + copied to clipboard"
+            }
         case "edit_copy":
-            copyListingOrDecompileToClipboard()
-            statusMessage = "Copied listing / decompile to clipboard"
+            if copyFocusedTextSelection() {
+                statusMessage = "Copied"
+            } else {
+                copyListingOrDecompileToClipboard()
+                statusMessage = "Copied listing / decompile to clipboard"
+            }
         case "edit_paste":
-            if let s = NSPasteboard.general.string(forType: .string), !s.isEmpty {
+            if NSApp.sendAction(#selector(NSText.paste(_:)), to: nil, from: nil) {
+                statusMessage = "Paste"
+            } else if let s = NSPasteboard.general.string(forType: .string), !s.isEmpty {
                 goToDraft = s.trimmingCharacters(in: .whitespacesAndNewlines)
                 statusMessage = "Paste — clipboard text in Go To field (apply with Listing tools)"
             } else {
                 statusMessage = "Clipboard empty"
+            }
+        case "edit_select_all":
+            if NSApp.sendAction(#selector(NSText.selectAll(_:)), to: nil, from: nil)
+                || NSApp.sendAction(#selector(NSResponder.selectAll(_:)), to: nil, from: nil)
+            {
+                statusMessage = "Select All"
+            } else {
+                statusMessage = "Nothing to select"
             }
         case "search_memory":
             showMemorySearchAlert = true
@@ -927,6 +1143,70 @@ final class AppModel {
         let text = listingText.isEmpty ? decompiledText : listingText
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
+    }
+
+    /// Copy from the focused editor / Textual selection overlay when pasteboard actually changes.
+    /// Avoids false success when `copy:` is a no-op (no selection) and listing fallback is wrong.
+    @discardableResult
+    func copyFocusedTextSelection() -> Bool {
+        performFocusedPasteboardEdit(#selector(NSText.copy(_:)), requireSelectionInTextView: true)
+    }
+
+    @discardableResult
+    func cutFocusedTextSelection() -> Bool {
+        if let tv = NSApp.keyWindow?.firstResponder as? NSTextView,
+           tv.isEditable,
+           tv.selectedRange().length > 0
+        {
+            let before = NSPasteboard.general.changeCount
+            tv.cut(nil)
+            return NSPasteboard.general.changeCount != before
+        }
+        return performFocusedPasteboardEdit(#selector(NSText.cut(_:)), requireSelectionInTextView: true)
+    }
+
+    /// Send a pasteboard edit action to the first responder; succeed only if the pasteboard changes.
+    private func performFocusedPasteboardEdit(
+        _ action: Selector,
+        requireSelectionInTextView: Bool
+    ) -> Bool {
+        guard let fr = NSApp.keyWindow?.firstResponder, fr.responds(to: action) else {
+            // Still try the responder chain (Textual selection overlay, SwiftUI text).
+            let before = NSPasteboard.general.changeCount
+            if NSApp.sendAction(action, to: nil, from: nil) {
+                return NSPasteboard.general.changeCount != before
+            }
+            return false
+        }
+        if requireSelectionInTextView, let tv = fr as? NSTextView {
+            let range = tv.selectedRange()
+            guard range.length > 0 else { return false }
+            if action == #selector(NSText.cut(_:)), !tv.isEditable { return false }
+        }
+        let before = NSPasteboard.general.changeCount
+        if NSApp.sendAction(action, to: fr, from: nil) {
+            return NSPasteboard.general.changeCount != before
+        }
+        if NSApp.sendAction(action, to: nil, from: nil) {
+            return NSPasteboard.general.changeCount != before
+        }
+        return false
+    }
+
+    /// Title used when sharing the current Agent conversation.
+    var agentShareChatTitle: String {
+        if let meta = agentHistoryThisProject.first(where: { $0.id == agentSessionId }),
+           !meta.title.isEmpty
+        {
+            return meta.title
+        }
+        return AgentChatStore.Session.makeTitle(
+            from: agentMessages.map { AgentChatStore.PersistedMessage($0) }
+        )
+    }
+
+    var agentShareChatText: String {
+        AgentShare.formatChat(title: agentShareChatTitle, messages: agentMessages)
     }
 
     func performMemorySearch() {
@@ -1294,6 +1574,42 @@ final class AppModel {
         // Headless MCP has no cancel_analysis endpoint — abort local wait / UI busy state.
         statusMessage = "Cancel Auto Analysis — stopped waiting on MCP"
         consoleAppend("Cancel Auto Analysis (status bar)")
+    }
+
+    /// Cancel whatever the Task Monitor is tracking (Auto Analyze or DSC import).
+    func cancelTaskMonitorWork() {
+        if analysisBusy {
+            cancelAutoAnalyze()
+        } else if dyldImportBusy {
+            cancelDyldImport()
+        }
+    }
+
+    /// Abort an in-flight DSC import (Task Monitor Cancel / GuiControl).
+    func cancelDyldImport() {
+        dyldImportTask?.cancel()
+        dyldImportTask = nil
+        if let proc = dyldImportProcess, proc.isRunning {
+            proc.terminate()
+        }
+        dyldImportProcess = nil
+        Self.killDSCImportHeadless()
+        stopDSCImportProgressWatchers()
+        dyldImportBusy = false
+        dyldImportPhase = "Cancelled"
+        endTaskMonitor()
+        statusMessage = "DSC import cancelled"
+        consoleAppend("DSC: import cancelled by user")
+    }
+
+    nonisolated private static func killDSCImportHeadless() {
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
+        p.arguments = ["-f", "ImportDyldCacheImage"]
+        p.standardOutput = FileHandle.nullDevice
+        p.standardError = FileHandle.nullDevice
+        try? p.run()
+        p.waitUntilExit()
     }
 
     // MARK: - MCP helpers
@@ -2384,6 +2700,29 @@ final class AppModel {
         }
     }
 
+    /// True when a text field / text view (Agent composer, Go To, etc.) is first responder.
+    func isTextEditingFocused() -> Bool {
+        let fr = NSApp.keyWindow?.firstResponder
+        return fr is NSTextView || fr is NSTextField || fr is NSText
+    }
+
+    /// Undo/redo inside the focused text editor; returns false so callers can fall back to program undo.
+    @discardableResult
+    func performFocusedTextUndoRedo(redo: Bool) -> Bool {
+        guard isTextEditingFocused() else { return false }
+        if let tv = NSApp.keyWindow?.firstResponder as? NSTextView, let um = tv.undoManager {
+            if redo {
+                guard um.canRedo else { return false }
+                um.redo()
+                return true
+            }
+            guard um.canUndo else { return false }
+            um.undo()
+            return true
+        }
+        return NSApp.sendAction(Selector((redo ? "redo:" : "undo:")), to: nil, from: nil)
+    }
+
     private func applyNav(_ resp: MCPClient.Response) {
         if let d = resp.json as? [String: Any] {
             navCanBack = d["can_back"] as? Bool ?? false
@@ -2502,26 +2841,32 @@ final class AppModel {
             .appendingPathComponent("Documents/GhidraVibe/projects", isDirectory: true)
     }
 
-    /// Prefer the open CodeBrowser project; else ~/Documents/GhidraVibe/projects/dsc.
+    /// Staging project for DSC headless import.
+    /// Never reuse the GUI's currently open project — in-process engine holds that write lock
+    /// and `analyzeHeadless` fails with "Unable to lock project" / rc=1.
     func dscImportTarget() -> (dir: String, name: String, gpr: String) {
-        if !projectPath.isEmpty {
-            let gprURL = URL(fileURLWithPath: projectPath)
-            if projectPath.hasSuffix(".gpr") {
-                let dir = gprURL.deletingLastPathComponent().path
-                let name = gprURL.deletingPathExtension().lastPathComponent
-                if dir != "/", !dir.isEmpty {
-                    return (dir, name.isEmpty ? "VibeDSC" : name, projectPath)
-                }
-            } else {
-                let dir = projectPath
-                if dir != "/", !dir.isEmpty {
-                    return (dir, "VibeDSC", (dir as NSString).appendingPathComponent("VibeDSC.gpr"))
-                }
-            }
-        }
         let dir = vibeProjectsRoot().appendingPathComponent("dsc", isDirectory: true).path
-        let gpr = (dir as NSString).appendingPathComponent("VibeDSC.gpr")
-        return (dir, "VibeDSC", gpr)
+        let openDir: String = {
+            guard !projectPath.isEmpty else { return "" }
+            if projectPath.hasSuffix(".gpr") {
+                return URL(fileURLWithPath: projectPath).deletingLastPathComponent().path
+            }
+            return projectPath
+        }()
+        let openName: String = {
+            guard projectPath.hasSuffix(".gpr") else { return "" }
+            return URL(fileURLWithPath: projectPath).deletingPathExtension().lastPathComponent
+        }()
+        // Unique name when the open project lives under dsc/ (or matches staging).
+        var name = "VibeDSC"
+        if !openDir.isEmpty,
+           (openDir as NSString).standardizingPath == (dir as NSString).standardizingPath
+            || openName == "VibeDSC"
+        {
+            name = "DSCImport-\(Int(Date().timeIntervalSince1970))"
+        }
+        let gpr = (dir as NSString).appendingPathComponent("\(name).gpr")
+        return (dir, name, gpr)
     }
 
     /// File / toolbar entry: simple framework picker (not a side-pane “addon”).
@@ -2592,17 +2937,32 @@ final class AppModel {
         }
     }
 
-    /// IDA-like: load selected DSC module into the open project (or Documents/GhidraVibe).
+    /// IDA-like: load selected DSC module into a staging project (not the locked GUI project).
     func importDyldImage(_ image: String) {
         guard !dyldImportBusy else { return }
         let short = (image as NSString).lastPathComponent
         let target = dscImportTarget()
-        statusMessage =
-            "Loading \(short) into \(target.name) (DyldCacheFileSystem, Apple symbols)…"
+        let analyzeNote = dyldRunAnalysisOnImport
+            ? "Auto Analyze ON after import"
+            : "open first (analyze later)"
+        dyldImportPhase = "Resolving \(short) in dyld shared cache…"
+        statusMessage = "DSC Import: \(dyldImportPhase)"
+        // Console + Shared Cache visible — stock/IDA-style import transcript.
+        showProvider(.console)
         showProvider(.dsc)
         ensureVibeMCP()
         dyldImportBusy = true
         beginTaskMonitor()
+        consoleAppend("────────────────────────────────────────")
+        consoleAppend("DSC Import → \(short)")
+        consoleAppend("  cache: \(dyldCachePath ?? "(auto-discover)")")
+        consoleAppend("  image: \(image)")
+        consoleAppend("  project: \(target.dir)/\(target.name)")
+        consoleAppend("  mode: DyldCacheFileSystem + Apple local symbols · \(analyzeNote)")
+        consoleAppend("  log: ~/Library/Logs/GhidraVibe/dsc-import-latest.log")
+        consoleAppend("────────────────────────────────────────")
+        startDSCImportProgressWatchers(framework: short)
+
         var body: [String: Any] = [
             "image": image,
             "project": target.dir,
@@ -2612,9 +2972,23 @@ final class AppModel {
             "rag_index": false,
         ]
         if let dyldCachePath { body["cache"] = dyldCachePath }
-        Task {
+        dyldImportTask?.cancel()
+        dyldImportTask = Task { @MainActor in
+            // Wait briefly for vibe MCP — ensureVibeMCP is async fire-and-forget.
+            if let base = self.vibeBaseURL {
+                for _ in 0 ..< 20 {
+                    if Task.isCancelled { return }
+                    if await Self.mcpReachable(base: base) { break }
+                    try? await Task.sleep(nanoseconds: 250_000_000)
+                }
+            }
+            if Task.isCancelled { return }
+            self.setDSCImportPhase("Launching Ghidra headless importer…")
             var resp = await self.vibePost("dyld_import_image", body: body)
+            if Task.isCancelled { return }
             if !resp.ok, !self.dyldHelper.isEmpty {
+                self.setDSCImportPhase("Headless helper fallback (ghidra-vibe-dyld)…")
+                self.consoleAppend("DSC: vibe MCP failed — falling back to ghidra-vibe-dyld CLI")
                 var args = [
                     "import", "--image", image,
                     "--project", target.dir,
@@ -2622,31 +2996,255 @@ final class AppModel {
                 ]
                 args += self.dyldRunAnalysisOnImport ? ["--analyze", "1"] : ["--no-analyze"]
                 if let path = self.dyldCachePath { args += ["--cache", path] }
-                let out = await Self.runCaptureOffMain(self.dyldHelper, arguments: args) ?? ""
+                let out = await self.runDyldHelperCancellable(self.dyldHelper, arguments: args) ?? ""
+                if Task.isCancelled { return }
                 resp = MCPClient.Response(ok: out.contains("OK:"), text: out, json: nil, statusCode: 200)
             }
-            await MainActor.run {
-                self.dyldImportBusy = false
-                self.endTaskMonitor()
-                self.consoleAppend(String(resp.text.prefix(800)))
-                guard resp.ok else {
-                    self.statusMessage = "DSC import failed: \(Self.dscFailureSummary(resp.text))"
-                    return
+            if Task.isCancelled { return }
+            self.stopDSCImportProgressWatchers()
+            self.dyldImportBusy = false
+            self.dyldImportTask = nil
+            self.dyldImportProcess = nil
+            self.endTaskMonitor()
+            // Tailer already mirrored the log; append a short completion trailer.
+            let trailer = resp.text
+                .split(whereSeparator: \.isNewline)
+                .map(String.init)
+                .suffix(12)
+                .joined(separator: "\n")
+            if !trailer.isEmpty {
+                self.consoleAppend("DSC: import finished — last lines:")
+                for line in trailer.split(whereSeparator: \.isNewline).prefix(12) {
+                    self.consoleAppend("  \(line)")
                 }
-                let meta = Self.parseDyldImportMeta(resp)
-                let program = meta["program"] ?? short
-                let gpr = meta["project_gpr"] ?? target.gpr
-                self.rememberProject(gpr)
-                self.currentProgramName = program
-                self.selectedProjectProgram = "/\(program)"
-                self.projectPrograms = Array(Set(self.projectPrograms + [program])).sorted()
-                self.statusMessage =
-                    "Imported \(program) → opening in CodeBrowser…"
-                self.toolMode = .codeBrowser
-                self.sheetProvider = nil
-                self.activateImportedDSCProgram(programPath: program.hasPrefix("/") ? program : "/\(program)")
+            }
+            guard resp.ok else {
+                let summary = Self.dscFailureSummary(resp.text)
+                self.dyldImportPhase = "Failed"
+                self.statusMessage = "DSC import failed: \(summary)"
+                self.consoleAppend("DSC FAIL: \(summary)")
+                self.consoleAppend("DSC log: ~/Library/Logs/GhidraVibe/dsc-import-latest.log")
+                return
+            }
+            let meta = Self.parseDyldImportMeta(resp)
+            let program = meta["program"] ?? short
+            let gpr = meta["project_gpr"] ?? target.gpr
+            self.rememberProject(gpr)
+            self.currentProgramName = program
+            self.selectedProjectProgram = "/\(program)"
+            self.projectPrograms = Array(Set(self.projectPrograms + [program])).sorted()
+            self.dyldImportPhase = "Opening \(program) in CodeBrowser…"
+            self.statusMessage = self.dyldImportPhase
+            self.consoleAppend("DSC OK: imported \(program) — opening Listing / Decompile / Graph…")
+            self.showFrameworkOpenSheet = false
+            self.toolMode = .codeBrowser
+            self.sheetProvider = nil
+            self.activateImportedDSCProgram(programPath: program.hasPrefix("/") ? program : "/\(program)")
+        }
+    }
+
+    /// Run ghidra-vibe-dyld while keeping `dyldImportProcess` for Cancel.
+    private func runDyldHelperCancellable(_ launchPath: String, arguments: [String]) async -> String? {
+        await withCheckedContinuation { cont in
+            Task.detached(priority: .userInitiated) {
+                let proc = Process()
+                proc.executableURL = URL(fileURLWithPath: launchPath)
+                proc.arguments = arguments
+                let pipe = Pipe()
+                proc.standardOutput = pipe
+                proc.standardError = pipe
+                await MainActor.run { self.dyldImportProcess = proc }
+                do {
+                    try proc.run()
+                    proc.waitUntilExit()
+                    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                    let text = String(data: data, encoding: .utf8)
+                    await MainActor.run { self.dyldImportProcess = nil }
+                    cont.resume(returning: text)
+                } catch {
+                    await MainActor.run { self.dyldImportProcess = nil }
+                    cont.resume(returning: nil)
+                }
             }
         }
+    }
+
+    private func setDSCImportPhase(_ phase: String) {
+        dyldImportPhase = phase
+        let elapsed = taskMonitorElapsedLabel
+        statusMessage = "DSC Import (\(elapsed)): \(phase)"
+    }
+
+    private func startDSCImportProgressWatchers(framework: String) {
+        stopDSCImportProgressWatchers()
+        dyldImportTickerTask = Task { @MainActor in
+            while !Task.isCancelled, self.dyldImportBusy {
+                let elapsed = self.taskMonitorElapsedLabel
+                let phase = self.dyldImportPhase.isEmpty
+                    ? "Importing \(framework)…"
+                    : self.dyldImportPhase
+                self.statusMessage = "DSC Import (\(elapsed)): \(phase)"
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+            }
+        }
+        dyldLogTailTask = Task {
+            await self.tailDSCImportLog()
+        }
+    }
+
+    private func stopDSCImportProgressWatchers() {
+        dyldImportTickerTask?.cancel()
+        dyldImportTickerTask = nil
+        dyldLogTailTask?.cancel()
+        dyldLogTailTask = nil
+    }
+
+    /// Stream `dsc-import-latest.log` into Console while headless import runs.
+    private func tailDSCImportLog() async {
+        let logURL = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Logs/GhidraVibe/dsc-import-latest.log")
+        var offset: UInt64 = 0
+        var sawFile = false
+        // Wait for the CLI to truncate/create the log, then follow.
+        for _ in 0 ..< 40 {
+            if Task.isCancelled { return }
+            if FileManager.default.fileExists(atPath: logURL.path) {
+                sawFile = true
+                // Start at 0 so PHASE: resolve lines written before we attach are visible.
+                offset = 0
+                break
+            }
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+        if !sawFile {
+            await MainActor.run {
+                self.consoleAppend("DSC: waiting for log ~/Library/Logs/GhidraVibe/dsc-import-latest.log")
+            }
+        }
+        while !Task.isCancelled {
+            let busy = await MainActor.run { self.dyldImportBusy }
+            if !busy { break }
+            if let chunk = Self.readFileChunk(at: logURL, from: &offset), !chunk.isEmpty {
+                let lines = chunk.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
+                    .map(String.init)
+                await MainActor.run {
+                    self.ingestDSCLogLines(lines)
+                }
+            }
+            try? await Task.sleep(nanoseconds: 400_000_000)
+        }
+        // Drain any final bytes after busy clears.
+        if let chunk = Self.readFileChunk(at: logURL, from: &offset), !chunk.isEmpty {
+            let lines = chunk.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
+                .map(String.init)
+            await MainActor.run {
+                self.ingestDSCLogLines(lines)
+            }
+        }
+    }
+
+    private static func readFileChunk(at url: URL, from offset: inout UInt64) -> String? {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return nil }
+        defer { try? handle.close() }
+        do {
+            let end = try handle.seekToEnd()
+            if offset > end {
+                // Log was truncated/recreated — restart from beginning.
+                offset = 0
+            }
+            try handle.seek(toOffset: offset)
+            guard let data = try handle.readToEnd(), !data.isEmpty else { return nil }
+            offset = try handle.offset()
+            return String(data: data, encoding: .utf8) ?? String(decoding: data, as: UTF8.self)
+        } catch {
+            return nil
+        }
+    }
+
+    private func ingestDSCLogLines(_ lines: [String]) {
+        var mirrored = 0
+        for raw in lines {
+            let line = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !line.isEmpty else { continue }
+            if let phase = Self.dscPhaseFromLogLine(line) {
+                setDSCImportPhase(phase)
+            }
+            guard Self.shouldMirrorDSCLogLine(line) else { continue }
+            consoleAppend("DSC │ \(line)")
+            mirrored += 1
+            // Keep Console readable during noisy headless INFO dumps.
+            if mirrored >= 40 { break }
+        }
+    }
+
+    private static func dscPhaseFromLogLine(_ line: String) -> String? {
+        if line.hasPrefix("PHASE:") {
+            let rest = line.dropFirst("PHASE:".count).trimmingCharacters(in: .whitespaces)
+            if let dash = rest.range(of: " — ") {
+                return String(rest[dash.upperBound...]).trimmingCharacters(in: .whitespaces)
+            }
+            if let dash = rest.range(of: " - ") {
+                return String(rest[dash.upperBound...]).trimmingCharacters(in: .whitespaces)
+            }
+            return rest
+        }
+        let lower = line.lowercased()
+        if line.hasPrefix("DSC open:") { return "Resolved dyld shared cache path" }
+        if line.hasPrefix("Select image:") { return "Selected framework image in cache" }
+        if line.hasPrefix("Import via DyldCacheFileSystem") {
+            return "Preparing DyldCacheFileSystem import"
+        }
+        if lower.contains("starting ghidra analyzeheadless") || line.hasPrefix("PHASE: launch_headless") {
+            return "Starting Ghidra headless importer…"
+        }
+        if line.hasPrefix("Opened DSC filesystem") {
+            return "Opened DyldCacheFileSystem"
+        }
+        if line.hasPrefix("Importing FSRL") {
+            return "Importing module (slide fixups + Apple local symbols)…"
+        }
+        if line.hasPrefix("Enabled Apple-oriented") {
+            return "Enabled Apple/DWARF/ObjC/Swift analyzers"
+        }
+        if line.hasPrefix("Analyzing with") {
+            return "Auto Analysis running on imported framework…"
+        }
+        if lower.contains("auto analysis finished") {
+            return "Auto Analysis finished"
+        }
+        if line.hasPrefix("OK: imported") {
+            return "Import complete — opening program…"
+        }
+        if line.hasPrefix("FAIL:") {
+            return String(line.prefix(160))
+        }
+        return nil
+    }
+
+    private static func shouldMirrorDSCLogLine(_ line: String) -> Bool {
+        let lower = line.lowercased()
+        if line.hasPrefix("PHASE:") || line.hasPrefix("DSC") || line.hasPrefix("Select ")
+            || line.hasPrefix("Import ") || line.hasPrefix("OK:") || line.hasPrefix("OK_DETAIL")
+            || line.hasPrefix("FAIL:") || line.hasPrefix("WARN:") || line.hasPrefix("Hint:")
+            || line.hasPrefix("Opened DSC") || line.hasPrefix("Importing FSRL")
+            || line.hasPrefix("Analyzing") || line.hasPrefix("Enabled Apple")
+            || line.hasPrefix("Removing existing") || line.hasPrefix("APPLE_SYMBOLS")
+            || line.hasPrefix("SWIFT_ANALYZERS") || line.hasPrefix("MAXMEM")
+            || line.hasPrefix("scriptPath:")
+        {
+            return true
+        }
+        if lower.contains("error") || lower.contains("exception") || lower.contains("outofmemory")
+            || lower.contains("unable to lock") || lower.contains("heap space")
+            || lower.contains("script not found")
+        {
+            return true
+        }
+        // Occasional stock analyzer breadcrumbs (not full INFO spam).
+        if lower.contains("analyzer") && (lower.contains("finished") || lower.contains("running")) {
+            return true
+        }
+        return false
     }
 
     /// After DyldCacheFileSystem import: open program and ready CodeBrowser like stock Ghidra.
@@ -2871,13 +3469,11 @@ final class AppModel {
         refreshProjectPrograms()
         Task { @MainActor in
             if await Self.mcpReachable(base: mcpBaseURL) {
-                mcpStatus = InProcessEngineHost.isRunning
-                    ? "Engine ready (in-process)"
-                    : "Engine ready (headless API)"
+                mcpStatus = "Engine ready"
                 statusMessage = mcpStatus
                 if !InProcessEngineHost.isRunning {
                     consoleAppend(
-                        "Engine: reusing \(mcpServerURL) — CFG with edges needs a fresh in-process start (quit other GhidraVibe/MCP on :8089)"
+                        "Engine: reusing \(mcpServerURL) — CFG with edges needs a fresh engine start (quit other GhidraVibe/MCP on :8089)"
                     )
                 }
                 if loadProgram {
@@ -2893,7 +3489,7 @@ final class AppModel {
             }
             if engineMode == "inprocess" {
                 consoleAppend(
-                    "Engine: in-process bridge unavailable — falling back to headless sidecar"
+                    "Engine: embedded bridge unavailable — falling back to headless sidecar"
                 )
             }
             await startSidecarEngine(loadProgram: loadProgram)
@@ -2901,7 +3497,7 @@ final class AppModel {
     }
 
     private func startInProcessEngine(loadProgram: Bool) async {
-        mcpStatus = "Engine starting (in-process)…"
+        mcpStatus = "Engine starting…"
         statusMessage = mcpStatus
         consoleAppend("Engine: embedding JVM in GhidraVibe process")
         // Always open project + program at JVM boot when known (HTTP open_* is unreliable).
@@ -2923,15 +3519,15 @@ final class AppModel {
         if !result.ok {
             mcpStatus = "Engine failed to start"
             statusMessage = mcpStatus
-            consoleAppend("In-process engine: \(result.message)")
+            consoleAppend("Engine: \(result.message)")
             consoleAppend("Falling back to headless sidecar…")
             await startSidecarEngine(loadProgram: loadProgram)
             return
         }
-        consoleAppend("In-process engine: \(result.message)")
+        consoleAppend("Engine: \(result.message)")
         for _ in 0 ..< 60 {
             if await Self.mcpReachable(base: mcpBaseURL) {
-                mcpStatus = "Engine ready (in-process)"
+                mcpStatus = "Engine ready"
                 statusMessage = mcpStatus
                 // Always hydrate — covers “already started” empty JVM and boot without --program.
                 await ensureWorkspaceLoaded(program: program ?? resolveMcpProgramPath())
@@ -2942,7 +3538,7 @@ final class AppModel {
         }
         mcpStatus = "Engine failed to start"
         statusMessage = mcpStatus
-        consoleAppend("In-process engine started but API not reachable on \(mcpServerURL)")
+        consoleAppend("Engine started but API not reachable on \(mcpServerURL)")
     }
 
     private func startSidecarEngine(loadProgram: Bool) async {
@@ -2951,7 +3547,7 @@ final class AppModel {
             mcpStatus = "Engine helper missing"
             statusMessage = mcpStatus
             consoleAppend(
-                "Engine: no in-process bridge and no headless helper — rebuild with package-app.sh or nix run"
+                "Engine: no embedded bridge and no headless helper — rebuild with package-app.sh or nix run"
             )
             return
         }
@@ -3038,8 +3634,7 @@ final class AppModel {
         }
         Task { @MainActor in
             if await Self.mcpReachable(base: base) {
-                mcpStatus = InProcessEngineHost.isRunning
-                    ? "Engine ready (in-process)" : "Engine ready"
+                mcpStatus = "Engine ready"
                 // Recover empty sessions — engine up but no program open.
                 if resolveMcpProgramPath() != nil {
                     let open = await MCPClient.get(base: base, path: "list_open_programs")
@@ -3116,10 +3711,10 @@ final class AppModel {
         if InProcessEngineHost.isRunning {
             let res = InProcessEngineHost.call("open_program", args: ["program": normalized])
             if res.ok {
-                consoleAppend("Opened \(normalized) (in-process)")
+                consoleAppend("Opened \(normalized)")
                 return true
             }
-            consoleAppend("in-process open_program: \(res.message)")
+            consoleAppend("open_program: \(res.message)")
         }
         guard let base = mcpBaseURL else { return false }
         // Already loaded at JVM boot?
@@ -3314,21 +3909,60 @@ final class AppModel {
     }
 
     func persistAgentAISettings() {
+        UserDefaults.standard.set(agentProvider.rawValue, forKey: "ghidra.vibe.agent.provider")
+        UserDefaults.standard.set(agentCompatPresetId, forKey: "ghidra.vibe.agent.compatPreset")
         UserDefaults.standard.set(agentBaseURL, forKey: "ghidra.vibe.agent.baseURL")
         UserDefaults.standard.set(agentModel, forKey: "ghidra.vibe.agent.model")
+        agentUseLocalOllama = (agentProvider == .ollama || agentProvider == .llamaCpp)
         UserDefaults.standard.set(agentUseLocalOllama, forKey: "ghidra.vibe.agent.useLocalOllama")
+        UserDefaults.standard.set(
+            agentCompletionSoundEnabled,
+            forKey: "ghidra.vibe.agent.completionSound"
+        )
         agentMoE.save()
         let cfg = currentLocalAIConfig()
         agentBackend = cfg.backend.rawValue
     }
 
+    /// System sound when an Agent turn finishes (disabled on interrupt).
+    func playAgentCompletionSound(success: Bool) {
+        guard agentCompletionSoundEnabled else { return }
+        let name = success ? "Glass" : "Basso"
+        if let sound = NSSound(named: NSSound.Name(name)) {
+            sound.play()
+        } else {
+            NSSound.beep()
+        }
+    }
+
+    func applyAgentProviderDefaults(_ kind: AgentProviderKind) {
+        agentProvider = kind
+        agentBaseURL = kind.defaultBaseURL
+        if agentModel.isEmpty || !kind.suggestedModels.contains(agentModel) {
+            agentModel = kind.defaultModel
+        }
+        agentUseLocalOllama = (kind == .ollama || kind == .llamaCpp)
+    }
+
     func currentLocalAIConfig() -> LocalAIConfig {
         LocalAIConfig.resolve(
+            provider: agentProvider,
             userBaseURL: agentBaseURL,
             userModel: agentModel,
             apiKeyFile: apiKeyFilePath,
-            preferCloud: !agentUseLocalOllama
+            preferCloud: agentProvider.needsKeyFile && !agentUseLocalOllama
         )
+    }
+
+    func refreshLocalWeightModels() {
+        let entries = AgentLocalModels.listEntries()
+        agentModelPicker = entries.map(\.displayName)
+        if agentModel.isEmpty, let first = entries.first {
+            agentModel = first.displayName
+        }
+        statusMessage = entries.isEmpty
+            ? "No GGUF in \(AgentLocalModels.modelsDirectory.path)"
+            : "Local weights: \(entries.map(\.displayName).joined(separator: ", "))"
     }
 
     /// MoE route for a prompt — local expert model, optional cloud escalation.
@@ -3361,17 +3995,21 @@ final class AppModel {
     }
 
     func refreshAgentModels() {
+        if agentProvider == .llamaCpp {
+            refreshLocalWeightModels()
+            return
+        }
         let cfg = currentLocalAIConfig()
         Task {
             let models = await LocalAIClient.listModels(config: cfg)
             await MainActor.run {
-                self.agentModelPicker = models
-                if self.agentModel.isEmpty, let first = models.first {
+                self.agentModelPicker = models.isEmpty ? cfg.provider.suggestedModels : models
+                if self.agentModel.isEmpty, let first = self.agentModelPicker.first {
                     self.agentModel = first
                 }
                 self.statusMessage = models.isEmpty
-                    ? "No local models (is Ollama running at \(cfg.baseURL.absoluteString)?)"
-                    : "Ollama models: \(models.prefix(6).joined(separator: ", "))"
+                    ? "Using suggested \(cfg.provider.title) models (refresh when online)"
+                    : "\(cfg.provider.title): \(models.prefix(6).joined(separator: ", "))"
             }
         }
     }
@@ -3429,95 +4067,692 @@ final class AppModel {
         return runCapture(bin, arguments: args) ?? "(empty JSpace response)"
     }
 
-    /// Agent tool loop: JSpace discover → LLM with tools → execute → reply.
-    func sendAgentMessage() {
+    /// Submit composer text: append user bubble, then run or enqueue (Cursor-style).
+    /// - Parameter sendNow: Cmd+Return — same enqueue/run path; kept for shortcut parity.
+    func sendAgentMessage(sendNow: Bool = false) {
         let text = agentDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
-        agentMessages.append(AgentMessage(role: .user, text: text))
+        let hasAttachments = !agentAttachments.isEmpty
+        guard !text.isEmpty || hasAttachments else { return }
+        let attached = agentAttachments
         agentDraft = ""
-        let lower = text.lowercased()
+        agentAttachments = []
+        var payload = text.isEmpty ? "(see attachments)" : text
+        if !attached.isEmpty {
+            payload += "\n\n## Attachments\n"
+            for a in attached {
+                if a.isText, !a.textPreview.isEmpty {
+                    payload += "### \(a.displayName) (\(a.byteCount) bytes)\n```\n\(a.textPreview)\n```\n"
+                } else {
+                    payload += "- \(a.displayName) — \(a.url.path) (\(a.byteCount) bytes, binary/unavailable)\n"
+                }
+            }
+        }
+        enqueueAgentUserMessage(payload, sendNow: sendNow)
+    }
+
+    var agentContextUsageFraction: Double {
+        AgentContextMeter.usageFraction(used: agentContextUsedTokens, window: agentContextWindowTokens)
+    }
+
+    func refreshAgentContextMeter(extraText: String = "") {
+        agentContextWindowTokens = AgentContextMeter.windowTokens(forModel: agentModel)
+        var blob = AgentTools.systemPrompt(for: .general)
+        if !agentContextSummary.isEmpty {
+            blob += "\n" + agentContextSummary
+        }
+        for msg in agentMessages.suffix(12) {
+            blob += "\n" + msg.text
+        }
+        blob += "\n" + agentDraft + "\n" + extraText
+        for a in agentAttachments {
+            blob += "\n" + a.textPreview
+        }
+        agentContextUsedTokens = AgentContextMeter.estimateTokens(blob)
+    }
+
+    func addAgentAttachment(url: URL) {
+        let accessed = url.startAccessingSecurityScopedResource()
+        defer { if accessed { url.stopAccessingSecurityScopedResource() } }
+        let name = url.lastPathComponent
+        let values = try? url.resourceValues(forKeys: [.fileSizeKey])
+        let size = values?.fileSize ?? 0
+        let ext = url.pathExtension.lowercased()
+        let textExts: Set<String> = [
+            "txt", "md", "json", "jsonl", "csv", "log", "swift", "m", "mm", "h", "c", "cc", "cpp",
+            "hpp", "java", "kt", "py", "rs", "go", "ts", "tsx", "js", "jsx", "xml", "plist",
+            "yml", "yaml", "toml", "sh", "zsh", "asm", "s", "ll", "ir",
+        ]
+        var preview = ""
+        var isText = textExts.contains(ext)
+        if isText, size <= 256_000, let data = try? Data(contentsOf: url),
+           let s = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .isoLatin1)
+        {
+            preview = String(s.prefix(48_000))
+        } else if isText, size > 256_000 {
+            preview = "(file too large to inline — \(size) bytes; path only)"
+            isText = false
+        }
+        agentAttachments.append(AgentAttachment(
+            url: url,
+            displayName: name,
+            byteCount: size,
+            textPreview: preview,
+            isText: isText && !preview.isEmpty
+        ))
+        refreshAgentContextMeter()
+        statusMessage = "Attached \(name)"
+    }
+
+    func removeAgentAttachment(_ id: UUID) {
+        agentAttachments.removeAll { $0.id == id }
+        refreshAgentContextMeter()
+    }
+
+    func clearAgentAttachments() {
+        agentAttachments.removeAll()
+        refreshAgentContextMeter()
+    }
+
+    /// Manual context renew (Cursor-style summarize).
+    func renewAgentContext(manual: Bool = true) {
+        guard !agentContextRenewing else { return }
+        if agentMessages.isEmpty {
+            statusMessage = "Nothing to summarize yet"
+            return
+        }
+        Task { await self.performAgentContextRenew(manual: manual) }
+    }
+
+    /// Awaitable renew used before a turn when the radial is near full.
+    func renewAgentContextIfNeeded() async {
+        refreshAgentContextMeter()
+        guard agentContextUsageFraction >= AgentContextMeter.autoRenewThreshold else { return }
+        guard !agentMessages.isEmpty else { return }
+        await performAgentContextRenew(manual: false)
+    }
+
+    private func performAgentContextRenew(manual: Bool) async {
+        guard !agentContextRenewing else { return }
+        let transcript = agentMessages
+        guard !transcript.isEmpty else { return }
+        agentContextRenewing = true
+        statusMessage = manual ? "Renewing context…" : "Auto-renewing context…"
+        let route = routeAgentMoE(userText: "summarize conversation context", force: .plan)
+        let cfg = route.config
+        let priorSummary = agentContextSummary
+        let blob = transcript.suffix(40).map { "\($0.role.rawValue): \($0.text)" }
+            .joined(separator: "\n\n")
+        defer {
+            agentContextRenewing = false
+            refreshAgentContextMeter()
+        }
+        do {
+            let result = try await LocalAIClient.chat(
+                config: cfg,
+                messages: [
+                    LocalAIChatMessage(
+                        role: "system",
+                        content: """
+                        You compress GhidraVibe Agent chat history for a renewed context window. \
+                        Keep: open program/project, selected function/addresses, renames done, \
+                        pending RE goals, important tool findings. Drop chitchat. \
+                        Reply with a tight markdown summary only (no tools, no JSON).
+                        """
+                    ),
+                    LocalAIChatMessage(
+                        role: "user",
+                        content: """
+                        Prior summary (may be empty):
+                        \(priorSummary.isEmpty ? "(none)" : priorSummary)
+
+                        Recent transcript:
+                        \(String(blob.prefix(24_000)))
+                        """
+                    ),
+                ],
+                tools: []
+            )
+            let summary = (result.content ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            if !summary.isEmpty {
+                agentContextSummary = summary
+                let keep = AgentContextMeter.keepRecentMessages
+                if agentMessages.count > keep {
+                    let dropped = agentMessages.dropLast(keep)
+                    agentArchivedMessages.append(contentsOf: dropped.map(AgentChatStore.PersistedMessage.init))
+                }
+                let kept = Array(agentMessages.suffix(keep))
+                agentMessages = [
+                    AgentMessage(
+                        role: .assistant,
+                        text: "↻ Context renewed — earlier turns were summarized to free the window."
+                    ),
+                ] + kept
+                statusMessage = "Context renewed"
+                persistAgentChatNow()
+            } else {
+                statusMessage = "Context renew produced empty summary"
+            }
+        } catch {
+            statusMessage = "Context renew failed: \(error.localizedDescription)"
+        }
+    }
+
+    /// Expand `@Functions:…` / `@Providers:…` / etc. into LLM mention context.
+    func agentMentionContext(for text: String) -> String {
+        AgentMentions.expandContext(in: text, model: self)
+    }
+
+    // MARK: - Agent chat history (project-scoped)
+
+    /// Short preview of the latest Agent chat for a recent project row.
+    func agentChatPreview(forProject path: String) -> String? {
+        guard let meta = AgentChatStore.latestSession(forProject: path) else { return nil }
+        let when = meta.updatedAt.formatted(date: .abbreviated, time: .shortened)
+        if meta.preview.isEmpty {
+            return "\(meta.title) · \(when)"
+        }
+        return "\(meta.title) — \(meta.preview) · \(when)"
+    }
+
+    func refreshAgentChatHistoryLists() {
+        agentHistoryThisProject = AgentChatStore.sessions(forProject: projectPath, limit: 16)
+        let thisKey = AgentChatStore.projectKey(projectPath)
+        agentHistoryRecent = AgentChatStore.recentSessions(limit: 20)
+            .filter { AgentChatStore.projectKey($0.projectPath) != thisKey || $0.id != agentSessionId }
+    }
+
+    /// Load the active (or latest) conversation for `projectPath`, or start empty.
+    func restoreAgentChatForCurrentProject() {
+        if let id = AgentChatStore.activeSessionId(forProject: projectPath),
+           let session = AgentChatStore.loadSession(id)
+        {
+            applyAgentChatSession(session)
+        } else if let latest = AgentChatStore.latestSession(forProject: projectPath),
+                  let session = AgentChatStore.loadSession(latest.id)
+        {
+            applyAgentChatSession(session)
+        } else {
+            let fresh = AgentChatStore.newSession(
+                projectPath: projectPath,
+                programName: currentProgramName
+            )
+            applyAgentChatSession(fresh)
+            // Don't write empty shells until the user actually chats.
+        }
+        refreshAgentChatHistoryLists()
+        refreshAgentContextMeter()
+    }
+
+    func startNewAgentChat() {
+        persistAgentChatNow()
+        let fresh = AgentChatStore.newSession(
+            projectPath: projectPath,
+            programName: currentProgramName
+        )
+        applyAgentChatSession(fresh)
+        AgentChatStore.setActiveSession(fresh.id, forProject: projectPath)
+        refreshAgentChatHistoryLists()
+        statusMessage = "New Agent chat"
+        refreshAgentContextMeter()
+    }
+
+    func openAgentChatSession(_ id: UUID) {
+        guard id != agentSessionId else { return }
+        persistAgentChatNow()
+        guard let session = AgentChatStore.loadSession(id) else {
+            statusMessage = "Chat not found"
+            return
+        }
+        applyAgentChatSession(session)
+        AgentChatStore.setActiveSession(session.id, forProject: session.projectPath)
+        // Keep chat tied to its project identity without forcing a full project reopen.
+        if !session.projectPath.isEmpty, session.projectPath != projectPath {
+            statusMessage = "Opened chat from \(session.meta.projectDisplayName)"
+        } else {
+            statusMessage = "Opened \(session.title)"
+        }
+        refreshAgentChatHistoryLists()
+        refreshAgentContextMeter()
+    }
+
+    func deleteAgentChatSession(_ id: UUID) {
+        if id == agentSessionId {
+            startNewAgentChat()
+        }
+        AgentChatStore.deleteSession(id)
+        refreshAgentChatHistoryLists()
+        statusMessage = "Deleted Agent chat"
+    }
+
+    private func applyAgentChatSession(_ session: AgentChatStore.Session) {
+        agentSessionId = session.id
+        agentMessages = session.messages.map { $0.toAgentMessage() }
+        agentArchivedMessages = session.archivedMessages
+        agentContextSummary = session.summary
+        agentDraft = ""
+        agentAttachments = []
+        agentSendQueue = []
+        agentReplyTo = nil
+        agentLastTurnStatus = ""
+        agentPlan = session.plan
+        if let modeRaw = session.interactionMode,
+           let mode = AgentInteractionMode(rawValue: modeRaw)
+        {
+            agentInteractionMode = mode
+        }
+        if let model = session.model, !model.isEmpty {
+            agentModel = model
+        }
+    }
+
+    /// Start a reply to an existing transcript bubble (composer quote chip).
+    func beginReply(to message: AgentMessage) {
+        guard !message.text.hasPrefix("↻ Context renewed") else { return }
+        let trimmed = message.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        showAgentWelcome = false
+        agentReplyTo = message
+        statusMessage = "Replying to \(message.role == .user ? "your" : "assistant") message"
+    }
+
+    func clearAgentReply() {
+        agentReplyTo = nil
+    }
+
+    /// Enrich a user turn with an optional quoted reply for the LLM (bubble keeps short text).
+    private static func agentUserTurnPayload(userText: String, replyTo: AgentMessage?) -> String {
+        guard let reply = replyTo else { return userText }
+        let quote = String(reply.text.prefix(2000))
+            .split(separator: "\n", omittingEmptySubsequences: false)
+            .map { "> \($0)" }
+            .joined(separator: "\n")
+        return """
+        ## Replying to \(reply.role.rawValue) message
+        \(quote)
+
+        ## User
+        \(userText)
+        """
+    }
+
+    func schedulePersistAgentChat() {
+        agentChatSaveTask?.cancel()
+        agentChatSaveTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(450))
+            guard !Task.isCancelled else { return }
+            persistAgentChatNow()
+        }
+    }
+
+    func persistAgentChatNow() {
+        agentChatSaveTask?.cancel()
+        agentChatSaveTask = nil
+        // Skip empty brand-new shells so History stays meaningful.
+        guard !agentMessages.isEmpty || !agentContextSummary.isEmpty || !agentArchivedMessages.isEmpty
+        else { return }
+        var session = AgentChatStore.Session(
+            id: agentSessionId,
+            projectPath: projectPath,
+            programName: currentProgramName,
+            title: AgentChatStore.Session.makeTitle(
+                from: agentMessages.map(AgentChatStore.PersistedMessage.init)
+            ),
+            createdAt: AgentChatStore.loadSession(agentSessionId)?.createdAt ?? Date(),
+            updatedAt: Date(),
+            summary: agentContextSummary,
+            messages: agentMessages.map(AgentChatStore.PersistedMessage.init),
+            archivedMessages: agentArchivedMessages,
+            interactionMode: agentInteractionMode.rawValue,
+            model: agentModel,
+            plan: agentPlan
+        )
+        if let existing = AgentChatStore.loadSession(agentSessionId) {
+            session.createdAt = existing.createdAt
+            if !existing.title.isEmpty, existing.title != "New chat",
+               session.title == "New chat"
+            {
+                session.title = existing.title
+            }
+        }
+        AgentChatStore.saveSession(session)
+        refreshAgentChatHistoryLists()
+    }
+
+    /// Queue (or start) a user turn without touching `agentDraft`.
+    func enqueueAgentUserMessage(_ text: String, sendNow: Bool = false) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        let reply = agentReplyTo
+        agentReplyTo = nil
+        let replyPreview: String? = reply.map { String($0.text.prefix(200)) }
+        agentMessages.append(AgentMessage(
+            role: .user,
+            text: trimmed,
+            replyToId: reply?.id,
+            replyPreview: replyPreview
+        ))
+        schedulePersistAgentChat()
+        let llmText = Self.agentUserTurnPayload(userText: trimmed, replyTo: reply)
+        let lower = trimmed.lowercased()
+        if lower.contains("autonomous") && (lower.contains("re") || lower.contains("reverse")) {
+            if agentBusy {
+                enqueueQueueItem(llmText, front: false)
+                statusMessage = "Queued (\(agentSendQueue.count))"
+            } else {
+                runAutonomousREPlaybook()
+            }
+            return
+        }
+        if agentBusy, sendNow {
+            // Interrupt in-flight, keep partial bubble, then run this turn next.
+            interruptAgentTurn(keepPartial: true)
+            enqueueQueueItem(llmText, front: true)
+            statusMessage = "Interrupted — sending next (\(agentSendQueue.count) queued)"
+            drainAgentSendQueue()
+            return
+        }
+        if agentBusy {
+            enqueueQueueItem(llmText, front: false)
+            statusMessage = "Queued (\(agentSendQueue.count)) — will send after current turn"
+            return
+        }
+        runAgentToolLoop(userText: llmText)
+    }
+
+    private func enqueueQueueItem(_ text: String, front: Bool) {
+        let lane: String
+        if agentInteractionMode.showsQueueLanes {
+            lane = agentBusy ? "background" : "primary"
+        } else {
+            lane = "primary"
+        }
+        let item = AgentQueueItem(text: text, lane: lane)
+        if front {
+            agentSendQueue.insert(item, at: 0)
+        } else {
+            agentSendQueue.append(item)
+        }
+    }
+
+    func clearAgentSendQueue() {
+        agentSendQueue.removeAll()
+        statusMessage = "Agent queue cleared"
+    }
+
+    func removeAgentQueueItem(_ id: UUID) {
+        agentSendQueue.removeAll { $0.id == id }
+    }
+
+    /// Cancel in-flight turn; optionally keep a partial assistant bubble.
+    func interruptAgentTurn(keepPartial: Bool = true) {
+        if agentToolApproval != nil {
+            resolveAgentToolApproval(.deny)
+        }
+        agentTurnTask?.cancel()
+        agentTurnTask = nil
+        if agentBusy {
+            agentBusy = false
+            endTaskMonitor()
+            if keepPartial,
+               agentMessages.last?.role != .assistant
+            {
+                agentMessages.append(AgentMessage.assistant(body: "_(interrupted)_"))
+            } else if keepPartial,
+                      let last = agentMessages.last,
+                      last.role == .assistant,
+                      last.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            {
+                if let idx = agentMessages.indices.last {
+                    agentMessages[idx].text = "_(interrupted)_"
+                    agentMessages[idx].parts = AgentContentParser.parts(from: agentMessages[idx].text)
+                }
+            }
+            statusMessage = "Agent interrupted"
+            schedulePersistAgentChat()
+        }
+    }
+
+    private func drainAgentSendQueue() {
+        guard !agentBusy, let next = agentSendQueue.first else { return }
+        agentSendQueue.removeFirst()
+        let lower = next.text.lowercased()
         if lower.contains("autonomous") && (lower.contains("re") || lower.contains("reverse")) {
             runAutonomousREPlaybook()
             return
         }
-        runAgentToolLoop(userText: text)
+        runAgentToolLoop(userText: next.text)
+    }
+
+    func setAgentInteractionMode(_ mode: AgentInteractionMode) {
+        agentInteractionMode = mode
+        schedulePersistAgentChat()
+        statusMessage = "Mode: \(mode.title)"
+    }
+
+    func toggleAgentPlanStep(_ id: UUID) {
+        guard var plan = agentPlan,
+              let idx = plan.steps.firstIndex(where: { $0.id == id })
+        else { return }
+        plan.steps[idx].status = plan.steps[idx].status == .done ? .pending : .done
+        plan.updatedAt = Date()
+        agentPlan = plan
+        schedulePersistAgentChat()
+    }
+
+    func discardAgentPlan() {
+        agentPlan = nil
+        schedulePersistAgentChat()
+        statusMessage = "Plan discarded"
+    }
+
+    /// Convert accepted plan steps into queued Agent turns and switch to Agent mode.
+    func buildAgentPlan() {
+        guard let plan = agentPlan, !plan.steps.isEmpty else {
+            statusMessage = "No plan to build"
+            return
+        }
+        agentInteractionMode = .agent
+        var updated = plan
+        for i in updated.steps.indices where updated.steps[i].status == .pending {
+            updated.steps[i].status = .active
+            let prompt = """
+            Execute this plan step (from accepted plan "\(plan.title)"):
+            \(updated.steps[i].title)
+
+            When finished, briefly confirm what you did. Prefer tools over speculation.
+            """
+            enqueueQueueItem(prompt, front: false)
+        }
+        updated.updatedAt = Date()
+        agentPlan = updated
+        schedulePersistAgentChat()
+        statusMessage = "Building plan — \(agentSendQueue.count) step(s) queued"
+        if !agentBusy {
+            drainAgentSendQueue()
+        }
     }
 
     func runAgentToolLoop(userText: String) {
         guard !agentBusy else {
-            statusMessage = "Agent busy"
+            enqueueQueueItem(userText, front: false)
+            statusMessage = "Queued (\(agentSendQueue.count))"
             return
         }
         agentBusy = true
         beginTaskMonitor()
         ensureVibeMCP()
+        let mode = agentInteractionMode
         let route = routeAgentMoE(userText: userText)
         var cfg = route.config
-        statusMessage = "Agent (\(route.role.title))…"
+        statusMessage = "\(mode.title) (\(route.role.title))…"
         let fnName = selectedFunction?.name
         let fnAddr = selectedFunction?.address
         let decompPreview = String(decompiledText.prefix(2500))
         let moeLabel = agentMoELastRoute
 
-        Task {
+        agentTurnTask = Task {
             defer {
                 Task { @MainActor in
                     self.agentBusy = false
+                    self.agentTurnTask = nil
                     self.endTaskMonitor()
+                    self.drainAgentSendQueue()
                 }
             }
+
+            let casual = AgentTools.isCasualChitchat(userText)
+            let modeTools = AgentTools.openAITools(allowed: mode.allowedToolNames)
+            let toolsForTurn: [[String: Any]] = (casual || mode == .ask) ? [] : modeTools
+            let mentionContext = await MainActor.run { self.agentMentionContext(for: userText) }
+
+            // Cursor-style: renew context window when the radial nears capacity.
+            await MainActor.run { self.refreshAgentContextMeter(extraText: userText) }
+            await self.renewAgentContextIfNeeded()
 
             var discovery = ""
-            var body: [String: Any] = ["query": userText]
-            if let fnName { body["function"] = fnName }
-            let discResp = await self.vibePost("rag_discover", body: body)
-            if let d = discResp.json as? [String: Any],
-               let data = d["data"] as? [String: Any]
-            {
-                discovery = (data["discovery"] as? String)
-                    ?? String(describing: data["discovery"] ?? "")
-                if let rules = data["rules"] as? String, !rules.isEmpty {
-                    discovery += "\n\n## Active rules\n\(rules.prefix(1500))"
+            if !casual {
+                var body: [String: Any] = ["query": userText]
+                if let fnName { body["function"] = fnName }
+                let discResp = await self.vibePost("rag_discover", body: body)
+                if let d = discResp.json as? [String: Any],
+                   let data = d["data"] as? [String: Any]
+                {
+                    discovery = (data["discovery"] as? String)
+                        ?? String(describing: data["discovery"] ?? "")
+                    if let rules = data["rules"] as? String, !rules.isEmpty {
+                        discovery += "\n\n## Active rules\n\(rules.prefix(1500))"
+                    }
+                } else {
+                    discovery = discResp.text
+                }
+                await MainActor.run {
+                    self.jspaceStatus = "JSpace pack ready (\(discovery.split(separator: "\n").count) lines)"
                 }
             } else {
-                discovery = discResp.text
-            }
-            await MainActor.run {
-                self.jspaceStatus = "JSpace pack ready (\(discovery.split(separator: "\n").count) lines)"
+                await MainActor.run {
+                    self.jspaceStatus = "Ready"
+                }
             }
 
+            let rollingSummary = await MainActor.run { self.agentContextSummary }
+            let history: [LocalAIChatMessage] = await MainActor.run {
+                self.agentMessages
+                    .filter { !$0.text.hasPrefix("↻ Context renewed") }
+                    .suffix(AgentContextMeter.maxHistoryMessages)
+                    .map { msg in
+                        var body = String(msg.text.prefix(3000))
+                        if let preview = msg.replyPreview?.trimmingCharacters(in: .whitespacesAndNewlines),
+                           !preview.isEmpty
+                        {
+                            body = "[reply to: \(String(preview.prefix(200)))]\n\(body)"
+                        }
+                        return LocalAIChatMessage(
+                            role: msg.role == .user ? "user" : "assistant",
+                            content: body
+                        )
+                    }
+            }
+
+            let userPayload: String
+            if casual {
+                userPayload = """
+                The user sent a casual greeting / chitchat. Reply briefly and warmly \
+                in natural language only. Do not call tools and do not emit JSON.
+
+                ## User
+                \(userText)
+                """
+            } else {
+                userPayload = """
+                ## JSpace discovery
+                \(String(discovery.prefix(4000)))
+
+                ## Context
+                selected_function=\(fnName ?? "(none)") address=\(fnAddr ?? "")
+                moe_expert=\(route.role.rawValue)
+                decompile_preview:
+                \(decompPreview.isEmpty ? "(empty)" : decompPreview)
+
+                \(mentionContext.isEmpty ? "" : mentionContext + "\n")
+                ## User
+                \(userText)
+                """
+            }
+
+            var systemPrompt = AgentTools.systemPrompt(for: route.role)
+            systemPrompt += "\n\n" + mode.systemPromptAppendix()
             var messages: [LocalAIChatMessage] = [
-                LocalAIChatMessage(role: "system", content: AgentTools.systemPrompt),
-                LocalAIChatMessage(
-                    role: "user",
-                    content: """
-                    ## JSpace discovery
-                    \(String(discovery.prefix(4000)))
-
-                    ## Context
-                    selected_function=\(fnName ?? "(none)") address=\(fnAddr ?? "")
-                    moe_expert=\(route.role.rawValue)
-                    decompile_preview:
-                    \(decompPreview.isEmpty ? "(empty)" : decompPreview)
-
-                    ## User
-                    \(userText)
-                    """
-                ),
+                LocalAIChatMessage(role: "system", content: systemPrompt),
             ]
+            if !rollingSummary.isEmpty {
+                messages.append(LocalAIChatMessage(
+                    role: "system",
+                    content: """
+                    ## Conversation memory (rolling summary)
+                    Earlier turns were compressed into this summary. Treat it as authoritative \
+                    prior context alongside the recent live transcript below. Do not ask the \
+                    user to repeat facts already covered here.
+
+                    \(String(rollingSummary.prefix(8000)))
+                    """
+                ))
+            }
+            // Prior turns (excluding the user message just appended for this send).
+            if history.count > 1 {
+                messages.append(contentsOf: history.dropLast())
+            }
+            messages.append(LocalAIChatMessage(role: "user", content: userPayload))
+
+            await MainActor.run {
+                self.agentContextUsedTokens = AgentContextMeter.estimateMessages(messages)
+                self.agentContextWindowTokens = AgentContextMeter.windowTokens(forModel: cfg.model)
+            }
 
             var finalText = ""
             var usedTools: [String] = []
-            let maxRounds = 6
+            let maxRounds = casual ? 2 : 6
+            let streamBubbleId = UUID()
+            let canStream = toolsForTurn.isEmpty
+                && (cfg.backend == .ollama || cfg.backend == .openaiCompat)
+            if canStream {
+                await MainActor.run {
+                    self.agentMessages.append(AgentMessage(
+                        id: streamBubbleId,
+                        role: .assistant,
+                        text: "",
+                        parts: nil,
+                        meta: nil
+                    ))
+                }
+            }
             do {
-                for _ in 0 ..< maxRounds {
+                for round in 0 ..< maxRounds {
+                    try Task.checkCancellation()
                     let result: LocalAIChatResult
                     do {
-                        result = try await LocalAIClient.chat(
-                            config: cfg,
-                            messages: messages,
-                            tools: AgentTools.openAITools
-                        )
+                        if canStream, round == 0 {
+                            result = try await LocalAIClient.chatStream(
+                                config: cfg,
+                                messages: messages,
+                                tools: [],
+                                temperature: 0.2
+                            ) { delta in
+                                Task { @MainActor in
+                                    guard let idx = self.agentMessages.firstIndex(where: {
+                                        $0.id == streamBubbleId
+                                    }) else { return }
+                                    self.agentMessages[idx].text += delta
+                                }
+                            }
+                        } else {
+                            result = try await LocalAIClient.chat(
+                                config: cfg,
+                                messages: messages,
+                                tools: toolsForTurn
+                            )
+                        }
+                    } catch is CancellationError {
+                        throw CancellationError()
                     } catch {
                         // Local failed — optional proprietary API escalation.
                         if let cloud = AgentMoERouter.cloudFallback(
@@ -3535,22 +4770,38 @@ final class AppModel {
                             result = try await LocalAIClient.chat(
                                 config: cfg,
                                 messages: messages,
-                                tools: AgentTools.openAITools
+                                tools: toolsForTurn
                             )
                         } else {
                             throw error
                         }
                     }
-                    if result.toolCalls.isEmpty {
+                    // Recover text-emitted tool JSON if the transport missed it.
+                    // Casual turns intentionally omit tools — never execute leaked JSON.
+                    var toolCalls = casual ? [] : result.toolCalls
+                    if !casual, toolCalls.isEmpty, let content = result.content {
+                        toolCalls = AgentTools.parseInlineToolCalls(from: content)
+                    }
+                    if toolCalls.isEmpty {
                         finalText = result.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                        // Leaked tool JSON with no executable path — one natural-language retry.
+                        if AgentTools.looksLikeLeakedToolJSON(finalText), round + 1 < maxRounds {
+                            messages.append(LocalAIChatMessage(role: "assistant", content: finalText))
+                            messages.append(LocalAIChatMessage(
+                                role: "user",
+                                content: "That was invalid. Reply in natural language only — no JSON, no tool calls."
+                            ))
+                            finalText = ""
+                            continue
+                        }
                         break
                     }
                     messages.append(LocalAIChatMessage(
                         role: "assistant",
                         content: result.content,
-                        toolCalls: result.toolCalls
+                        toolCalls: toolCalls
                     ))
-                    for call in result.toolCalls {
+                    for call in toolCalls {
                         usedTools.append(call.name)
                         let args = AgentTools.parseArgs(call.argumentsJSON)
                         let toolOut = await self.executeAgentTool(name: call.name, args: args)
@@ -3566,7 +4817,11 @@ final class AppModel {
                     // Last assistant content or constrained rename-table fallback.
                     let last = messages.last(where: { $0.role == "assistant" })?.content ?? ""
                     finalText = last.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if finalText.isEmpty {
+                    if AgentTools.looksLikeLeakedToolJSON(finalText) {
+                        finalText = casual
+                            ? "Hey — GhidraVibe agent here. Ask me to decompile, rename, or explore the open program."
+                            : "I tried to call a tool but the local model returned raw JSON. Try again, or use a larger model (7b+) in Agent Setup."
+                    } else if finalText.isEmpty {
                         finalText = "Tools ran: \(usedTools.joined(separator: ", ")). Ask a follow-up or Apply pending edits."
                     }
                     let renames = AgentTools.parseRenameTable(from: finalText)
@@ -3589,6 +4844,54 @@ final class AppModel {
                         }
                     }
                 }
+                await MainActor.run {
+                    let toolsLabel = usedTools.isEmpty ? "none" : usedTools.joined(separator: ", ")
+                    self.agentLastTurnStatus =
+                        "\(mode.title) · \(route.role.title) · \(cfg.backend.rawValue) · \(cfg.model) · tools=\(toolsLabel) · pending=\(self.agentPendingEdits.count)"
+                    if !moeLabel.isEmpty {
+                        self.agentMoELastRoute = moeLabel
+                    }
+                    if canStream,
+                       let idx = self.agentMessages.firstIndex(where: { $0.id == streamBubbleId })
+                    {
+                        let body = finalText.isEmpty ? self.agentMessages[idx].text : finalText
+                        self.agentMessages[idx] = AgentMessage.assistant(body: body, meta: nil)
+                        self.agentMessages[idx].id = streamBubbleId
+                    } else {
+                        self.agentMessages.append(AgentMessage.assistant(body: finalText, meta: nil))
+                    }
+                    if mode == .plan || finalText.contains("```plan") {
+                        if let plan = AgentPlan.parse(from: finalText) {
+                            self.agentPlan = plan
+                        }
+                    }
+                    if var plan = self.agentPlan,
+                       let activeIdx = plan.steps.firstIndex(where: { $0.status == .active }),
+                       !usedTools.isEmpty
+                    {
+                        plan.steps[activeIdx].status = .done
+                        plan.updatedAt = Date()
+                        self.agentPlan = plan
+                    }
+                    self.statusMessage = "\(mode.title) reply (\(route.role.title))"
+                    self.schedulePersistAgentChat()
+                    self.playAgentCompletionSound(success: true)
+                }
+            } catch is CancellationError {
+                await MainActor.run {
+                    if canStream,
+                       let idx = self.agentMessages.firstIndex(where: { $0.id == streamBubbleId })
+                    {
+                        var t = self.agentMessages[idx].text
+                        if t.isEmpty { t = "_(interrupted)_" }
+                        else if !t.contains("interrupted") { t += "\n\n_(interrupted)_" }
+                        self.agentMessages[idx] = AgentMessage.assistant(body: t, meta: nil)
+                        self.agentMessages[idx].id = streamBubbleId
+                    }
+                    self.statusMessage = "Agent interrupted"
+                    self.schedulePersistAgentChat()
+                    // No completion sound on interrupt.
+                }
             } catch {
                 finalText = """
                 LLM call failed (\(cfg.backend.rawValue) @ \(cfg.baseURL.absoluteString)): \(error.localizedDescription)
@@ -3598,24 +4901,178 @@ final class AppModel {
 
                 Tip: start Metal Ollama (`ollama serve`) or set a cloud key file in Settings.
                 """
-            }
-
-            await MainActor.run {
-                let footer = """
-
-                — moe=\(moeLabel)
-                backend=\(cfg.backend.rawValue) model=\(cfg.model)
-                tools=\(usedTools.isEmpty ? "none" : usedTools.joined(separator: ", "))
-                pending_edits=\(self.agentPendingEdits.count)
-                """
-                self.agentMessages.append(AgentMessage(role: .assistant, text: finalText + footer))
-                self.statusMessage = "Agent reply (\(route.role.title))"
+                await MainActor.run {
+                    if canStream,
+                       let idx = self.agentMessages.firstIndex(where: { $0.id == streamBubbleId })
+                    {
+                        self.agentMessages[idx] = AgentMessage.assistant(body: finalText, meta: nil)
+                        self.agentMessages[idx].id = streamBubbleId
+                    } else {
+                        self.agentMessages.append(AgentMessage.assistant(body: finalText, meta: nil))
+                    }
+                    self.statusMessage = "Agent error"
+                    self.schedulePersistAgentChat()
+                    self.playAgentCompletionSound(success: false)
+                }
             }
         }
     }
 
     /// Execute one Agent tool (GuiControl + analysis/vibe MCP + engine writes).
-    func executeAgentTool(name: String, args: [String: Any]) async -> String {
+    /// - Parameters:
+    ///   - promptIfNeeded: when true (LLM loop), pause for Cursor-style approval UI.
+    ///   - autoApprove: skip Ask prompts (GuiControl tests / trusted automation).
+    func executeAgentTool(
+        name: String,
+        args: [String: Any],
+        promptIfNeeded: Bool = true,
+        autoApprove: Bool = false
+    ) async -> String {
+        let mode = await MainActor.run { self.agentInteractionMode }
+        if AgentInteractionMode.writeToolNames.contains(name), !mode.allowsWrites {
+            return #"{"ok":false,"error":"\#(mode.title) mode blocks writes until Build"}"#
+        }
+        if let allowed = mode.allowedToolNames, !allowed.contains(name) {
+            return #"{"ok":false,"error":"Tool \#(name) not allowed in \#(mode.title) mode"}"#
+        }
+
+        let risk = AgentToolPermissionStore.risk(forTool: name, args: args)
+        let gate = await MainActor.run {
+            AgentToolPermissionStore.shared.evaluate(tool: name, args: args)
+        }
+        switch gate {
+        case .allow:
+            break
+        case .deny(let reason):
+            return Self.toolJSONError(reason)
+        case .ask:
+            if autoApprove {
+                break
+            }
+            if !promptIfNeeded {
+                return """
+                {"ok":false,"error":"approval required","needs_approval":true,\
+                "tool":\(Self.jsonString(name)),"risk":\(Self.jsonString(risk.rawValue))}
+                """
+            }
+            let decision = await requestAgentToolApproval(name: name, args: args, risk: risk)
+            await MainActor.run {
+                AgentToolPermissionStore.shared.record(tool: name, decision: decision)
+            }
+            switch decision {
+            case .allowOnce, .allowSession, .alwaysAllow:
+                break
+            case .deny:
+                return Self.toolJSONError("User denied \(name)")
+            }
+        }
+
+        // Sandbox: refuse network tools that somehow leave the allowlist surface.
+        if await MainActor.run(body: { AgentToolPermissionStore.shared.sandboxEnabled }),
+           name == "web_search"
+        {
+            // AgentWebSearch already uses allowlisted hosts; keep a hard gate for clarity.
+        }
+
+        return await dispatchAgentTool(name: name, args: args)
+    }
+
+    /// Resolve the approval card (Allow once / session / always / Deny).
+    @MainActor
+    func resolveAgentToolApproval(_ decision: AgentToolUserDecision) {
+        guard agentToolApproval != nil else { return }
+        let cont = agentToolApprovalContinuation
+        agentToolApprovalContinuation = nil
+        agentToolApproval = nil
+        cont?.resume(returning: decision)
+        switch decision {
+        case .allowOnce:
+            statusMessage = "Tool allowed once"
+        case .allowSession:
+            statusMessage = "Tool allowed for this session"
+        case .alwaysAllow:
+            statusMessage = "Tool always allowed"
+        case .deny:
+            statusMessage = "Tool denied"
+        }
+    }
+
+    @MainActor
+    func resetAgentToolPermissions() {
+        if agentToolApproval != nil {
+            resolveAgentToolApproval(.deny)
+        }
+        AgentToolPermissionStore.shared.resetPermissions()
+        agentToolPermissionEpoch &+= 1
+        statusMessage = "Agent tool permissions reset (ask writes · sandbox on)"
+        consoleAppend("Agent: tool permissions reset")
+    }
+
+    @MainActor
+    func setAgentToolPermissionProfile(_ profile: AgentToolPermissionProfile) {
+        let store = AgentToolPermissionStore.shared
+        store.profile = profile
+        if profile == .allowAlways {
+            store.applyAllowAlwaysProfile()
+        }
+        agentToolPermissionEpoch &+= 1
+        statusMessage = "Tool permissions: \(profile.title)"
+    }
+
+    @MainActor
+    func setAgentToolSandboxEnabled(_ enabled: Bool) {
+        AgentToolPermissionStore.shared.sandboxEnabled = enabled
+        agentToolPermissionEpoch &+= 1
+        statusMessage = enabled ? "Agent tool sandbox on" : "Agent tool sandbox off"
+    }
+
+    private func requestAgentToolApproval(
+        name: String,
+        args: [String: Any],
+        risk: AgentToolRisk
+    ) async -> AgentToolUserDecision {
+        let blocked = await MainActor.run { () -> Bool in
+            // Collapse overlapping asks — deny the new one so the loop can continue.
+            if self.agentToolApproval != nil {
+                return true
+            }
+            self.agentToolApproval = AgentToolApprovalRequest(
+                id: UUID(),
+                toolName: name,
+                risk: risk,
+                argsPreview: AgentToolPermissionStore.argsPreview(args)
+            )
+            self.statusMessage = "Allow tool “\(name)”? (\(risk.title))"
+            self.consoleAppend("Agent: awaiting permission for \(name) [\(risk.rawValue)]")
+            return false
+        }
+        if blocked { return .deny }
+
+        return await withCheckedContinuation { (cont: CheckedContinuation<AgentToolUserDecision, Never>) in
+            Task { @MainActor in
+                if self.agentToolApprovalContinuation != nil {
+                    cont.resume(returning: .deny)
+                    return
+                }
+                self.agentToolApprovalContinuation = cont
+            }
+        }
+    }
+
+    private static func toolJSONError(_ message: String) -> String {
+        let escaped = message
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+        return #"{"ok":false,"error":"\#(escaped)"}"#
+    }
+
+    private static func jsonString(_ value: String) -> String {
+        let data = try? JSONSerialization.data(withJSONObject: value, options: [])
+        return data.flatMap { String(data: $0, encoding: .utf8) } ?? "\"\""
+    }
+
+    /// Backend dispatch after permission gate.
+    private func dispatchAgentTool(name: String, args: [String: Any]) async -> String {
         switch name {
         case "gui_state":
             return await MainActor.run {
@@ -3707,6 +5164,11 @@ final class AppModel {
                 self.runAutonomousREPlaybook(budget: budget, apply: apply)
             }
             return #"{"ok":true,"started":true,"budget":\#(budget)}"#
+        case "web_search":
+            let q = (args["query"] as? String) ?? (args["q"] as? String) ?? ""
+            let limit = (args["limit"] as? Int) ?? 6
+            let sandbox = await MainActor.run { AgentToolPermissionStore.shared.sandboxEnabled }
+            return await AgentWebSearch.search(query: q, limit: limit, sandbox: sandbox)
         default:
             return #"{"ok":false,"error":"unknown tool \#(name)"}"#
         }
@@ -3828,6 +5290,7 @@ final class AppModel {
             role: .assistant,
             text: "Applied \(edits.count) pending edit(s). Functions/Decompile refreshed."
         ))
+        schedulePersistAgentChat()
     }
 
     func clearAgentPendingEdits() {
@@ -3844,6 +5307,7 @@ final class AppModel {
             await MainActor.run {
                 self.agentMessages.append(AgentMessage(role: .assistant, text: out))
                 self.statusMessage = "improve_decompile done"
+                self.schedulePersistAgentChat()
             }
         }
     }
@@ -3884,7 +5348,7 @@ final class AppModel {
                 result = try await LocalAIClient.chat(
                     config: cfg,
                     messages: [
-                        LocalAIChatMessage(role: "system", content: AgentTools.systemPrompt),
+                        LocalAIChatMessage(role: "system", content: AgentTools.systemPrompt(for: .decompile)),
                         LocalAIChatMessage(role: "user", content: prompt),
                     ],
                     tools: []
@@ -3899,7 +5363,7 @@ final class AppModel {
                     result = try await LocalAIClient.chat(
                         config: cfg,
                         messages: [
-                            LocalAIChatMessage(role: "system", content: AgentTools.systemPrompt),
+                            LocalAIChatMessage(role: "system", content: AgentTools.systemPrompt(for: .decompile)),
                             LocalAIChatMessage(role: "user", content: prompt),
                         ],
                         tools: []
@@ -3977,6 +5441,7 @@ final class AppModel {
             role: .assistant,
             text: "Starting Autonomous RE (budget=\(budget), apply=\(apply), expert=\(route.role.title) / \(route.config.model))…"
         ))
+        schedulePersistAgentChat()
 
         Task {
             var report: [String] = []
@@ -4049,6 +5514,8 @@ final class AppModel {
                 self.agentBusy = false
                 self.endTaskMonitor()
                 self.statusMessage = "Autonomous RE done (\(targets.count) functions)"
+                self.schedulePersistAgentChat()
+                self.drainAgentSendQueue()
             }
         }
     }
@@ -4230,9 +5697,52 @@ struct FunctionRow: Identifiable, Hashable, Sendable {
     var address: String
 }
 
-struct AgentMessage: Identifiable, Hashable {
-    enum Role: String { case user, assistant }
-    var id = UUID()
-    var role: Role
+struct AgentQueueItem: Identifiable, Hashable, Sendable {
+    var id: UUID = UUID()
     var text: String
+    /// Multitask V1 lane label (`primary` / `background`).
+    var lane: String = "primary"
+}
+
+struct AgentMessage: Identifiable, Hashable, Sendable {
+    enum Role: String, Codable, Sendable { case user, assistant }
+    var id: UUID = UUID()
+    var role: Role
+    /// Primary bubble body (user text or assistant answer) — also LLM persistence source.
+    var text: String
+    /// Optional structured parts (derived at render when nil).
+    var parts: [AgentContentPart]? = nil
+    /// When set, this user turn is a reply to another bubble.
+    var replyToId: UUID? = nil
+    /// Short preview of the replied-to message (shown as a quote chip).
+    var replyPreview: String? = nil
+    /// Legacy field — unused in UI (diagnostics live in `AppModel.agentLastTurnStatus`).
+    var meta: String? = nil
+
+    /// Render parts: explicit cache or parse fences/mentions from `text`.
+    var contentParts: [AgentContentPart] {
+        parts ?? AgentContentParser.parts(from: text)
+    }
+
+    var replyPreviewLine: String {
+        let raw = (replyPreview ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !raw.isEmpty else { return "" }
+        let line = raw.split(separator: "\n", maxSplits: 1).first.map(String.init) ?? raw
+        return String(line.prefix(120))
+    }
+
+    /// Strip any legacy “— moe=…” trailer from the bubble body.
+    static func assistant(body: String, meta _: String? = nil) -> AgentMessage {
+        var main = body
+        if let range = body.range(of: "\n— moe=") {
+            main = String(body[..<range.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+            if main.isEmpty { main = body }
+        }
+        return AgentMessage(
+            role: .assistant,
+            text: main,
+            parts: AgentContentParser.parts(from: main),
+            meta: nil
+        )
+    }
 }

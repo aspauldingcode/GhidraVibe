@@ -95,7 +95,7 @@ public final class InProcessEngine {
 			while (System.nanoTime() < deadline) {
 				if (svc.isRunning()) {
 					started = true;
-					return okMsg("engine ready (in-process port " + svc.getPort() + ")");
+					return okMsg("engine ready (port " + svc.getPort() + ")");
 				}
 				if (lastError != null) {
 					return err(lastError);

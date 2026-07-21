@@ -11,22 +11,21 @@ final class AppActivationDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
+        WindowChromeWatchdog.start()
         bringToFront()
-        // One more beat after SwiftUI creates the WindowGroup.
         DispatchQueue.main.async { [weak self] in
             self?.bringToFront()
         }
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
-        for win in NSApp.windows where win.isVisible || win.isMiniaturized {
-            win.makeKeyAndOrderFront(nil)
-        }
+        bringToFront()
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if !flag {
-            for win in NSApp.windows {
+            // Prefer reopening Project Window, not inventing a second splash.
+            for win in NSApp.windows where !WindowChrome.isSplashWindow(win) {
                 win.makeKeyAndOrderFront(nil)
             }
         }
@@ -36,7 +35,17 @@ final class AppActivationDelegate: NSObject, NSApplicationDelegate {
 
     private func bringToFront() {
         NSApp.activate(ignoringOtherApps: true)
+        // While splash is up, key only that plate — do not promote a half-ready main window.
+        // After startup advances, never re-front a leftover splash (dismiss can race).
+        if WindowChrome.splashActive,
+           let splash = NSApp.windows.first(where: { WindowChrome.isSplashWindow($0) && $0.isVisible })
+        {
+            if splash.isMiniaturized { splash.deminiaturize(nil) }
+            splash.makeKeyAndOrderFront(nil)
+            return
+        }
         for win in NSApp.windows {
+            if WindowChrome.isSplashWindow(win) { continue }
             if win.isMiniaturized {
                 win.deminiaturize(nil)
             }

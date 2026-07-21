@@ -44,10 +44,12 @@ struct NativeOutlineTree: View {
             if roots.isEmpty {
                 List {
                     Label(emptyLabel, systemImage: "folder")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.vibeSecondary)
                         .font(.caption)
+                        .listRowBackground(Color.vibeContent)
                 }
                 .listStyle(.sidebar)
+                .vibeThemedList()
             } else {
                 // Hierarchical List API = native macOS disclosure chevrons + selection.
                 List(
@@ -70,15 +72,19 @@ struct NativeOutlineTree: View {
                             .truncationMode(.middle)
                     } icon: {
                         Image(systemName: node.systemImage)
-                            .foregroundStyle(node.isFolder ? Color.accentColor : .secondary)
+                            .foregroundStyle(node.isFolder ? Color.vibeAccent : Color.vibeSecondary)
                     }
                     .help(node.payload ?? node.title)
                     .tag(node.id)
                     .accessibilityIdentifier(node.id)
                 }
                 .listStyle(.sidebar)
+                .vibeThemedList()
             }
         }
+        // Let parent concentric / provider shells own the plate — AppKit list chrome is square.
+        .scrollContentBackground(.hidden)
+        .background(Color.vibeContent)
         .environment(\.defaultMinListRowHeight, 20)
         .a11yCatalog(a11yId)
     }

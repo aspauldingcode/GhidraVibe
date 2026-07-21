@@ -1,22 +1,62 @@
+import AppKit
 import SwiftUI
 
-/// Startup → Workspace → Project Window / CodeBrowser chrome (native + Liquid Glass).
+/// Front End / tool chrome only. Splash is a separate `Window` scene — never morph here.
 struct ContentRootView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.vibeTheme) private var themes
+
+    private var restoreSize: CGSize {
+        switch model.toolMode {
+        case .codeBrowser, .debugger, .emulator, .versionTrackingTool:
+            return CGSize(
+                width: WindowChrome.codeBrowserSize.width,
+                height: WindowChrome.codeBrowserSize.height
+            )
+        default:
+            return CGSize(
+                width: WindowChrome.frontEndSize.width,
+                height: WindowChrome.frontEndSize.height
+            )
+        }
+    }
+
+    /// Stock Ghidra tool title 1:1 — never the app bundle name.
+    private var stockWindowTitle: String {
+        let mode = model.toolMode == .splash ? .projectWindow : model.toolMode
+        return WindowChrome.stockWindowTitle(
+            toolMode: mode,
+            programName: model.currentProgramName
+        )
+    }
 
     var body: some View {
+        // Observe Ghidra Theme so ProviderSurface / chrome redraw on change.
+        let _ = themes.revision
+        mainChrome
+            .background(themes.theme.vibeWindow)
+            .vibeUnifiedWindowChrome(
+                restoreSize: NSSize(width: restoreSize.width, height: restoreSize.height),
+                windowTitle: stockWindowTitle
+            )
+    }
+
+    private var mainChrome: some View {
         @Bindable var model = model
-        NavigationStack {
+        return NavigationStack {
             VStack(spacing: 0) {
                 Group {
                     switch model.toolMode {
                     case .splash:
-                        SplashView()
+                        // Separate splash window owns loading; main should already be past this.
+                        ProgressView("Opening…")
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                     case .workspacePicker:
                         WorkspacePickerView()
                     case .welcomeHelp:
                         WelcomeHelpView()
                     case .projectWindow:
+                        // Tool Chest is a section *inside* this view — not a separate window.
                         ProjectWindowView()
                     case .codeBrowser:
                         CodeBrowserDockView()
@@ -26,12 +66,15 @@ struct ContentRootView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(VibeChrome.ProviderSurface.content)
+                .vibeContainer(radius: VibeChrome.Radius.shell)
 
                 if model.toolMode == .projectWindow, let sheet = model.sheetProvider {
                     Divider()
                     ProviderSheetHost(kind: sheet)
                         .frame(minHeight: 160, idealHeight: 220, maxHeight: 320)
                         .layoutPriority(0)
+                        .vibeContainer(radius: VibeChrome.Radius.panel)
                 }
 
                 if model.toolMode != .splash {
@@ -39,9 +82,9 @@ struct ContentRootView: View {
                 }
             }
             .a11yContainerCatalog("ghidra.vibe.root")
-            .navigationTitle(model.toolMode.rawValue)
-            // Engine Status / Restart live in ProjectWindowView chrome (AX-stable).
-            // CodeBrowser keeps its own in-content toolbar.
+            .vibeContainer(radius: VibeChrome.Radius.shell)
+            .navigationTitle(stockWindowTitle)
+            .toolbarBackground(.automatic, for: .windowToolbar)
             .alert("Headless", isPresented: $model.showHeadlessHelp) {
                 Button("OK", role: .cancel) {}
                     .help("Dismiss headless help")
@@ -52,7 +95,8 @@ struct ContentRootView: View {
             .alert("Go To", isPresented: $model.showGoToAlert) {
                 TextField("Address or label", text: $model.goToDraft)
                 Button("Go") { model.performGoTo() }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.goto.go")
                 Button("Cancel", role: .cancel) {}
                     .a11yCatalog("ghidra.vibe.goto.cancel")
@@ -62,7 +106,8 @@ struct ContentRootView: View {
             .alert("Search Memory", isPresented: $model.showMemorySearchAlert) {
                 TextField("Hex / ASCII pattern", text: $model.memorySearchDraft)
                 Button("Search") { model.performMemorySearch() }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.search.memory.go")
                 Button("Cancel", role: .cancel) {}
                     .a11yCatalog("ghidra.vibe.search.memory.cancel")
@@ -91,6 +136,7 @@ struct StatusBar: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: model.taskMonitorActive)
+        .vibeStatusBarInset()
         .a11yContainerCatalog("ghidra.vibe.status.bar")
     }
 
@@ -106,14 +152,12 @@ struct StatusBar: View {
                 Spacer(minLength: 8)
                 Text(model.currentProgramName.isEmpty ? "No program" : model.currentProgramName)
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.vibeSecondary)
                     .lineLimit(1)
                 MCPStatusChip()
             }
             .vibeGlassBarBackground()
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
         .fixedSize(horizontal: false, vertical: true)
     }
 
@@ -131,8 +175,8 @@ struct StatusBar: View {
                         .tracking(0.6)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Color.orange.opacity(0.85), in: Capsule())
-                        .foregroundStyle(.white)
+                        .background(VibeChrome.ProviderSurface.warning.opacity(0.9), in: Capsule())
+                        .foregroundStyle(VibeChrome.ProviderSurface.window)
                         .a11yCatalog("ghidra.vibe.status.busy_badge")
 
                     Text(model.statusMessage)
@@ -144,29 +188,37 @@ struct StatusBar: View {
 
                     Text(model.taskMonitorElapsedLabel)
                         .font(.caption.monospacedDigit().weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.vibeSecondary)
                         .a11yCatalog("ghidra.vibe.status.elapsed")
 
                     Text(model.currentProgramName.isEmpty ? "No program" : model.currentProgramName)
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.vibeSecondary)
                         .lineLimit(1)
 
                     MCPStatusChip()
 
-                    if model.analysisBusy {
+                    if model.analysisBusy || model.dyldImportBusy {
                         Button {
-                            model.cancelAutoAnalyze()
+                            model.cancelTaskMonitorWork()
                         } label: {
                             Label("Cancel", systemImage: "xmark.circle.fill")
                                 .labelStyle(.titleAndIcon)
                                 .font(.caption.weight(.semibold))
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.orange)
+                        .tint(VibeChrome.ProviderSurface.warning)
                         .controlSize(.small)
-                        .help("Cancel Auto Analysis")
-                        .a11yCatalog("ghidra.vibe.status.cancel_analysis")
+                        .help(
+                            model.dyldImportBusy
+                                ? "Cancel DSC import (stops headless importer)"
+                                : "Cancel Auto Analysis"
+                        )
+                        .a11yCatalog(
+                            model.dyldImportBusy
+                                ? "ghidra.vibe.status.cancel_dsc"
+                                : "ghidra.vibe.status.cancel_analysis"
+                        )
                     }
                 }
                 .padding(.horizontal, 12)
@@ -175,24 +227,13 @@ struct StatusBar: View {
 
                 ProgressView()
                     .progressViewStyle(.linear)
-                    .tint(.orange)
+                    .tint(VibeChrome.ProviderSurface.warning)
                     .padding(.horizontal, 12)
                     .padding(.bottom, 10)
                     .a11yCatalog("ghidra.vibe.status.progress_bar")
             }
-            // Opaque task plate (not Liquid Glass) — stock Task Monitor must read as a
-            // content/status surface, not another glass chrome layer.
-            .background {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color(nsColor: .windowBackgroundColor))
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(Color.orange.opacity(0.7), lineWidth: 2)
-            }
-            .background(Color.orange.opacity(0.12))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
+            .vibeStatusTaskPlate()
+            .background(VibeChrome.ProviderSurface.control)
         }
     }
 }
@@ -219,7 +260,8 @@ struct ProviderSheetHost: View {
                     Text(kind.title).font(.headline)
                     Spacer()
                     Button("Close") { model.sheetProvider = nil }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.sheet.close")
                 }
                 .padding(.horizontal, 4)
@@ -228,7 +270,9 @@ struct ProviderSheetHost: View {
             Divider()
             // Content layer stays opaque (no glass-on-glass over listing/providers).
             ProviderView(kind: kind)
+                .background(VibeChrome.ProviderSurface.content)
         }
+        .background(VibeChrome.ProviderSurface.window)
         .a11yContainerCatalog(kind.a11yRoot)
     }
 }

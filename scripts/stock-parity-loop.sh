@@ -22,6 +22,7 @@ run "$ROOT/scripts/check-codebrowser-impl.sh"
 run "$ROOT/scripts/check-liquid-glass.sh"
 run "$ROOT/scripts/check-stock-tracked-gaps.sh"
 run "$ROOT/scripts/check-capability-matrix.sh"
+run "$ROOT/scripts/check-stock-help.sh"
 if [[ "$fail" -ne 0 ]]; then
   echo "Stock parity loop: FAIL — fix list above and re-run" >&2
   exit 1

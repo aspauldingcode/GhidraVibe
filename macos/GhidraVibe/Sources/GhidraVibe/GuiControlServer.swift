@@ -92,7 +92,7 @@ final class GuiControlServer {
                     connection.cancel()
                     return
                 }
-                let response = self.route(httpRequest: req)
+                let response = await self.route(httpRequest: req)
                 let payload = response.data(using: .utf8) ?? Data()
                 connection.send(
                     content: payload,
@@ -102,7 +102,7 @@ final class GuiControlServer {
         }
     }
 
-    private func route(httpRequest: String) -> String {
+    private func route(httpRequest: String) async -> String {
         let lines = httpRequest.split(separator: "\r\n", omittingEmptySubsequences: false).map(String.init)
         guard let requestLine = lines.first else { return httpJSON(400, ["ok": false, "error": "bad request"]) }
         let parts = requestLine.split(separator: " ")
@@ -188,15 +188,20 @@ final class GuiControlServer {
             return httpJSON(200, [
                 "ok": true,
                 "agentEnabled": model.agentEnabled,
+                "leftSidebarVisible": model.dockLayout.leftSidebarVisible,
                 "agentSidebarVisible": model.dockLayout.agentSidebarVisible,
                 "agentBusy": model.agentBusy,
                 "agentBackend": model.agentBackend,
                 "agentModel": model.agentModel,
                 "agentBaseURL": model.agentBaseURL,
+                "agentMode": model.agentInteractionMode.rawValue,
+                "agentQueueCount": model.agentSendQueue.count,
                 "pendingEdits": model.agentPendingEdits.count,
                 "messageCount": model.agentMessages.count,
                 "lastMessage": String(model.agentMessages.last?.text.prefix(500) ?? ""),
                 "jspaceStatus": model.jspaceStatus,
+                "theme": ThemeStore.shared.ghidraThemeName,
+                "ghidraTheme": ThemeStore.shared.ghidraThemeName,
                 "state": model.controlState(),
             ])
         case ("POST", "/agent/playbook"):
@@ -234,6 +239,62 @@ final class GuiControlServer {
                 apply: (json["apply"] as? Bool) ?? (json["apply"] as? NSNumber)?.boolValue ?? false
             )
             return httpJSON(200, ["ok": true, "started": true, "state": model.controlState()])
+        case ("GET", "/agent/permissions"):
+            return httpJSON(200, [
+                "ok": true,
+                "permissions": AgentToolPermissionStore.shared.controlState(),
+            ])
+        case ("POST", "/agent/permissions/reset"):
+            model.resetAgentToolPermissions()
+            return httpJSON(200, [
+                "ok": true,
+                "permissions": AgentToolPermissionStore.shared.controlState(),
+            ])
+        case ("POST", "/agent/permissions"):
+            if let profileRaw = json["profile"] as? String,
+               let profile = AgentToolPermissionProfile(rawValue: profileRaw)
+            {
+                model.setAgentToolPermissionProfile(profile)
+            }
+            if let sandbox = json["sandbox"] as? Bool {
+                AgentToolPermissionStore.shared.sandboxEnabled = sandbox
+            } else if let n = json["sandbox"] as? NSNumber {
+                AgentToolPermissionStore.shared.sandboxEnabled = n.boolValue
+            }
+            if let tool = json["tool"] as? String, let decisionRaw = json["decision"] as? String {
+                switch decisionRaw {
+                case "alwaysAllow", "allow_always":
+                    AgentToolPermissionStore.shared.record(tool: tool, decision: .alwaysAllow)
+                case "allowSession", "allow_session":
+                    AgentToolPermissionStore.shared.record(tool: tool, decision: .allowSession)
+                case "deny", "alwaysDeny":
+                    AgentToolPermissionStore.shared.setAlwaysDeny(tool: tool)
+                default:
+                    break
+                }
+            }
+            return httpJSON(200, [
+                "ok": true,
+                "permissions": AgentToolPermissionStore.shared.controlState(),
+            ])
+        case ("POST", "/agent/tool"):
+            let name = (json["name"] as? String) ?? (json["tool"] as? String) ?? ""
+            guard !name.isEmpty else {
+                return httpJSON(400, ["ok": false, "error": "name required"])
+            }
+            let args = (json["args"] as? [String: Any])
+                ?? (json["arguments"] as? [String: Any])
+                ?? [:]
+            let autoApprove = (json["auto_approve"] as? Bool)
+                ?? (json["auto_approve"] as? NSNumber)?.boolValue
+                ?? false
+            let toolResult = await model.executeAgentTool(
+                name: name,
+                args: args,
+                promptIfNeeded: false,
+                autoApprove: autoApprove
+            )
+            return httpBody(200, toolResult, contentType: "application/json")
         case ("GET", "/a11y/catalog"):
             if let text = A11yCatalog.catalogJSONString() {
                 return httpBody(200, text, contentType: "application/json")

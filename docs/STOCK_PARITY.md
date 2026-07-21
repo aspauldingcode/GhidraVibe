@@ -63,6 +63,8 @@ python3 scripts/extract-stock-universe.py
 4. Every stock `disabled_honest` ∈ `TRACKED_GAPS.json`
 5. CodeBrowser liquid-glass / a11y gates
 6. Capability matrix covers every stock wired id + universe module (`check-capability-matrix.sh`)
+7. Stock Help corpus extract (`check-stock-help.sh`: ≥200 articles, ≥70 tips, TOC/map);
+   F1/context Help maps providers → `map.json`; Linux shares the same bundle
 
 ## Implementation waves
 

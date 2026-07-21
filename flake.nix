@@ -270,6 +270,29 @@
             '';
 
           srcRoot = ./.;
+          agentModels = import ./nix/agent/models.nix;
+          # Pull declarative Ollama tags (weights stay in Ollama's store — never in Nix).
+          agentEnsureModels = pkgs.writeShellApplication {
+            name = "ghidra-vibe-agent-ensure-models";
+            runtimeInputs = [ pkgs.ollama ];
+            text = ''
+              set -euo pipefail
+              if ! command -v ollama >/dev/null 2>&1; then
+                echo "ollama not found — install Ollama or use llama.cpp GGUF drops." >&2
+                exit 1
+              fi
+              models=(
+                ${pkgs.lib.concatMapStringsSep "\n                " (m: "\"${m}\"") agentModels.ollamaEnsureModels}
+              )
+              echo "Ensuring Ollama models from nix/agent/models.nix (no weights in flake)…"
+              for m in "''${models[@]}"; do
+                echo "→ ollama pull $m"
+                ollama pull "$m"
+              done
+              echo "Default model: ${agentModels.defaultModel}"
+              ollama list
+            '';
+          };
         in
         {
           packages = {
@@ -280,6 +303,7 @@
             extract = extractDyld;
             dyld = dyldHelper;
             mcp-headless = mcpHeadlessHelper;
+            ghidra-vibe-agent-ensure-models = agentEnsureModels;
           }
           // pkgs.lib.optionalAttrs (ghidraVibeApp != null) {
             ghidra-vibe-app = ghidraVibeApp;

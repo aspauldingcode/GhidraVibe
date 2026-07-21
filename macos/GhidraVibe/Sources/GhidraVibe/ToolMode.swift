@@ -119,12 +119,19 @@ enum ProviderKind: String, CaseIterable, Identifiable {
     static let consoleStack: [ProviderKind] = [.console, .bookmarks]
 
     /// Window menu extras (excludes default dock + bottom strip — those are listed explicitly).
+    /// Agent is omitted — it is a trailing sidebar, not a modular Window provider.
     static var windowMenuOrder: [ProviderKind] {
         allCases.filter {
             !defaultDocked.contains($0)
                 && !bottomStrip.contains($0)
                 && $0 != .versionTracking
+                && $0 != .agent
         }
+    }
+
+    /// All CodeBrowser modules shown in the leading Modules palette / Window menu.
+    static var modularWindowModules: [ProviderKind] {
+        allCases.filter(\.isModularDockProvider)
     }
 
     /// Stock CodeBrowser.tool right-stack providers (before vibe More… panes).
@@ -134,4 +141,9 @@ enum ProviderKind: String, CaseIterable, Identifiable {
     ]
 
     var isCoreDocked: Bool { Self.defaultDocked.contains(self) }
+
+    /// Dockable / floatable CodeBrowser providers (Agent is trailing-sidebar only).
+    var isModularDockProvider: Bool {
+        self != .agent && self != .versionTracking
+    }
 }

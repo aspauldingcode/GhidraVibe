@@ -55,23 +55,27 @@ struct MalimiteAnalysisView: View {
                 .a11yCatalog("ghidra.vibe.provider.apple_bundle.path")
             Text(model.malimiteInfoSummary)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.vibeSecondary)
             LiquidGlass.Bar(spacing: 8) {
                 HStack(spacing: 8) {
                     Button("Open IPA / App…") { model.openAppBundlePicker() }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.apple_bundle.open")
                         .help("Open a whole .app / IPA / framework bundle")
                     Button("Analyze Bundle") { model.runMalimiteAnalyze(binOnly: false) }
-                        .buttonStyle(.glassProminent)
+                        .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.apple_bundle.import")
                         .disabled(model.appleBundlePath.isEmpty)
                         .help("Full app-bundle analysis: resources, class dump, refs")
                     Button("List resources") { model.listAppleResources() }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.apple_bundle.resources")
                     Button("Refresh DB") { model.refreshMalimiteDB() }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.apple_bundle.refresh_db")
                 }
             }
@@ -79,7 +83,7 @@ struct MalimiteAnalysisView: View {
                 .font(.caption2.monospaced())
             Text(model.malimiteStatsText)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.vibeSecondary)
             Spacer()
         }
         .padding(8)
@@ -92,6 +96,7 @@ struct MalimiteAnalysisView: View {
                 Text(row).font(.caption.monospaced())
             }
             .a11yCatalog("ghidra.vibe.provider.swift_classes.list")
+                .vibeThemedList()
             .frame(minWidth: 160)
             .onChange(of: model.selectedMalimiteClass) { _, row in
                 if let row { model.loadMalimiteClassFunctions(row) }
@@ -122,7 +127,7 @@ struct MalimiteAnalysisView: View {
         if !syms.locals.isEmpty {
             Text("Locals (SyntaxParser parity): \(syms.locals.prefix(8).joined(separator: ", "))")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.vibeSecondary)
                 .padding(.horizontal, 6)
                 .lineLimit(2)
         }
@@ -133,6 +138,7 @@ struct MalimiteAnalysisView: View {
             Text(row).font(.caption.monospaced())
         }
         .a11yCatalog("ghidra.vibe.provider.apple_bundle.list")
+                .vibeThemedList()
     }
 
     private var stringsPane: some View {
@@ -151,6 +157,7 @@ struct MalimiteAnalysisView: View {
             .buttonStyle(.plain)
             .font(.caption.monospaced())
             .a11yCatalog("ghidra.vibe.provider.apple_bundle.entrypoint.go")
+                .vibeThemedList()
             .help("Go to entrypoint \(row)")
         }
         .onAppear { model.refreshMalimiteEntrypoints() }
@@ -172,14 +179,16 @@ struct MalimiteAnalysisView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Skip decompiling these library namespaces (stock library skip-list).")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.vibeSecondary)
             LiquidGlass.Bar(spacing: 8) {
                 HStack {
                     Button("Reload") { model.refreshMalimiteLibraries() }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.apple_bundle.libraries.reload")
                     Button("Reset defaults") { model.resetMalimiteLibraries() }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.apple_bundle.libraries.reset")
                 }
             }
@@ -194,7 +203,7 @@ struct MalimiteAnalysisView: View {
         return VStack(alignment: .leading, spacing: 8) {
             Text("LLM actions: Auto Fix → Swift/ObjC, Summarize, Find Vulnerabilities.")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.vibeSecondary)
             Picker("Action", selection: $model.malimiteTranslateAction) {
                 Text("Auto Fix").tag("auto_fix")
                 Text("Summarize").tag("summarize")
@@ -211,21 +220,25 @@ struct MalimiteAnalysisView: View {
                     Button("Load current decompile") {
                         model.malimiteTranslateInput = model.decompiledText
                     }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.provider.apple_bundle.translate.load_decompile")
                     Button("Load DB function") {
                         model.malimiteTranslateInput = model.malimiteFunctionCode
                     }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.provider.apple_bundle.translate.load_db")
                     Button("Run Translate") { model.runMalimiteTranslate() }
-                        .buttonStyle(.glassProminent)
+                        .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.apple_bundle.translate.run")
                     Button("Send to Agent") {
                         model.agentDraft = model.malimiteTranslateOutput
                         model.showProvider(.agent)
                     }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.provider.apple_bundle.translate.to_agent")
                 }
             }

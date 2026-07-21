@@ -184,6 +184,7 @@ enum AgentMoERouter {
 
         if wantsCloud && moe.allowCloudEscalation && base.apiKey != nil {
             let cloud = LocalAIConfig.resolve(
+                provider: .openai,
                 userBaseURL: nil,
                 userModel: moe.enabled ? moe.model(for: role, fallback: base.model) : base.model,
                 apiKeyFile: nil,
@@ -194,7 +195,8 @@ enum AgentMoERouter {
                 baseURL: cloud.baseURL,
                 model: cloud.model,
                 apiKey: base.apiKey ?? cloud.apiKey,
-                backend: .openaiCompat
+                backend: cloud.backend,
+                provider: cloud.provider
             )
             escalated = true
         }
@@ -215,6 +217,7 @@ enum AgentMoERouter {
     ) -> LocalAIConfig? {
         guard moe.allowCloudEscalation, let key = local.apiKey, !key.isEmpty else { return nil }
         let cloud = LocalAIConfig.resolve(
+            provider: .openai,
             userModel: moe.model(for: role, fallback: local.model),
             preferCloud: true
         )
@@ -222,7 +225,8 @@ enum AgentMoERouter {
             baseURL: cloud.baseURL,
             model: cloud.model,
             apiKey: key,
-            backend: .openaiCompat
+            backend: cloud.backend,
+            provider: cloud.provider
         )
     }
 }

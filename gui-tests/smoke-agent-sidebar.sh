@@ -14,12 +14,35 @@ from pathlib import Path
 text = Path(r"$BRIDGE").read_text()
 assert "agent_send" in text and "agent_status" in text and "agent_playbook" in text
 print("OK bridge agent tools present")
+# Mode / mention chip a11y ids from Agent Chat overhaul
+swift = Path(r"$REPO_ROOT/macos/GhidraVibe/Sources/GhidraVibe")
+blob = "\n".join(p.read_text(errors="ignore") for p in swift.glob("Agent*.swift"))
+for aid in (
+    "ghidra.vibe.agent.mode",
+    "ghidra.vibe.agent.model_picker",
+    "ghidra.vibe.agent.mention_chip",
+    "ghidra.vibe.agent.plan_card",
+):
+    assert aid in blob, aid
+print("OK agent mode/mention/plan a11y ids present")
 PY
 
 # Optional: GuiControl live
 if curl -fsS --max-time 2 "$GUI_URL/health" >/dev/null 2>&1; then
   st="$(curl -fsS --max-time 5 "$GUI_URL/agent/status")"
-  echo "$st" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d.get("ok") is True; print("OK /agent/status")'
+  echo "$st" | python3 -c '
+import json,sys
+d=json.load(sys.stdin)
+assert d.get("ok") is True
+# Mode / theme fields from Agent Chat overhaul (optional when older binary)
+mode = d.get("agentMode") or (d.get("state") or {}).get("agentMode")
+if mode is not None:
+    assert mode in {"ask","agent","plan","debug","multitask"}, mode
+    print("OK /agent/status mode=", mode)
+else:
+    print("OK /agent/status (mode field absent — older binary)")
+print("OK /agent/status")
+'
   # Soft send — should queue even without Ollama
   curl -fsS --max-time 5 -X POST -H 'Content-Type: application/json' \
     -d '{"text":"smoke: list functions briefly"}' \

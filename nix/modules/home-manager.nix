@@ -19,13 +19,18 @@ in
       GHIDRA_MCP_URL = cfg.mcp.ghidraServer;
       GHIDRA_VIBE_GUI_URL = cfg.mcp.guiControl;
       GHIDRA_VIBE_AI = if cfg.agent.enable then "1" else "0";
+      GHIDRA_VIBE_AI_PROVIDER = cfg.agent.provider;
       GHIDRA_VIBE_AI_BASE_URL = cfg.agent.baseUrl;
       GHIDRA_VIBE_AI_MODEL = cfg.agent.model;
+      GHIDRA_VIBE_AI_CLOUD_PROVIDER = cfg.agent.cloudProvider;
       GHIDRA_VIBE_AI_MOE = if cfg.agent.moe.enable then "1" else "0";
       GHIDRA_VIBE_AI_MOE_CLOUD = if cfg.agent.moe.allowCloudEscalation then "1" else "0";
     }
     // lib.optionalAttrs (cfg.agent.apiKeyFile != null) {
       GHIDRA_VIBE_API_KEY_FILE = toString cfg.agent.apiKeyFile;
+    }
+    // lib.optionalAttrs (cfg.agent.modelsDir != null) {
+      GHIDRA_VIBE_AI_MODELS_DIR = cfg.agent.modelsDir;
     }
     // lib.optionalAttrs (cfg.agent.moe.codeModel != null) {
       GHIDRA_VIBE_AI_MODEL_CODE = cfg.agent.moe.codeModel;

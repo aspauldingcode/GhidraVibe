@@ -8,11 +8,23 @@ gui-tests/a11y-id-catalog.txt
 .ghidra-vibe-projects/
 ghidra-vibe-projects/
 .ghidra-vibe-jspace/
+# User-dropped local LLM weights (never commit / never Nix-store)
+models/
+*.gguf
+*.ccp
 *.log
 .idea/
 .vscode/
 *~
 __pycache__/
+
+# Generated stock Help corpus (package-time extract; keep README)
+native-ui/help/*
+!native-ui/help/README.md
+
+# Local / CI packaging output
+dist/
+*.dmg
 
 # Rust build artifacts
 rust/target/

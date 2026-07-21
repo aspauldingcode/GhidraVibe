@@ -3,9 +3,9 @@ import SwiftUI
 /// 1:1 Project Window (FrontEndTool) layout — top→bottom matches stock
 /// (`native-ui/parity/FrontEnd.chrome.json`). Liquid Glass on chrome only.
 ///
-/// Resize policy (no redesign): fixed chrome strips keep their stock look;
-/// Active Project absorbs height; toolbars clip/scroll only when the window
-/// is narrower than the stock control row.
+/// Stock order (unchanged): unified toolbar → Tool Chest → Active Project
+/// (tabs / Filter / tree|table / New·Open·Import·Open Program) → Running Tools → Log.
+/// Resize: Active Project absorbs height; no control relocation.
 struct ProjectWindowView: View {
     @Environment(AppModel.self) private var model
     @State private var projectTab: ProjectDataTab = .tree
@@ -20,89 +20,113 @@ struct ProjectWindowView: View {
     var body: some View {
         @Bindable var model = model
         VStack(spacing: 0) {
-            frontEndToolbar
-                .fixedSize(horizontal: false, vertical: true)
-            Divider()
             toolChest
                 .fixedSize(horizontal: false, vertical: true)
-            Divider()
             activeProject
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .layoutPriority(1)
-            Divider()
             runningToolsRow
                 .fixedSize(horizontal: false, vertical: true)
-            Divider()
             logPanel
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .a11yContainerCatalog("ghidra.vibe.project")
-    }
-
-    // MARK: Docking toolbar (VC + Refresh) — same slots as FrontEndPlugin
-
-    private var frontEndToolbar: some View {
-        LiquidGlass.Bar(spacing: 6) {
-            // Horizontal scroll only when narrower than the stock icon row —
-            // at default width this reads identically to a plain HStack.
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    ForEach(Self.vcActions, id: \.0) { title, symbol, id in
-                        GlassToolbarButton(id: id, systemImage: symbol, label: title) {
-                            let act = id.split(separator: ".").last.map(String.init) ?? "refresh_vc"
-                            model.runAction(id: act == "refresh" ? "refresh_vc" : act)
-                        }
+        // Narrow windows (macOS 26): trailing More… mirrors every toolbar action.
+        // Adopt `.visibilityPriority` + `ToolbarOverflowMenu` when building with macOS 27 SDK.
+        .toolbar {
+            ToolbarItemGroup(placement: .navigation) {
+                ForEach(Array(UnifiedToolbars.projectWindow.prefix(6)), id: \.id) { item in
+                    UnifiedToolbarButton(id: item.id, systemImage: item.symbol, label: item.label) {
+                        projectToolbarAction(item.id)
                     }
-                    GlassToolbarButton(
-                        id: "ghidra.vibe.project.toolbar.refresh",
-                        systemImage: "arrow.clockwise",
-                        label: "Refresh"
+                }
+            }
+
+            ToolbarSpacer(.fixed, placement: .navigation)
+
+            ToolbarItemGroup(placement: .navigation) {
+                if let refresh = UnifiedToolbars.projectWindow[safe: 6] {
+                    UnifiedToolbarButton(
+                        id: refresh.id,
+                        systemImage: refresh.symbol,
+                        label: refresh.label
                     ) {
-                        model.refreshProjectPrograms()
-                        model.refreshRecentProjects()
-                        model.statusMessage = "Refreshed project data"
+                        projectToolbarAction(refresh.id)
                     }
                     .keyboardShortcut("r", modifiers: [])
-                    Divider().frame(height: 18)
-                    // In-content (not NSToolbar) so AX ids are stable for smokes / GuiControl.
-                    GlassToolbarButton(
-                        id: "ghidra.vibe.toolbar.mcp_health",
-                        systemImage: "heart.text.square",
-                        label: "Engine Status"
-                    ) {
-                        model.refreshMCPHealth()
-                    }
-                    GlassToolbarButton(
-                        id: "ghidra.vibe.toolbar.start_mcp",
-                        systemImage: "bolt.horizontal.circle",
-                        label: "Restart Engine"
-                    ) {
-                        model.ensureProgramEngineRunning()
-                    }
-                    .a11yCatalog("ghidra.vibe.project.start_mcp")
-                    Spacer(minLength: 0)
                 }
-                .vibeGlassBarBackground()
+            }
+
+            ToolbarSpacer(.fixed, placement: .navigation)
+
+            ToolbarItemGroup(placement: .navigation) {
+                UnifiedToolbarButton(
+                    id: "ghidra.vibe.toolbar.mcp_health",
+                    systemImage: "heart.text.square",
+                    label: "Engine Status"
+                ) {
+                    projectToolbarAction("ghidra.vibe.toolbar.mcp_health")
+                }
+                UnifiedToolbarButton(
+                    id: "ghidra.vibe.toolbar.start_mcp",
+                    systemImage: "bolt.horizontal.circle",
+                    label: "Restart Engine"
+                ) {
+                    projectToolbarAction("ghidra.vibe.toolbar.start_mcp")
+                }
+                .a11yCatalog("ghidra.vibe.project.start_mcp")
+            }
+
+            ToolbarSpacer(.fixed, placement: .primaryAction)
+
+            ToolbarItemGroup(placement: .primaryAction) {
+                Menu {
+                    Section("Version Control") {
+                        ForEach(Array(UnifiedToolbars.projectWindow.prefix(6)), id: \.id) { item in
+                            Button(item.label) { projectToolbarAction(item.id) }
+                        }
+                    }
+                    if let refresh = UnifiedToolbars.projectWindow[safe: 6] {
+                        Button(refresh.label) { projectToolbarAction(refresh.id) }
+                    }
+                    Section("Engine") {
+                        Button("Engine Status") {
+                            projectToolbarAction("ghidra.vibe.toolbar.mcp_health")
+                        }
+                        Button("Restart Engine") {
+                            projectToolbarAction("ghidra.vibe.toolbar.start_mcp")
+                        }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+                .help("More Project Window tools (includes actions clipped on narrow windows)")
+                .accessibilityIdentifier("ghidra.vibe.project.toolbar.more")
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
     }
 
-    private static let vcActions: [(String, String, String)] = [
-        ("Add to Version Control", "plus.rectangle.on.folder", "ghidra.vibe.project.toolbar.vc_add"),
-        ("CheckOut", "arrow.down.doc", "ghidra.vibe.project.toolbar.vc_checkout"),
-        ("Update", "arrow.triangle.2.circlepath", "ghidra.vibe.project.toolbar.vc_update"),
-        ("CheckIn", "arrow.up.doc", "ghidra.vibe.project.toolbar.vc_checkin"),
-        ("UndoCheckOut", "arrow.uturn.backward", "ghidra.vibe.project.toolbar.vc_undo"),
-        ("Find Checkouts", "magnifyingglass", "ghidra.vibe.project.toolbar.vc_find"),
-    ]
+    private func projectToolbarAction(_ id: String) {
+        switch id {
+        case "ghidra.vibe.project.toolbar.refresh":
+            model.refreshProjectPrograms()
+            model.refreshRecentProjects()
+            model.statusMessage = "Refreshed project data"
+        case "ghidra.vibe.toolbar.mcp_health":
+            model.refreshMCPHealth()
+        case "ghidra.vibe.toolbar.start_mcp":
+            model.ensureProgramEngineRunning()
+        default:
+            let act = id.split(separator: ".").last.map(String.init) ?? "refresh_vc"
+            model.runAction(id: act == "refresh" ? "refresh_vc" : act)
+        }
+    }
 
     // MARK: Tool Chest
 
     private var toolChest: some View {
-        GroupBox("Tool Chest") {
+        stockSection("Tool Chest") {
             LiquidGlass.Bar(spacing: 20) {
                 HStack(spacing: 20) {
                     // Stock FrontEnd ProjectToolBar: alphabetical tool-chest order
@@ -140,10 +164,7 @@ struct ProjectWindowView: View {
                     Spacer(minLength: 0)
                 }
             }
-            .padding(6)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
     }
 
     // MARK: Active Project
@@ -153,24 +174,17 @@ struct ProjectWindowView: View {
         let title = model.projectPath.isEmpty
             ? "Active Project: "
             : "Active Project: \(URL(fileURLWithPath: model.projectPath).deletingPathExtension().lastPathComponent)"
-        return GroupBox(title) {
-            VStack(spacing: 0) {
+        return stockSection(title) {
+            VStack(spacing: VibeChrome.Space.sm) {
                 Picker("", selection: $projectTab) {
                     ForEach(ProjectDataTab.allCases) { tab in
                         Text(tab.rawValue).tag(tab)
                     }
                 }
                 .pickerStyle(.segmented)
-                .padding(6)
                 .accessibilityIdentifier("ghidra.vibe.project.data_tabs")
 
-                HStack {
-                    Text("Filter:")
-                    TextField("Filter", text: $projectFilter)
-                        .textFieldStyle(.roundedBorder)
-                        .a11yCatalog("ghidra.vibe.project.filter")
-                }
-                .padding(.horizontal, 8)
+                projectFilterRow
 
                 Group {
                     switch projectTab {
@@ -209,39 +223,104 @@ struct ProjectWindowView: View {
                                 Text(model.projectPath)
                                     .lineLimit(1)
                                     .truncationMode(.middle)
-                                    .foregroundStyle(.secondary)
-                                Text("Program").foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.vibeSecondary)
+                                Text("Program").foregroundStyle(Color.vibeSecondary)
                             }
                             .font(.caption)
                             .accessibilityIdentifier("ghidra.vibe.project.row.\(name)")
                         }
+                        .listStyle(.inset)
+                .vibeThemedList()
+                        .scrollContentBackground(.hidden)
                         .a11yCatalog("ghidra.vibe.project.tree")
                     }
                 }
-                // Stock look at default size; list is the only flex region when shrinking.
+                // Rounded nested plate under Project Window shell. Explicit continuous radius —
+                // ConcentricRectangle alone collapsed to sharp after stockSection was flattened
+                // (no panel containerShape for the List's square AppKit chrome to nest under).
                 .frame(minHeight: 80, maxHeight: .infinity)
+                .padding(VibeChrome.Space.xs)
+                .vibeProviderShell(radius: VibeChrome.Radius.panel)
+                .overlay {
+                    VibeChrome.rounded(VibeChrome.Radius.panel)
+                        .strokeBorder(VibeChrome.ProviderSurface.separator.opacity(0.55), lineWidth: 1)
+                }
+                .vibeContainer(radius: VibeChrome.Radius.panel)
 
-                LiquidGlass.Bar(spacing: 8) {
-                    HStack(spacing: 8) {
+                LiquidGlass.Bar(spacing: VibeChrome.Space.md) {
+                    HStack(spacing: VibeChrome.Space.md) {
                         Button("New Project...") { model.newProject() }
-                            .buttonStyle(.glass)
+                            .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.project.new")
                         Button("Open Project...") { model.openProjectPicker() }
-                            .buttonStyle(.glass)
+                            .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.project.open")
                         Button("Import File...") { model.importFilePicker() }
-                            .buttonStyle(.glass)
+                            .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.project.import")
                         Button("Open Program") { model.openSelectedProgram() }
-                            .buttonStyle(.glassProminent)
+                            .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                             .a11yCatalog("ghidra.vibe.project.open_program")
                         Spacer(minLength: 0)
                     }
                 }
-                .padding(6)
             }
         }
-        .padding(.horizontal, 8)
+    }
+
+    /// Stock “Filter:” above the tree — concentric field nest (not AppKit roundedBorder).
+    private var projectFilterRow: some View {
+        HStack(alignment: .center, spacing: VibeChrome.Space.sm) {
+            Text("Filter:")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(Color.vibeSecondary)
+                .fixedSize()
+
+            HStack(spacing: VibeChrome.Space.sm) {
+                Image(systemName: "line.3.horizontal.decrease")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.vibeSecondary)
+                    .accessibilityHidden(true)
+
+                TextField("Filter", text: $projectFilter)
+                    .textFieldStyle(.plain)
+                    .font(.body)
+                    .a11yCatalog("ghidra.vibe.project.filter")
+
+                if !projectFilter.isEmpty {
+                    Button {
+                        projectFilter = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 12))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(Color.vibeSecondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Clear filter")
+                    .accessibilityLabel("Clear filter")
+                }
+            }
+            .padding(.horizontal, VibeChrome.Space.lg)
+            .padding(.vertical, VibeChrome.Space.sm)
+            .frame(maxWidth: .infinity, minHeight: 28, alignment: .leading)
+            .glassEffect(
+                .regular.interactive(),
+                in: VibeChrome.concentric(minimum: VibeChrome.Radius.dock)
+            )
+            .containerShape(
+                .rect(cornerRadius: VibeChrome.nested(
+                    outer: VibeChrome.Radius.panel,
+                    padding: VibeChrome.Space.md
+                ))
+            )
+        }
+        .padding(.horizontal, VibeChrome.Space.xxs)
+        .accessibilityElement(children: .contain)
     }
 
     private var filteredPrograms: [String] {
@@ -253,23 +332,26 @@ struct ProjectWindowView: View {
     // MARK: Running Tools + Workspace
 
     private var runningToolsRow: some View {
-        GroupBox("Running Tools") {
+        stockSection("Running Tools") {
             HStack {
                 if model.toolMode == .debugger {
                     Button("Debugger") { model.openDebugger() }
-                        .buttonStyle(.glassProminent)
+                        .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.project.running_debugger")
                 } else if model.toolMode == .emulator {
                     Button("Emulator") { model.openEmulator() }
-                        .buttonStyle(.glassProminent)
+                        .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.project.running_emulator")
                 } else if model.toolMode == .versionTrackingTool {
                     Button("Version Tracking") { model.openVersionTracking() }
-                        .buttonStyle(.glassProminent)
+                        .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.project.running_vt")
                 } else if model.currentProgramName.isEmpty && model.toolMode != .codeBrowser {
                     Text("(none)")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.vibeSecondary)
                         .font(.caption)
                 } else {
                     Button {
@@ -282,7 +364,8 @@ struct ProjectWindowView: View {
                         )
                         .lineLimit(1)
                     }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.project.running_codebrowser")
                 }
                 Spacer(minLength: 8)
@@ -292,24 +375,21 @@ struct ProjectWindowView: View {
                 .frame(minWidth: 120, idealWidth: 200, maxWidth: 200)
                 .a11yCatalog("ghidra.vibe.project.workspace_picker")
             }
-            .padding(6)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
         .a11yCatalog("ghidra.vibe.project.body.running_tools_workspace_combo")
     }
 
-    // MARK: LogPanel (FrontEnd status window — not docking StatusBar)
+    // MARK: LogPanel (FrontEnd in-content log strip — concentric with shell; StatusBar is separate)
 
     private var logPanel: some View {
-        LiquidGlass.Bar(spacing: 8) {
-            HStack(spacing: 10) {
+        LiquidGlass.Bar(spacing: VibeChrome.Space.md) {
+            HStack(spacing: VibeChrome.Space.lg) {
                 if model.taskMonitorActive {
                     ProgressView()
                         .controlSize(.small)
                     Text(model.taskMonitorTitle.uppercased())
                         .font(.caption2.weight(.bold))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Color.vibeWarning)
                 }
                 Text(model.consoleText.split(separator: "\n").last.map(String.init) ?? model.statusMessage)
                     .font(model.taskMonitorActive ? .caption.weight(.medium) : .caption.monospaced())
@@ -328,8 +408,33 @@ struct ProjectWindowView: View {
             }
             .vibeGlassBarBackground()
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .vibeStatusBarInset()
+    }
+
+    /// Labeled FrontEnd section (stock GroupBox title strings).
+    /// Flat in-window strip — not a nested “card window” (Tool Chest lives *inside* Project Window).
+    @ViewBuilder
+    private func stockSection<Content: View>(
+        _ title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: VibeChrome.Space.sm) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.vibeSecondary)
+                .padding(.horizontal, VibeChrome.Space.md)
+
+            content()
+                .padding(.horizontal, VibeChrome.Space.md)
+                .padding(.vertical, VibeChrome.Space.sm)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.vertical, VibeChrome.Space.xs)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(VibeChrome.ProviderSurface.separator)
+                .frame(height: 1)
+        }
     }
 
     private func toolButton(_ title: String, _ symbol: String, _ id: String, action: @escaping () -> Void) -> some View {
@@ -337,16 +442,16 @@ struct ProjectWindowView: View {
         // `.background { …glassEffect }` on Tahoe composites the material *over* the
         // SF Symbol. Avoid `.interactive` glass inside Button — it steals AX/click hits.
         Button(action: action) {
-            VStack(spacing: 6) {
+            VStack(spacing: VibeChrome.Space.sm) {
                 Image(systemName: symbol)
                     .font(.system(size: 26))
                     .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color.vibeForeground)
                     .frame(width: 52, height: 52)
-                    .glassEffect(.regular, in: .rect(cornerRadius: 12))
+                    .glassEffect(.regular, in: VibeChrome.rounded(VibeChrome.Radius.well))
                 Text(title)
                     .font(.caption2)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color.vibeForeground)
             }
             .contentShape(Rectangle())
         }

@@ -98,37 +98,65 @@ def gui_http(method: str, path: str, body: dict | None = None) -> Any:
 def _run_dyld(args: list[str], env: dict[str, str] | None = None) -> dict[str, Any]:
     helper = os.environ.get("GHIDRA_VIBE_DYLD", "ghidra-vibe-dyld")
     run_env = os.environ.copy()
+    # Ensure headless/JVM can run when vibe MCP was started with a thin GUI env.
+    for key in (
+        "GHIDRA_INSTALL_DIR",
+        "JAVA_HOME",
+        "GHIDRA_VIBE_HEADLESS",
+        "GHIDRA_VIBE_SCRIPT_PATH",
+        "GHIDRA_VIBE_DSC_INDEX",
+        "GHIDRA_VIBE_MAXMEM",
+        "MAXMEM",
+        "GHIDRA_VIBE_DSC_LOG_DIR",
+    ):
+        val = os.environ.get(key)
+        if val:
+            run_env.setdefault(key, val)
     if env:
         run_env.update(env)
+    # AppKit-class imports regularly exceed 10 minutes on first open.
+    timeout_s = int(os.environ.get("GHIDRA_VIBE_DYLD_TIMEOUT", "900"))
     try:
         proc = subprocess.run(
             [helper, *args],
             capture_output=True,
             text=True,
-            timeout=600,
+            timeout=timeout_s,
             check=False,
             env=run_env,
         )
     except FileNotFoundError:
         # Fallback: pure Python index for list/find
         return _dyld_python_fallback(args)
+    except subprocess.TimeoutExpired as e:
+        out = ((e.stdout or "") + (e.stderr or "")) if isinstance(e.stdout, str) else ""
+        return _json_err(
+            f"dyld timed out after {timeout_s}s — see ~/Library/Logs/GhidraVibe/dsc-import-latest.log",
+            text=out or str(e),
+        )
     except Exception as e:  # noqa: BLE001
         return _json_err(str(e))
     out = (proc.stdout or "") + (proc.stderr or "")
-    if proc.returncode != 0 and "OK" not in out:
+    if proc.returncode != 0 and "OK:" not in out and "OK: imported" not in out:
         # try python fallback for list/find
         fb = _dyld_python_fallback(args)
         if fb.get("ok"):
             return fb
         return _json_err(out.strip() or f"exit {proc.returncode}", text=out)
-    lines = [ln for ln in proc.stdout.splitlines() if ln.strip()]
+    lines = [ln for ln in (proc.stdout or "").splitlines() if ln.strip()]
     return _json_ok(lines, text=proc.stdout, returncode=proc.returncode)
 
 
 def _parse_dyld_import_ok(text: str) -> dict[str, str]:
-    """Parse `OK: project=… program=… image=… cache=…` from ghidra-vibe-dyld."""
+    """Parse `OK: project=… program=…` / `OK: imported AppKit` from ghidra-vibe-dyld."""
     meta: dict[str, str] = {}
     for line in (text or "").splitlines():
+        if line.startswith("OK: imported "):
+            # `OK: imported AppKit` (actual DomainFile leaf)
+            leaf = line[len("OK: imported ") :].strip().split()[0]
+            if leaf:
+                meta["program"] = leaf
+            continue
         if not line.startswith("OK:") or "project=" not in line:
             continue
         payload = line[3:].strip()

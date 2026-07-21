@@ -21,20 +21,22 @@ struct DebugUniqueProviderView: View {
                 Text(title).font(.headline)
                 Spacer()
                 Button("Refresh") { reload() }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                     .a11yCatalog("\(a11yId).refresh")
             }
             .padding(8)
             if !banner.isEmpty {
                 Text(banner)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.vibeSecondary)
                     .padding(.horizontal, 8)
             }
             List(rows, id: \.self) { row in
                 Text(row).font(.caption.monospaced())
             }
             .a11yCatalog(a11yId)
+                .vibeThemedList()
         }
         .onAppear { reload() }
         .onChange(of: model.debuggerStatus) { _, _ in reload() }

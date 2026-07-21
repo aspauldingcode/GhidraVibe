@@ -1,6 +1,7 @@
 /* GhidraVibe GTK — CodeBrowser / Project Window docking shell (native, not Swing). */
 #include "a11y.h"
 #include "dock.h"
+#include "help_view.h"
 #include "mcp_client.h"
 #include "stock_tools.h"
 
@@ -110,6 +111,19 @@ SHOW_FN(show_apple, "apple_bundle")
 SHOW_FN(show_swift_classes, "swift_classes")
 SHOW_FN(show_code_editor, "code_editor")
 
+static void on_show_help(GSimpleAction *a, GVariant *p, gpointer data) {
+  (void)a;
+  (void)p;
+  AppState *st = data;
+  GtkWindow *win = NULL;
+  if (st && st->stack) {
+    GtkRoot *root = gtk_widget_get_root(st->stack);
+    if (GTK_IS_WINDOW(root))
+      win = GTK_WINDOW(root);
+  }
+  vibe_help_show(win);
+}
+
 static void add_menu(GtkApplication *app, AppState *st) {
   const GActionEntry entries[] = {
       {"show_project", on_show_project, NULL, NULL, NULL, {0}},
@@ -148,6 +162,7 @@ static void add_menu(GtkApplication *app, AppState *st) {
       {"show_swift_classes", on_show_swift_classes, NULL, NULL, NULL, {0}},
       {"show_code_editor", on_show_code_editor, NULL, NULL, NULL, {0}},
       {"mcp_health", on_mcp_health, NULL, NULL, NULL, {0}},
+      {"show_help", on_show_help, NULL, NULL, NULL, {0}},
   };
   g_action_map_add_action_entries(G_ACTION_MAP(app), entries, G_N_ELEMENTS(entries), st);
 
@@ -241,6 +256,7 @@ static void add_menu(GtkApplication *app, AppState *st) {
   g_menu_append_submenu(menubar, "Window", G_MENU_MODEL(window));
 
   GMenu *help = g_menu_new();
+  g_menu_append(help, "Ghidra Help…", "app.show_help");
   g_menu_append(help, "About GhidraVibe", "app.show_project");
   g_menu_append_submenu(menubar, "Help", G_MENU_MODEL(help));
 

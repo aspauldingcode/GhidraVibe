@@ -283,7 +283,7 @@ static void draw_graph(GtkDrawingArea *area, cairo_t *cr, int width, int height,
   cairo_translate(cr, st->pan_x, st->pan_y);
   cairo_scale(cr, st->zoom, st->zoom);
 
-  // Edges — port-aware curves + oriented arrowheads (matches macOS canvas).
+  /* Edges — obstacle-avoiding Beziers (matches macOS GraphEdgeRouter). */
   for (int e = 0; e < st->n_edges; e++) {
     int a = find_node(st, st->edges[e].from);
     int b = find_node(st, st->edges[e].to);
@@ -295,40 +295,123 @@ static void draw_graph(GtkDrawingArea *area, cairo_t *cr, int width, int height,
     double ax = na->x + NODE_W / 2, ay = na->y + na->h / 2;
     double bx = nb->x + NODE_W / 2, by = nb->y + nb->h / 2;
     double ddx = bx - ax, ddy = by - ay;
-    double x1, y1, x2, y2, c1x, c1y, c2x, c2y;
+    double x1, y1, x2, y2, osx, osy, oex, oey;
     if (fabs(ddy) >= fabs(ddx) * 0.85) {
       if (ddy >= 0) {
         x1 = na->x + NODE_W / 2;
         y1 = na->y + na->h;
         x2 = nb->x + NODE_W / 2;
         y2 = nb->y;
+        osx = 0;
+        osy = 1;
+        oex = 0;
+        oey = -1;
       } else {
         x1 = na->x + NODE_W / 2;
         y1 = na->y;
         x2 = nb->x + NODE_W / 2;
         y2 = nb->y + nb->h;
+        osx = 0;
+        osy = -1;
+        oex = 0;
+        oey = 1;
       }
-      c1x = x1;
-      c1y = (y1 + y2) / 2;
-      c2x = x2;
-      c2y = (y1 + y2) / 2;
+    } else if (ddx >= 0) {
+      x1 = na->x + NODE_W;
+      y1 = na->y + na->h / 2;
+      x2 = nb->x;
+      y2 = nb->y + nb->h / 2;
+      osx = 1;
+      osy = 0;
+      oex = -1;
+      oey = 0;
     } else {
-      if (ddx >= 0) {
-        x1 = na->x + NODE_W;
-        y1 = na->y + na->h / 2;
-        x2 = nb->x;
-        y2 = nb->y + nb->h / 2;
-      } else {
-        x1 = na->x;
-        y1 = na->y + na->h / 2;
-        x2 = nb->x + NODE_W;
-        y2 = nb->y + nb->h / 2;
-      }
-      c1x = (x1 + x2) / 2;
-      c1y = y1;
-      c2x = (x1 + x2) / 2;
-      c2y = y2;
+      x1 = na->x;
+      y1 = na->y + na->h / 2;
+      x2 = nb->x + NODE_W;
+      y2 = nb->y + nb->h / 2;
+      osx = -1;
+      osy = 0;
+      oex = 1;
+      oey = 0;
     }
+
+    const double stub = 14.0;
+    const double clear = 16.0;
+    double ex = x1 + osx * stub, ey = y1 + osy * stub;
+    double apx = x2 + oex * stub, apy = y2 + oey * stub;
+
+    /* Inflated obstacles = other nodes. */
+    double left = 1e9, right = -1e9, top = 1e9, bot = -1e9;
+    int blockers = 0;
+    double band_x0 = fmin(ex, apx) - clear, band_y0 = fmin(ey, apy) - clear;
+    double band_x1 = fmax(ex, apx) + clear, band_y1 = fmax(ey, apy) + clear;
+    for (int i = 0; i < st->n_nodes; i++) {
+      if (i == a || i == b) {
+        continue;
+      }
+      GNode *o = &st->nodes[i];
+      double ox0 = o->x - clear, oy0 = o->y - clear;
+      double ox1 = o->x + NODE_W + clear, oy1 = o->y + o->h + clear;
+      if (ox1 < band_x0 || ox0 > band_x1 || oy1 < band_y0 || oy0 > band_y1) {
+        continue;
+      }
+      blockers++;
+      if (ox0 < left) {
+        left = ox0;
+      }
+      if (ox1 > right) {
+        right = ox1;
+      }
+      if (oy0 < top) {
+        top = oy0;
+      }
+      if (oy1 > bot) {
+        bot = oy1;
+      }
+    }
+
+    /* Waypoints: direct stubs, or C-detour around blocker cluster. */
+    double wx[6], wy[6];
+    int nw = 0;
+    wx[nw] = x1;
+    wy[nw] = y1;
+    nw++;
+    wx[nw] = ex;
+    wy[nw] = ey;
+    nw++;
+    if (blockers > 0) {
+      double side = (fabs(ex - left) + fabs(apx - left) <= fabs(ex - right) + fabs(apx - right)) ? left
+                                                                                                 : right;
+      if (fabs(ex - side) > 0.5) {
+        wx[nw] = side;
+        wy[nw] = ey;
+        nw++;
+      }
+      if (fabs(ey - apy) > 0.5) {
+        wx[nw] = side;
+        wy[nw] = apy;
+        nw++;
+      }
+      if (fabs(apx - side) > 0.5) {
+        wx[nw] = apx;
+        wy[nw] = apy;
+        nw++;
+      }
+    } else {
+      wx[nw] = apx;
+      wy[nw] = apy;
+      nw++;
+    }
+    if (fabs(wx[nw - 1] - apx) > 0.5 || fabs(wy[nw - 1] - apy) > 0.5) {
+      wx[nw] = apx;
+      wy[nw] = apy;
+      nw++;
+    }
+    wx[nw] = x2;
+    wy[nw] = y2;
+    nw++;
+
     if (strcmp(st->edges[e].type, "conditional") == 0) {
       cairo_set_source_rgb(cr, 0.95, 0.55, 0.2);
     } else if (strcmp(st->edges[e].type, "fallthrough") == 0) {
@@ -340,25 +423,73 @@ static void draw_graph(GtkDrawingArea *area, cairo_t *cr, int width, int height,
       cairo_set_dash(cr, NULL, 0, 0);
     }
     cairo_set_line_width(cr, 1.4);
-    cairo_move_to(cr, x1, y1);
-    cairo_curve_to(cr, c1x, c1y, c2x, c2y, x2, y2);
-    cairo_stroke(cr);
-    cairo_set_dash(cr, NULL, 0, 0);
-    /* Arrowhead along final tangent. */
-    double adx = x2 - c2x, ady = y2 - c2y;
+    cairo_set_line_join(cr, CAIRO_LINE_JOIN_ROUND);
+    cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
+
+    /* Stem direction into the tip (last chord); triangle tip at port. */
+    double adx = x2 - (nw >= 2 ? wx[nw - 2] : ex);
+    double ady = y2 - (nw >= 2 ? wy[nw - 2] : ey);
     double alen = hypot(adx, ady);
     if (alen < 1e-3) {
-      adx = 0;
-      ady = 1;
-      alen = 1;
+      adx = -oex;
+      ady = -oey;
+      alen = hypot(adx, ady);
+      if (alen < 1e-3) {
+        adx = 0;
+        ady = 1;
+        alen = 1;
+      }
     }
     adx /= alen;
     ady /= alen;
+    const double head_len = 10.0;
+    const double head_half = 5.0;
+    /* Stem ends at midpoint of the base edge (opposite the tip). */
+    double base_x = x2 - adx * head_len;
+    double base_y = y2 - ady * head_len;
+
+    /* Rounded polyline to the base — never through the triangle. */
+    cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+    cairo_move_to(cr, wx[0], wy[0]);
+    if (nw == 2) {
+      cairo_line_to(cr, base_x, base_y);
+    } else {
+      for (int i = 1; i < nw - 1; i++) {
+        double px = wx[i - 1], py = wy[i - 1];
+        double cx = wx[i], cy = wy[i];
+        double nx = (i + 1 == nw - 1) ? base_x : wx[i + 1];
+        double ny = (i + 1 == nw - 1) ? base_y : wy[i + 1];
+        /* Last corner before tip uses base as the outgoing target. */
+        if (i == nw - 2) {
+          nx = base_x;
+          ny = base_y;
+        }
+        double din = hypot(cx - px, cy - py);
+        double dout = hypot(nx - cx, ny - cy);
+        double r = fmin(22.0, fmin(din * 0.45, dout * 0.45));
+        if (r < 1.5 || din < 1e-3 || dout < 1e-3) {
+          cairo_line_to(cr, cx, cy);
+          continue;
+        }
+        double bx = cx + (px - cx) / din * r;
+        double by = cy + (py - cy) / din * r;
+        double ax2 = cx + (nx - cx) / dout * r;
+        double ay2 = cy + (ny - cy) / dout * r;
+        cairo_line_to(cr, bx, by);
+        double c1x = bx + (cx - bx) * 0.55, c1y = by + (cy - by) * 0.55;
+        double c2x = ax2 + (cx - ax2) * 0.55, c2y = ay2 + (cy - ay2) * 0.55;
+        cairo_curve_to(cr, c1x, c1y, c2x, c2y, ax2, ay2);
+      }
+      cairo_line_to(cr, base_x, base_y);
+    }
+    cairo_stroke(cr);
+    cairo_set_dash(cr, NULL, 0, 0);
+
+    /* Triangle: tip at port; base edge ⊥ direction, centered on stem end. */
     double px = -ady, py = adx;
-    double back_x = x2 - adx * 8, back_y = y2 - ady * 8;
     cairo_move_to(cr, x2, y2);
-    cairo_line_to(cr, back_x + px * 4.5, back_y + py * 4.5);
-    cairo_line_to(cr, back_x - px * 4.5, back_y - py * 4.5);
+    cairo_line_to(cr, base_x + px * head_half, base_y + py * head_half);
+    cairo_line_to(cr, base_x - px * head_half, base_y - py * head_half);
     cairo_close_path(cr);
     cairo_fill(cr);
   }

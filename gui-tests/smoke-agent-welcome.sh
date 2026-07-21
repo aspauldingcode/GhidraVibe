@@ -7,6 +7,10 @@ defaults delete "$DOMAIN" 2>/dev/null || true
 # Simulate opt-out
 defaults write "$DOMAIN" "ghidra.vibe.agent.optOut" -bool true
 defaults write "$DOMAIN" "ghidra.vibe.agent.welcomeDismissed" -bool true
+defaults write "$DOMAIN" "ghidra.vibe.theme.ghidra" -string "Default Dark"
+defaults write "$DOMAIN" "ghidra.vibe.theme.base16" -string "Default Dark"
 opt="$(defaults read "$DOMAIN" "ghidra.vibe.agent.optOut")"
 [[ "$opt" == "1" || "$opt" == "true" ]]
-echo "OK smoke-agent-welcome (opt-out preference persisted)"
+theme="$(defaults read "$DOMAIN" "ghidra.vibe.theme.ghidra")"
+[[ "$theme" == "Default Dark" ]]
+echo "OK smoke-agent-welcome (opt-out + Ghidra Theme preference persisted)"

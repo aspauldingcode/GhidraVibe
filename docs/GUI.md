@@ -16,12 +16,19 @@ they are not a runnable Swing UI. See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Startup flow (native; not Swing)
 
-1. **User Agreement** — SwiftUI `.alert` (not Java `UserAgreementDialog`)
-2. **Splash** — dragon / version / “Creating front end tool…”
-3. **Welcome / Ghidra Help** — two-pane help (first run, or Help → Ghidra Help…)
-4. **Tip of the Day** — Help → Tip of the Day… (optional at startup)
+1. **User Agreement** — SwiftUI `.alert` on the splash window (not Java `UserAgreementDialog`)
+2. **Splash** — separate undecorated window (`ghidra.vibe.splash`): dragon / version / “Creating front end tool…”
+3. **Welcome / Ghidra Help** — full stock JavaHelp corpus in a native TOC + WKWebView
+   browser (first run, or Help → Ghidra Help…). Packaged from `$GHIDRA_INSTALL_DIR`
+   via `scripts/extract-stock-help.py` → `Contents/Resources/help/`. GhidraVibe
+   addenda (MCP / DSC / Agent) append under a TOC section. Missing bundle → 8-topic fallback.
+   **F1 / Help → Context Help** opens the stock `map.json` article for the focused
+   provider (`HelpCatalog.open(mapId:)` / `HelpContext`). Linux: Help → Ghidra Help…
+   uses the same bundle (WebKitGTK when available).
+4. **Tip of the Day** — stock `tips.txt` (≥70 tips) from the help bundle; Help → Tip of the Day…
 5. **Workspace / project picker** — recent `.gpr` projects, New / Browse
-6. **Project Window** — stock Front End chrome (`native-ui/parity/FrontEnd.chrome.json`):
+6. **Project Window** — separate Tahoe unified window (`ghidra.vibe.main`, opened after splash closes):
+   stock Front End chrome (`native-ui/parity/FrontEnd.chrome.json`):
    VC toolbar → Tool Chest (CodeBrowser / Debugger / Emulator / Version Tracking, A–Z) → Active Project
    (Tree/Table + Filter) → Running Tools + Workspace → LogPanel
 7. **CodeBrowser** — stock dock + menus (`CodeBrowser.chrome.json` /
@@ -30,6 +37,13 @@ they are not a runnable Swing UI. See [ARCHITECTURE.md](ARCHITECTURE.md).
 If you see a Java splash or Swing Project Window, you are not running the
 packaged GhidraVibe runtime (`pkill -f ghidra.GhidraRun`). Product `bin/ghidra`
 always exits — use `nix run` for the native GUI.
+
+## Menubar (macOS Tahoe)
+
+Window → module list uses **checkmark `Toggle`s** (stock show/hide), not plain buttons —
+that keeps titles left-aligned. SF Symbols appear only on clarity actions (File/Edit standards,
+tool windows, Modules/Agent sidebars). In-app shortcuts are declared on the matching menu items.
+See [macos-liquid-glass.md](macos-liquid-glass.md#menubar-tahoe).
 
 ## Modular docking (SwiftUI ≡ stock DockingWindowManager)
 
@@ -59,9 +73,15 @@ Default active panes: Program Trees, Symbol Tree, Data Type Manager, Listing, De
 
 ## Vibe / Apple panels (Window menu)
 
-MCP, Agent (trailing sidebar), RAG/JSpace, Rules, Code Editor,
+MCP, RAG/JSpace, Rules, Code Editor,
 **Shared Cache / Framework…** (File + toolbar + Tool Chest), **App Bundle** (File + toolbar + Tool Chest),
 **Classes** (left dock ObjC/Swift).
+
+**Modules sidebar** (toolbar `sidebar.leading` / Window → Show Modules): checklist +
+drag-to-dock for every CodeBrowser provider (same set as Window → module items).
+Replaces the old right-stack **More…** module picker.
+
+**Agent** (toolbar `sidebar.trailing`): trailing LLM chat only — not a dockable module.
 
 Apple RE details: [APPLE.md](APPLE.md). Malimite-inspired IPA/resources/Swift namespaces — native UI, not Swing.
 

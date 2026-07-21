@@ -64,11 +64,41 @@
       "id": "edit",
       "label": "Edit",
       "items": [
-        { "id": "edit.undo", "title": "Undo", "action": "undo" },
-        { "id": "edit.redo", "title": "Redo", "action": "redo" },
-        { "id": "edit.cut", "title": "Cut", "action": "edit_cut" },
-        { "id": "edit.copy", "title": "Copy", "action": "edit_copy" },
-        { "id": "edit.paste", "title": "Paste", "action": "edit_paste" }
+        {
+          "id": "edit.undo",
+          "title": "Undo",
+          "action": "undo",
+          "shortcut": "z",
+          "modifiers": ["command"]
+        },
+        {
+          "id": "edit.redo",
+          "title": "Redo",
+          "action": "redo",
+          "shortcut": "z",
+          "modifiers": ["command", "shift"]
+        },
+        {
+          "id": "edit.cut",
+          "title": "Cut",
+          "action": "edit_cut",
+          "shortcut": "x",
+          "modifiers": ["command"]
+        },
+        {
+          "id": "edit.copy",
+          "title": "Copy",
+          "action": "edit_copy",
+          "shortcut": "c",
+          "modifiers": ["command"]
+        },
+        {
+          "id": "edit.paste",
+          "title": "Paste",
+          "action": "edit_paste",
+          "shortcut": "v",
+          "modifiers": ["command"]
+        }
       ]
     },
     {
@@ -113,8 +143,20 @@
           "shortcut": "g",
           "modifiers": ["command", "shift"]
         },
-        { "id": "navigation.prev", "title": "Previous Location", "action": "nav_back" },
-        { "id": "navigation.next", "title": "Next Location", "action": "nav_fwd" }
+        {
+          "id": "navigation.prev",
+          "title": "Previous Location",
+          "action": "nav_back",
+          "shortcut": "leftArrow",
+          "modifiers": ["option"]
+        },
+        {
+          "id": "navigation.next",
+          "title": "Next Location",
+          "action": "nav_fwd",
+          "shortcut": "rightArrow",
+          "modifiers": ["option"]
+        }
       ]
     },
     {

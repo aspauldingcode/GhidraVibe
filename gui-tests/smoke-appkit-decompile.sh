@@ -9,7 +9,8 @@ set -euo pipefail
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-WORKDIR="${GHIDRA_VIBE_APPKIT_WORKDIR:-/tmp/ghidra-vibe-appkit-gui}"
+RUN_ID="${GITHUB_RUN_ID:-$$}"
+WORKDIR="${GHIDRA_VIBE_APPKIT_WORKDIR:-/tmp/ghidra-vibe-appkit-gui-${RUN_ID}}"
 MCP_URL="${GHIDRA_MCP_URL:-http://127.0.0.1:8089}"
 GUI_URL="${GHIDRA_VIBE_GUI_URL:-http://127.0.0.1:8091}"
 INSTALL="${GHIDRA_VIBE_APP_INSTALL:-$HOME/Applications/GhidraVibe.app}"
@@ -19,7 +20,8 @@ PROJ_NAME="AppKitGUI"
 PROJ_GPR="$PROJ_DIR/${PROJ_NAME}.gpr"
 DYLD="${GHIDRA_VIBE_DYLD:-$ROOT/scripts/ghidra-vibe-dyld}"
 ARTIFACTS="${AD_ARTIFACTS:-$ROOT/gui-tests/artifacts}"
-mkdir -p "$ARTIFACTS" "$WORKDIR"
+export GHIDRA_VIBE_DSC_LOG_DIR="${GHIDRA_VIBE_DSC_LOG_DIR:-$WORKDIR/logs}"
+mkdir -p "$ARTIFACTS" "$WORKDIR" "$GHIDRA_VIBE_DSC_LOG_DIR"
 
 resolve_ghidra_install_dir() {
   if [[ -n "${GHIDRA_INSTALL_DIR:-}" && -x "${GHIDRA_INSTALL_DIR}/support/launch.sh" ]]; then
@@ -112,6 +114,9 @@ ensure_appkit_fixture() {
     echo "FAIL: ghidra-vibe-dyld missing at $DYLD" >&2
     exit 1
   fi
+  # Don't fight a live GUI holding another project lock.
+  pkill -x GhidraVibe 2>/dev/null || true
+  sleep 1
   echo "==> fixture: DSC import $IMAGE → ${PROJ_NAME}.gpr (no full auto-analyze)"
   mkdir -p "$PROJ_DIR"
   # Apple symbols on; analyze off (IDA-like snappy module load). First import can take minutes.
@@ -121,23 +126,30 @@ ensure_appkit_fixture() {
     --project-name "$PROJ_NAME" \
     --no-analyze \
     2>&1 | tee "$WORKDIR/fixture-import.log"
+  cp -f "$WORKDIR/fixture-import.log" "$ARTIFACTS/appkit-fixture-import.log" 2>/dev/null || true
   if [[ ! -f "$PROJ_GPR" ]]; then
     echo "FAIL: fixture project missing at $PROJ_GPR" >&2
-    tail -60 "$WORKDIR/fixture-import.log" >&2 || true
+    tail -80 "$WORKDIR/fixture-import.log" >&2 || true
+    echo "See also: $GHIDRA_VIBE_DSC_LOG_DIR/dsc-import-latest.log" >&2
     exit 1
   fi
-  if ! grep -E -q 'OK: imported|OK:' "$WORKDIR/fixture-import.log" 2>/dev/null; then
+  if ! grep -E -q 'OK: imported|OK:.*program=' "$WORKDIR/fixture-import.log" 2>/dev/null; then
     echo "FAIL: dyld import did not report OK" >&2
-    tail -60 "$WORKDIR/fixture-import.log" >&2 || true
+    tail -80 "$WORKDIR/fixture-import.log" >&2 || true
     exit 1
   fi
-  echo "PASS: fixture $PROJ_GPR"
+  # Prefer actual DomainFile leaf from import log.
+  PARSED="$(grep -E '^OK:.*program=' "$WORKDIR/fixture-import.log" | tail -1 | sed -E 's/.*program=([^ ]+).*/\1/' || true)"
+  if [[ -n "$PARSED" ]]; then
+    PROGRAM_LEAF="$PARSED"
+  fi
+  echo "PASS: fixture $PROJ_GPR program=$PROGRAM_LEAF"
 }
 
-ensure_appkit_fixture
-
-# Program leaf name from dyld import (usually "AppKit").
 PROGRAM_LEAF="${APPKIT_SMOKE_PROGRAM:-$IMAGE}"
+ensure_appkit_fixture
+# ensure_appkit_fixture may refine PROGRAM_LEAF from the import log.
+PROGRAM_LEAF="${APPKIT_SMOKE_PROGRAM:-${PROGRAM_LEAF:-$IMAGE}}"
 export GHIDRA_VIBE_PROJECT="$PROJ_GPR"
 export GHIDRA_VIBE_PROGRAM="/${PROGRAM_LEAF}"
 defaults write dev.ghidravibe.app ghidra.vibe.userAgreementAccepted -bool true

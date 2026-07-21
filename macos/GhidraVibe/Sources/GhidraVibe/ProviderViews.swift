@@ -23,7 +23,12 @@ struct ProviderView: View {
             case .functionGraph: FunctionGraphProvider()
             case .mcp: MCPProvider()
             case .agent:
-                ProviderChrome(kind: .agent) { AgentChatView() }
+                // Agent is trailing-sidebar only — never a modular dock pane.
+                ContentUnavailableView(
+                    "Agent Sidebar",
+                    systemImage: "sidebar.trailing",
+                    description: Text("Use the trailing Agent sidebar from the toolbar.")
+                )
             case .rag: RAGProvider()
             case .rules: RulesProvider()
             case .dsc: DSCProvider()
@@ -73,6 +78,7 @@ struct ProviderChrome<Content: View>: View {
 }
 
 /// Stock-style provider header: draggable title, Dock-to menu, local toolbar, close.
+/// Titlebar is square / stock (no concentric Liquid Glass radius on module chrome).
 struct DockedProviderChrome<Toolbar: View, Content: View>: View {
     @Environment(AppModel.self) private var model
     let kind: ProviderKind
@@ -82,21 +88,27 @@ struct DockedProviderChrome<Toolbar: View, Content: View>: View {
     @ViewBuilder var toolbar: () -> Toolbar
     @ViewBuilder var content: () -> Content
 
+    private var isDraggingThis: Bool { model.dockDragKind == kind }
+
     var body: some View {
         // Chrome must sit above content in z-order: NSViewRepresentable canvases
         // (Function Graph) otherwise composite over the title/toolbar buttons.
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 4) {
+            HStack(spacing: VibeChrome.Space.sm) {
+                // Explicit move grip — square stock chrome, not concentric glass.
                 Image(systemName: "line.3.horizontal")
-                    .font(.system(size: 9, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .help("Drag to redock")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(isDraggingThis ? VibeChrome.ProviderSurface.accent : VibeChrome.ProviderSurface.secondary)
+                    .frame(width: 16, height: 16)
+                    .help("Drag to tile on Top / Left / Right / Bottom / Center")
                 Text(title)
                     .font(.caption.weight(.semibold))
                     .lineLimit(1)
                     .truncationMode(.middle)
-                    .help(title)
-                Spacer(minLength: 4)
+                    .foregroundStyle(isDraggingThis ? VibeChrome.ProviderSurface.accent : VibeChrome.ProviderSurface.foreground)
+                    .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                    .help("Drag to redock · Right-click for Dock to…")
+                Spacer(minLength: 0)
                 toolbar()
                 if let onClose {
                     ProviderToolButton(
@@ -107,11 +119,36 @@ struct DockedProviderChrome<Toolbar: View, Content: View>: View {
                 }
             }
             .padding(.horizontal, 6)
-            .padding(.vertical, 3)
-            .background(.quaternary)
+            .padding(.vertical, 4)
+            // Title strip: content base + wash (controlBackground ≈ textBackground on Tahoe).
+            .background {
+                ZStack {
+                    VibeChrome.ProviderSurface.titleBar
+                    if isDraggingThis {
+                        VibeChrome.ProviderSurface.titleBarActiveWash
+                    } else {
+                        VibeChrome.ProviderSurface.titleBarWash
+                    }
+                }
+            }
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(isDraggingThis ? VibeChrome.ProviderSurface.accent : VibeChrome.ProviderSurface.separator)
+                    .frame(height: 1)
+            }
             .contentShape(Rectangle())
             .draggable(ProviderDockDrag(kindRaw: kind.rawValue)) {
-                Text(title).font(.caption).padding(6)
+                Label(title, systemImage: "arrow.up.and.down.and.arrow.left.and.right")
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(VibeChrome.ProviderSurface.content)
+                    .overlay {
+                        ZStack {
+                            VibeChrome.ProviderSurface.titleBarWash
+                            Rectangle().stroke(VibeChrome.ProviderSurface.accent, lineWidth: 2)
+                        }
+                    }
             }
             .simultaneousGesture(
                 DragGesture(minimumDistance: 4)
@@ -119,6 +156,10 @@ struct DockedProviderChrome<Toolbar: View, Content: View>: View {
                         if model.dockDragKind != kind {
                             model.beginProviderDockDrag(kind)
                         }
+                    }
+                    .onEnded { _ in
+                        // Keep HUD up until drop / Cancel; clear highlight only.
+                        model.setDockDropHighlight(nil)
                     }
             )
             .contextMenu {
@@ -128,19 +169,26 @@ struct DockedProviderChrome<Toolbar: View, Content: View>: View {
             .zIndex(2)
 
             content()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
+                .background(VibeChrome.ProviderSurface.content)
                 .clipped()
                 .zIndex(0)
         }
-        .background(Color(nsColor: .textBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 4))
+        // One content fill for the module — do not stack windowBackground under title+body.
+        .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
+        .background(VibeChrome.ProviderSurface.content)
+        .overlay {
+            Rectangle()
+                .stroke(VibeChrome.ProviderSurface.separator, lineWidth: 1)
+                .allowsHitTesting(false)
+        }
     }
 
     @ViewBuilder
     private var providerDockMenu: some View {
         Menu("Dock to") {
             ForEach(DockRegion.dropTargets, id: \DockRegion.id) { (region: DockRegion) in
-                Button(region.title) { model.moveProvider(kind, to: region) }
+                Button(region.dropLabel) { model.moveProvider(kind, to: region) }
             }
         }
         Button("Float") { model.floatProvider(kind) }
@@ -256,18 +304,26 @@ struct ListingProvider: View {
             VStack(spacing: 0) {
                 TextField("Go to address / label", text: $model.goToDraft)
                     .textFieldStyle(.roundedBorder)
+                    .frame(minWidth: 0, maxWidth: .infinity)
                     .padding(4)
                     .a11yCatalog("ghidra.vibe.provider.listing.goto_field")
                     .onSubmit { model.performGoTo() }
-                ScrollView {
+                // Bidirectional scroll: narrow panes hide columns; pan left/right to read them.
+                ScrollView([.horizontal, .vertical]) {
                     Text(model.listingText.isEmpty ? "// Listing empty — select a function or Go To" : model.listingText)
                         .font(.system(.body, design: .monospaced))
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundStyle(Color.vibeForeground)
                         .textSelection(.enabled)
+                        .multilineTextAlignment(.leading)
+                        // Intrinsic width so long disasm lines scroll instead of wrapping/clipping.
+                        .fixedSize(horizontal: true, vertical: false)
                         .padding(8)
                         .a11yCatalog("ghidra.vibe.provider.listing.text")
                 }
+                .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
+                .vibeDocumentPane()
             }
+            .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
@@ -307,13 +363,15 @@ struct DecompilerProvider: View {
                 if model.selectedFunction == nil && model.decompiledText.contains("Select a function") {
                     Text("No Function")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.vibeSecondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(6)
+                        .background(Color.vibeContentAlt)
                 }
                 SyntaxHighlightedCodeView(
                     text: model.decompiledText.isEmpty ? "// No Function" : model.decompiledText
                 )
+                .vibeDocumentPane()
                 .a11yCatalog("ghidra.vibe.provider.decompiler.text")
             }
         }
@@ -451,7 +509,7 @@ struct SymbolTreeProvider: View {
                 HStack(spacing: 6) {
                     Text("Filter:")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.vibeSecondary)
                     TextField("Filter", text: $model.symbolSearch)
                         .textFieldStyle(.roundedBorder)
                         .font(.caption)
@@ -538,7 +596,7 @@ struct DataTypesProvider: View {
                 HStack(spacing: 6) {
                     Text("Filter:")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.vibeSecondary)
                     TextField("Filter", text: $model.dataTypeSearch)
                         .textFieldStyle(.roundedBorder)
                         .font(.caption)
@@ -592,11 +650,13 @@ struct ConsoleProvider: View {
                 ScrollView {
                     Text(model.consoleText.isEmpty ? "// Console" : model.consoleText)
                         .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(Color.vibeForeground)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(8)
                         .a11yCatalog("ghidra.vibe.provider.console.text")
                 }
+                .vibeDocumentPane()
                 HStack {
                     TextField("Script / command (!script to run)", text: $model.consoleInputDraft)
                         .textFieldStyle(.roundedBorder)
@@ -604,7 +664,8 @@ struct ConsoleProvider: View {
                         .a11yCatalog("ghidra.vibe.provider.console.input")
                         .onSubmit { model.submitConsoleInput() }
                     Button("Run") { model.submitConsoleInput() }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .help("Submit console input")
                 }
                 .padding(4)
@@ -648,6 +709,7 @@ struct StringsProvider: View {
         ProviderChrome(kind: .strings) {
             List(model.stringRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.strings.body")
+                .vibeThemedList()
                 .onAppear { model.probeStrings() }
         }
     }
@@ -660,6 +722,7 @@ struct MemoryMapProvider: View {
         ProviderChrome(kind: .memoryMap) {
             List(model.memoryMapRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.memory_map.body")
+                .vibeThemedList()
                 .onAppear { model.refreshMemoryMap() }
         }
     }
@@ -672,6 +735,7 @@ struct SymbolTableProvider: View {
         ProviderChrome(kind: .symbolTable) {
             List(model.symbolTableRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.symbol_table.body")
+                .vibeThemedList()
                 .onAppear { model.refreshSymbolTable() }
         }
     }
@@ -685,9 +749,11 @@ struct BytesProvider: View {
             ScrollView {
                 Text(model.bytesText.isEmpty ? "// Select address for bytes" : model.bytesText)
                     .font(.system(.caption, design: .monospaced))
+                    .foregroundStyle(Color.vibeForeground)
                     .padding(8)
                     .a11yCatalog("ghidra.vibe.provider.bytes.body")
             }
+            .vibeDocumentPane()
             .onAppear { model.refreshBytes() }
         }
     }
@@ -700,6 +766,7 @@ struct BookmarksProvider: View {
         ProviderChrome(kind: .bookmarks) {
             List(model.bookmarkRows, id: \.self) { Text($0) }
                 .a11yCatalog("ghidra.vibe.provider.bookmarks.body")
+                .vibeThemedList()
                 .onAppear { model.refreshBookmarks() }
         }
     }
@@ -712,7 +779,8 @@ struct ScriptManagerProvider: View {
         ProviderChrome(kind: .scriptManager) {
             VStack(alignment: .leading) {
                 Button("Refresh scripts") { model.refreshScripts() }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                     .padding(4)
                     .a11yCatalog("ghidra.vibe.provider.script_manager.refresh")
                 List(model.scriptRows, id: \.self) { row in
@@ -720,6 +788,7 @@ struct ScriptManagerProvider: View {
                         .buttonStyle(.plain)
                         .font(.caption.monospaced())
                         .a11yCatalog("ghidra.vibe.provider.script_manager.run")
+                .vibeThemedList()
                         .help("Run script \(row)")
                 }
                 .a11yCatalog("ghidra.vibe.provider.script_manager.body")
@@ -745,11 +814,13 @@ struct FunctionGraphProvider: View {
                                 ? "// Select a function, then Refresh Graph"
                                 : model.functionGraphText)
                                 .font(.caption.monospaced())
+                                .foregroundStyle(Color.vibeForeground)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .textSelection(.enabled)
                                 .padding(.top, 36)
                                 .padding(8)
                         }
+                        .vibeDocumentPane()
                     } else {
                         FunctionGraphCanvas(
                             model: model.functionGraphModel,
@@ -761,16 +832,18 @@ struct FunctionGraphProvider: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.vibeContent)
                 .a11yCatalog("ghidra.vibe.provider.function_graph.body")
 
                 HStack(spacing: 8) {
                     Button("Refresh Graph") { model.refreshFunctionGraph() }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.function_graph.refresh")
                     if !model.functionGraphModel.isEmpty {
                         Text("\(model.functionGraphModel.function) · \(model.functionGraphModel.nodes.count) blocks · \(model.functionGraphModel.edges.count) edges")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.vibeSecondary)
                             .lineLimit(1)
                     }
                     Spacer()
@@ -782,7 +855,10 @@ struct FunctionGraphProvider: View {
                 .padding(.horizontal, 6)
                 .padding(.vertical, 4)
                 .frame(maxWidth: .infinity)
-                .background(.bar)
+                .background(Color.vibeControl)
+                .overlay(alignment: .bottom) {
+                    Rectangle().fill(Color.vibeSeparator).frame(height: 1)
+                }
                 .zIndex(10)
             }
             .onAppear { model.refreshFunctionGraph() }
@@ -799,6 +875,7 @@ struct EntropyProvider: View {
         ProviderChrome(kind: .entropy) {
             List(model.entropyRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.entropy.body")
+                .vibeThemedList()
                 .onAppear { model.refreshEntropy(); model.ensureVibeMCP() }
         }
     }
@@ -825,6 +902,7 @@ struct DefinedDataProvider: View {
         ProviderChrome(kind: .definedData) {
             List(model.definedDataRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.defined_data.body")
+                .vibeThemedList()
                 .onAppear { model.refreshDefinedData() }
         }
     }
@@ -836,6 +914,7 @@ struct EquatesProvider: View {
         ProviderChrome(kind: .equates) {
             List(model.equateRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.equates.body")
+                .vibeThemedList()
                 .onAppear { model.refreshEquates() }
         }
     }
@@ -847,6 +926,7 @@ struct ExternalProgramsProvider: View {
         ProviderChrome(kind: .externalPrograms) {
             List(model.externalProgramRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.external_programs.body")
+                .vibeThemedList()
                 .onAppear { model.refreshExternals() }
         }
     }
@@ -858,6 +938,7 @@ struct RelocationsProvider: View {
         ProviderChrome(kind: .relocations) {
             List(model.relocationRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.relocations.body")
+                .vibeThemedList()
                 .onAppear { model.refreshRelocations() }
         }
     }
@@ -868,9 +949,10 @@ struct RegistersProvider: View {
     var body: some View {
         ProviderChrome(kind: .registers) {
             VStack(alignment: .leading) {
-                Text(model.debuggerStatus).font(.caption2).foregroundStyle(.secondary).padding(4)
+                Text(model.debuggerStatus).font(.caption2).foregroundStyle(Color.vibeSecondary).padding(4)
                 List(model.registerRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                     .a11yCatalog("ghidra.vibe.provider.registers.body")
+                .vibeThemedList()
             }
             .onAppear {
                 model.refreshRegisters()
@@ -886,6 +968,7 @@ struct SymbolReferencesProvider: View {
         ProviderChrome(kind: .symbolReferences) {
             List(model.symbolRefRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.symbol_references.body")
+                .vibeThemedList()
                 .onAppear { model.refreshSymbolReferences() }
         }
     }
@@ -912,6 +995,7 @@ struct FunctionTagsProvider: View {
         ProviderChrome(kind: .functionTags) {
             List(model.functionTagRows, id: \.self) { Text($0).font(.caption.monospaced()) }
                 .a11yCatalog("ghidra.vibe.provider.function_tags.body")
+                .vibeThemedList()
                 .onAppear { model.refreshFunctionTags() }
         }
     }
@@ -923,6 +1007,7 @@ struct CommentsProvider: View {
         ProviderChrome(kind: .comments) {
             List(model.commentRows, id: \.self) { Text($0) }
                 .a11yCatalog("ghidra.vibe.provider.comments.body")
+                .vibeThemedList()
                 .onAppear { model.refreshComments() }
         }
     }
@@ -967,12 +1052,17 @@ struct PythonProvider: View {
                 TextEditor(text: $model.pythonScriptDraft)
                     .font(.system(.body, design: .monospaced))
                     .frame(minHeight: 120)
+                    .vibeThemedEditor()
                 Button("Run via MCP scripts") { model.runPythonScript() }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.provider.python.run")
                 ScrollView {
-                    Text(model.pythonScriptOutput).font(.caption.monospaced())
+                    Text(model.pythonScriptOutput)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(Color.vibeForeground)
                 }
+                .vibeDocumentPane()
             }
             .padding(8)
             .a11yCatalog("ghidra.vibe.provider.python.body")
@@ -994,7 +1084,7 @@ struct MCPProvider: View {
                 TextField("Debugger URL", text: $model.debuggerURL)
                 Text("Optional diagnostics. Daily RE uses the in-process engine; Cursor bridges need GHIDRA_VIBE_CURSOR_BRIDGE=1.")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.vibeSecondary)
                 HStack {
                     Button("Engine status") { model.refreshMCPHealth(); model.ensureVibeMCP() }
                         .a11yCatalog("ghidra.vibe.provider.mcp.health")
@@ -1047,11 +1137,13 @@ struct RulesProvider: View {
             VStack {
                 TextEditor(text: $model.rulesText)
                     .font(.system(.body, design: .monospaced))
+                    .vibeThemedEditor()
                     .a11yCatalog("ghidra.vibe.provider.rules.editor")
                 Button("Save rules") { model.saveRules() }
                     .a11yCatalog("ghidra.vibe.provider.rules.save")
             }
             .padding(8)
+            .background(Color.vibeContent)
             .onAppear { model.loadRules() }
         }
     }
@@ -1063,12 +1155,14 @@ struct DSCProvider: View {
     var body: some View {
         @Bindable var model = model
         ProviderChrome(kind: .dsc) {
-            VStack(alignment: .leading, spacing: 8) {
+            // Same control order as stock DSC index; HIG margins/gaps only.
+            VStack(alignment: .leading, spacing: VibeChrome.Space.related) {
                 Text("Shared Cache index — prefer File → Open Framework… for the simple open path.")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.vibeSecondary)
                 Button("Open Framework…") { model.presentFrameworkOpenSheet() }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.provider.dsc.open_framework")
                 Text(model.dyldCachePath ?? "(no cache discovered)")
                     .font(.caption.monospaced())
@@ -1077,19 +1171,22 @@ struct DSCProvider: View {
                     .a11yCatalog("ghidra.vibe.provider.dsc.cache_path")
                 Text("Project: \(model.dscImportTarget().gpr)")
                     .font(.caption2.monospaced())
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.vibeSecondary)
                     .lineLimit(2)
                     .textSelection(.enabled)
                     .a11yCatalog("ghidra.vibe.provider.dsc.project_path")
+
                 TextField("Filter (AppKit, SwiftUI, SkyLight…)", text: $model.dyldQuery)
                     .a11yCatalog("ghidra.vibe.provider.dsc.image_search")
                     .onSubmit { model.refreshDyldImagesAsync(query: model.dyldQuery) }
                     .onChange(of: model.dyldQuery) { _, newValue in
                         model.scheduleDyldFilter(newValue)
                     }
-                HStack(spacing: 8) {
+
+                HStack(spacing: VibeChrome.Space.related) {
                     Button("Rescan") { model.openDyldCache() }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.dsc.refresh")
                         .disabled(model.dyldListingBusy || model.dyldImportBusy)
                     Button("Open selected") {
@@ -1097,7 +1194,8 @@ struct DSCProvider: View {
                             model.importDyldImage(img)
                         }
                     }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.provider.dsc.import")
                     .disabled(model.selectedDyldImage == nil || model.dyldImportBusy)
                     Toggle("Auto Analyze", isOn: $model.dyldRunAnalysisOnImport)
@@ -1106,19 +1204,33 @@ struct DSCProvider: View {
                         .help("Off = open module first. On = full analysis (slower).")
                         .a11yCatalog("ghidra.vibe.provider.dsc.analyze_toggle")
                 }
+
                 if model.dyldImportBusy || model.dyldListingBusy {
-                    HStack(spacing: 8) {
-                        ProgressView().controlSize(.small)
-                        Text(model.dyldImportBusy
-                            ? "Opening framework (slide fixups; may take a minute)…"
-                            : "Scanning Shared Cache…")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: VibeChrome.Space.related) {
+                            ProgressView().controlSize(.small)
+                            Text(model.dyldImportBusy
+                                ? "DSC Import — see Console for live log"
+                                : "Scanning Shared Cache…")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.vibeSecondary)
+                        }
+                        if model.dyldImportBusy {
+                            Text(model.statusMessage)
+                                .font(.caption2)
+                                .foregroundStyle(Color.vibeMuted)
+                                .lineLimit(3)
+                        }
                     }
                 }
+
                 Text("\(model.dyldImages.count) images — double-click to open")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.vibeSecondary)
+                    .padding(.top, VibeChrome.Space.xs)
+                    // Breathing room above the scrolling list (was flush under Auto Analyze).
+                    .padding(.bottom, VibeChrome.Space.listInset)
+
                 List(model.dyldImages, id: \.self, selection: $model.selectedDyldImage) { img in
                     Text(img)
                         .font(.caption.monospaced())
@@ -1130,9 +1242,10 @@ struct DSCProvider: View {
                             model.importDyldImage(img)
                         }
                 }
+                .listStyle(.inset(alternatesRowBackgrounds: true))
                 .a11yCatalog("ghidra.vibe.provider.dsc.image_list")
             }
-            .padding(8)
+            .padding(VibeChrome.Space.margin)
             .onAppear {
                 model.ensureVibeMCP()
                 if model.dyldCachePath == nil || model.dyldImages.isEmpty {
@@ -1169,7 +1282,8 @@ struct SwiftClassesProvider: View {
                         model.refreshSwiftClasses()
                         model.refreshMalimiteClasses()
                     }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.provider.swift_classes.refresh")
                     Button("App Bundle…") { model.showProvider(.appleBundle) }
                         .help("Open App Bundle analysis (resources, refs, translate)")
@@ -1266,23 +1380,25 @@ struct VersionTrackingProvider: View {
                             .font(.headline)
                         Text("Match markup between a source and destination program (stock VT tool).")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.vibeSecondary)
                     }
                 }
                 .padding(.top, 8)
 
                 Text("Create a session by choosing two programs from the Active Project, or drag programs onto this tool in stock Ghidra. Here: pick source/destination names then start.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.vibeSecondary)
 
                 HStack {
                     Button("Create Session…") {
                         model.runVT(op: "create")
                     }
-                    .buttonStyle(.glassProminent)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.vibeAccent)
                     .a11yCatalog("ghidra.vibe.provider.version_tracking.create")
                     Button("Open CodeBrowser") { model.openCodeBrowser() }
-                        .buttonStyle(.glass)
+                        .buttonStyle(.bordered)
+                        .tint(Color.vibeAccent)
                         .a11yCatalog("ghidra.vibe.provider.version_tracking.open_codebrowser")
                 }
 
@@ -1296,7 +1412,7 @@ struct VersionTrackingProvider: View {
                 } else {
                     Text("(no programs — import or open a project first)")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.vibeSecondary)
                 }
                 Spacer(minLength: 0)
             }
@@ -1309,81 +1425,129 @@ struct VersionTrackingProvider: View {
 
 struct SettingsView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.vibeTheme) private var themes
 
     var body: some View {
         @Bindable var model = model
-        Form {
-            TextField("MCP URL", text: $model.mcpServerURL)
-            TextField("Vibe MCP URL", text: $model.vibeMcpURL)
-            Section("Agent") {
-                Toggle("Show Agent", isOn: $model.agentEnabled)
-                Toggle("Use local Ollama", isOn: $model.agentUseLocalOllama)
-                    .onChange(of: model.agentUseLocalOllama) { _, _ in
-                        model.persistAgentAISettings()
+        let t = themes.theme
+        NavigationStack {
+            Form {
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("Ghidra Theme")
+                                .font(.headline)
+                            Spacer()
+                            Text(themes.ghidraThemeName)
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(t.vibeAccent)
+                                .a11yCatalog("ghidra.vibe.settings.theme.active")
+                        }
+                        Text(
+                            "Default Light / Default Dark use stock macOS window, control, "
+                                + "and button accent colors. Custom Base16 themes keep their palette."
+                        )
+                        .font(.caption)
+                        .foregroundStyle(Color.vibeSecondary)
+                        Toggle(
+                            "Match System Appearance",
+                            isOn: Binding(
+                                get: { themes.followSystemAppearance },
+                                set: { themes.setFollowSystemAppearance($0) }
+                            )
+                        )
+                        .a11yCatalog("ghidra.vibe.settings.theme.follow_system")
+                        Base16ThemePicker()
                     }
-                TextField("AI base URL", text: $model.agentBaseURL)
-                    .onSubmit { model.persistAgentAISettings() }
-                TextField("Default model", text: $model.agentModel)
-                    .onSubmit { model.persistAgentAISettings() }
-                if !model.agentModelPicker.isEmpty {
-                    Picker("Installed models", selection: $model.agentModel) {
-                        ForEach(model.agentModelPicker, id: \.self) { name in
-                            Text(name).tag(name)
+                } header: {
+                    Text("Appearance")
+                }
+                TextField("MCP URL", text: $model.mcpServerURL)
+                TextField("Vibe MCP URL", text: $model.vibeMcpURL)
+                Section("Agent") {
+                    Toggle("Show Agent", isOn: $model.agentEnabled)
+                    Picker("Provider", selection: $model.agentProvider) {
+                        ForEach(AgentProviderKind.allCases) { kind in
+                            Text(kind.title).tag(kind)
                         }
                     }
-                    .onChange(of: model.agentModel) { _, _ in
+                    .onChange(of: model.agentProvider) { _, new in
+                        model.applyAgentProviderDefaults(new)
                         model.persistAgentAISettings()
                     }
-                }
-                HStack {
-                    Button("Refresh models") { model.refreshAgentModels() }
-                    Text(model.agentBackend)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                TextField("API key file", text: $model.apiKeyFilePath)
-                    .help("Opt-in proprietary API: path to a key file (never paste into nix)")
-            }
-            Section("Mixture of Experts") {
-                Toggle(
-                    "Route by expert",
-                    isOn: Binding(
-                        get: { model.agentMoE.enabled },
-                        set: { model.agentMoE.enabled = $0; model.persistAgentAISettings() }
-                    )
-                )
-                .help("Pick local models by task (rename / decompile / ObjC / plan)")
-                Toggle(
-                    "Allow API escalation",
-                    isOn: Binding(
-                        get: { model.agentMoE.allowCloudEscalation },
-                        set: {
-                            model.agentMoE.allowCloudEscalation = $0
+                    TextField("Base URL", text: $model.agentBaseURL)
+                        .onSubmit { model.persistAgentAISettings() }
+                    TextField("Model", text: $model.agentModel)
+                        .onSubmit { model.persistAgentAISettings() }
+                    if !model.agentModelPicker.isEmpty {
+                        Picker("Models", selection: $model.agentModel) {
+                            ForEach(model.agentModelPicker, id: \.self) { name in
+                                Text(name).tag(name)
+                            }
+                        }
+                        .onChange(of: model.agentModel) { _, _ in
                             model.persistAgentAISettings()
                         }
-                    )
-                )
-                .help("On local failure or “use cloud”, call proprietary API if a key file is set")
-                ForEach(AgentExpertRole.allCases) { role in
-                    TextField(
-                        role.title,
-                        text: Binding(
-                            get: { model.agentMoE.models[role] ?? "" },
-                            set: { model.agentMoE.models[role] = $0 }
+                    }
+                    HStack {
+                        Button("Refresh models") { model.refreshAgentModels() }
+                        Button("Agent Setup…") { model.showAgentSetup = true }
+                        Text(model.agentBackend)
+                            .font(.caption)
+                            .foregroundStyle(Color.vibeSecondary)
+                    }
+                    if model.agentProvider.needsKeyFile {
+                        TextField("API key file", text: $model.apiKeyFilePath)
+                            .help("Path to a key file (never paste keys into Nix)")
+                    }
+                    Text("Local weights: \(AgentLocalModels.modelsDirectory.path)")
+                        .font(.caption2)
+                        .foregroundStyle(Color.vibeSecondary)
+                        .textSelection(.enabled)
+                }
+                Section("Mixture of Experts") {
+                    Toggle(
+                        "Route by expert",
+                        isOn: Binding(
+                            get: { model.agentMoE.enabled },
+                            set: { model.agentMoE.enabled = $0; model.persistAgentAISettings() }
                         )
                     )
-                    .help(role.hint)
-                    .onSubmit { model.persistAgentAISettings() }
-                }
-                if !model.agentMoELastRoute.isEmpty {
-                    Text("Last route: \(model.agentMoELastRoute)")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                    .help("Pick local models by task (rename / decompile / ObjC / plan)")
+                    Toggle(
+                        "Allow API escalation",
+                        isOn: Binding(
+                            get: { model.agentMoE.allowCloudEscalation },
+                            set: {
+                                model.agentMoE.allowCloudEscalation = $0
+                                model.persistAgentAISettings()
+                            }
+                        )
+                    )
+                    .help("On local failure or “use cloud”, call proprietary API if a key file is set")
+                    ForEach(AgentExpertRole.allCases) { role in
+                        TextField(
+                            role.title,
+                            text: Binding(
+                                get: { model.agentMoE.models[role] ?? "" },
+                                set: { model.agentMoE.models[role] = $0 }
+                            )
+                        )
+                        .help(role.hint)
+                        .onSubmit { model.persistAgentAISettings() }
+                    }
+                    if !model.agentMoELastRoute.isEmpty {
+                        Text("Last route: \(model.agentMoELastRoute)")
+                            .font(.caption2)
+                            .foregroundStyle(Color.vibeSecondary)
+                    }
                 }
             }
+            .formStyle(.grouped)
+            .navigationTitle("Settings")
         }
-        .padding()
-        .frame(width: 520)
+        .frame(minWidth: 480, idealWidth: 520, minHeight: 420)
+        .vibeContainer(radius: VibeChrome.Radius.shell)
         .onDisappear { model.persistAgentAISettings() }
     }
 }

@@ -2,32 +2,38 @@ import AppKit
 import SwiftUI
 
 /// Floating undocked provider window (stock DockingWindowManager float stand-in).
+/// Uses Tahoe unified titlebar chrome; dock/close live in the native toolbar.
 struct FloatingProviderRoot: View {
     @Environment(AppModel.self) private var model
     let kind: ProviderKind
 
     var body: some View {
-        VStack(spacing: 0) {
+        NavigationStack {
             ProviderView(kind: kind)
-            Divider()
-            HStack {
-                Button("Dock Back") {
-                    model.reattachProvider(kind)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .vibeProviderShell(radius: VibeChrome.Radius.panel)
+                .navigationTitle(kind.title)
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigation) {
+                        UnifiedToolbarButton(
+                            id: "ghidra.vibe.dock.float.reattach",
+                            systemImage: "rectangle.split.2x1",
+                            label: "Dock Back"
+                        ) {
+                            model.reattachProvider(kind)
+                        }
+                        UnifiedToolbarButton(
+                            id: "ghidra.vibe.dock.float.close",
+                            systemImage: "xmark",
+                            label: "Close"
+                        ) {
+                            model.closeProvider(kind)
+                        }
+                    }
                 }
-                .buttonStyle(.glass)
-                .a11yCatalog("ghidra.vibe.dock.float.reattach")
-                .help("Reattach \(kind.title) to its home dock region")
-                Spacer()
-                Button("Close") {
-                    model.closeProvider(kind)
-                }
-                .buttonStyle(.borderless)
-                .a11yCatalog("ghidra.vibe.dock.float.close")
-            }
-            .padding(8)
         }
         .frame(minWidth: 360, minHeight: 280)
-        .navigationTitle(kind.title)
+        .vibeUnifiedWindowChrome(restoreSize: NSSize(width: 520, height: 420))
     }
 }
 

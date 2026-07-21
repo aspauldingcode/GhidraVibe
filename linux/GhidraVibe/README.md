@@ -9,8 +9,13 @@ program engine over HTTP; stock tool pages share `native-ui/parity` contracts wi
 ```bash
 meson setup build
 meson compile -C build
+# Optional HTML Help rendering (TOC works without it):
+#   apt/dnf/nix: webkitgtk-6.0
 GHIDRA_VIBE_UI_DATA=../../native-ui ./build/ghidra-vibe
 ```
+
+Help → **Ghidra Help…** opens the stock JavaHelp corpus from `native-ui/help`
+(or `GHIDRA_VIBE_HELP`). Generate with `scripts/extract-stock-help.py`.
 
 Nix: `nix build .#ghidra-vibe-gtk` (Linux).
 

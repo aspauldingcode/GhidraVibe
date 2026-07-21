@@ -2,13 +2,102 @@ import Foundation
 
 /// Typed Agent tool schemas (OpenAI tools[]) — keep few for small local models.
 enum AgentTools {
-    static let systemPrompt = """
-    You are the GhidraVibe reverse-engineering agent. You help rename symbols, improve \
-    decompile readability, navigate the GUI, and run Autonomous RE playbooks.
-    Always reason from the JSpace discovery pack first. Prefer tools over guessing.
-    When renaming, use clear RE names (verbs, ObjC/Swift idioms). Never invent addresses.
-    For improve_decompile: propose renames + plate/EOL comments; do not invent fake source.
-    """
+    /// Canonical LLM pre-prompt (environment, roles, tools, RE playbook).
+    static func systemPrompt(for role: AgentExpertRole = .general) -> String {
+        AgentSystemPrompt.prompt(for: role)
+    }
+
+    /// Known tool names (for inline JSON recovery from small local models).
+    static var knownToolNames: Set<String> {
+        Set(openAITools.compactMap { tool in
+            ((tool["function"] as? [String: Any])?["name"] as? String)
+        })
+    }
+
+    /// Short chitchat — skip tools so tiny models don't dump fake tool JSON.
+    static func isCasualChitchat(_ text: String) -> Bool {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !t.isEmpty, t.count <= 160 else { return false }
+        let casualExact: Set<String> = [
+            "hi", "hey", "hello", "yo", "sup", "hola", "thanks", "thank you",
+            "ty", "thx", "bye", "goodbye", "gm", "good morning", "good evening",
+            "good night", "lol", "lmao", "ok", "okay", "cool", "nice",
+        ]
+        if casualExact.contains(t) { return true }
+        let casualHints = [
+            "hello", "hi ", "hey ", "what's up", "whats up", "how are you",
+            "how're you", "good morning", "good evening", "thank you", "thanks",
+        ]
+        let hasCasual = casualHints.contains(where: { t.contains($0) })
+        guard hasCasual else { return false }
+        let reHints = [
+            "decompile", "function", "rename", "xref", "symbol", "address",
+            "0x", "analyze", "ghidra", "objc", "swift", "dsc", "whoami",
+            "listing", "rag", "jspace", "autonomous",
+        ]
+        return !reHints.contains(where: { t.contains($0) })
+    }
+
+    /// Small models often print tool calls as content JSON instead of `tool_calls`.
+    static func parseInlineToolCalls(from text: String?) -> [LocalAIToolCall] {
+        guard var body = text?.trimmingCharacters(in: .whitespacesAndNewlines), !body.isEmpty
+        else { return [] }
+
+        if body.hasPrefix("```") {
+            body = body.replacingOccurrences(
+                of: #"^```(?:json)?\s*"#,
+                with: "",
+                options: .regularExpression
+            )
+            body = body.replacingOccurrences(
+                of: #"\s*```$"#,
+                with: "",
+                options: .regularExpression
+            )
+            body = body.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        if let call = toolCall(fromJSONObject: body) {
+            return [call]
+        }
+
+        // Scan for embedded `{"name":…,"arguments":…}` objects.
+        var found: [LocalAIToolCall] = []
+        var search = body[...]
+        while let start = search.firstIndex(of: "{") {
+            let fromStart = search[start...]
+            if let endOffset = matchingJSONObjectEnd(fromStart),
+               endOffset > 0
+            {
+                let slice = String(fromStart.prefix(endOffset))
+                if let call = toolCall(fromJSONObject: slice) {
+                    found.append(call)
+                }
+                search = fromStart.dropFirst(endOffset)
+            } else {
+                search = search[search.index(after: start)...]
+            }
+        }
+        return found
+    }
+
+    /// True when the whole reply is just a leaked tool-call JSON blob.
+    static func looksLikeLeakedToolJSON(_ text: String) -> Bool {
+        !parseInlineToolCalls(from: text).isEmpty
+            && text.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("{")
+    }
+
+    /// Filter `openAITools` by mode allowlist (`nil` = all, empty = none).
+    static func openAITools(allowed: Set<String>?) -> [[String: Any]] {
+        guard let allowed else { return openAITools }
+        if allowed.isEmpty { return [] }
+        return openAITools.filter { tool in
+            guard let name = (tool["function"] as? [String: Any])?["name"] as? String else {
+                return false
+            }
+            return allowed.contains(name)
+        }
+    }
 
     /// OpenAI-compatible `tools` array.
     static var openAITools: [[String: Any]] {
@@ -101,6 +190,14 @@ enum AgentTools {
                     "apply": prop("boolean", "Apply renames/comments", default: true),
                 ]
             ),
+            tool(
+                "web_search",
+                "Search the public web for RE writeups, Ghidra/Apple fixes, and known issues",
+                [
+                    "query": prop("string", "Search query (add ghidra/github/error text as needed)"),
+                    "limit": prop("integer", "Max hits", default: 6),
+                ]
+            ),
         ]
     }
 
@@ -151,6 +248,77 @@ enum AgentTools {
         var p: [String: Any] = ["type": type, "description": description]
         if let defaultValue { p["default"] = defaultValue }
         return p
+    }
+
+    private static func toolCall(fromJSONObject text: String) -> LocalAIToolCall? {
+        guard let data = text.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else { return nil }
+
+        // OpenAI nested: {"function":{"name":…,"arguments":…}}
+        let name: String
+        let argsRaw: Any?
+        if let fn = obj["function"] as? [String: Any],
+           let n = fn["name"] as? String
+        {
+            name = n
+            argsRaw = fn["arguments"] ?? fn["parameters"]
+        } else if let n = obj["name"] as? String {
+            name = n
+            argsRaw = obj["arguments"] ?? obj["parameters"] ?? obj["args"]
+        } else {
+            return nil
+        }
+        guard knownToolNames.contains(name) else { return nil }
+
+        let argsJSON: String
+        if let s = argsRaw as? String {
+            argsJSON = s.isEmpty ? "{}" : s
+        } else if let argsRaw,
+                  let d = try? JSONSerialization.data(withJSONObject: argsRaw),
+                  let s = String(data: d, encoding: .utf8)
+        {
+            argsJSON = s
+        } else if argsRaw == nil {
+            argsJSON = "{}"
+        } else {
+            return nil
+        }
+
+        return LocalAIToolCall(
+            id: (obj["id"] as? String) ?? UUID().uuidString,
+            name: name,
+            argumentsJSON: argsJSON
+        )
+    }
+
+    /// Byte-length of a balanced `{…}` JSON object starting at `text.startIndex`, or nil.
+    private static func matchingJSONObjectEnd(_ text: Substring) -> Int? {
+        guard text.first == "{" else { return nil }
+        var depth = 0
+        var inString = false
+        var escape = false
+        for (i, ch) in text.enumerated() {
+            if inString {
+                if escape {
+                    escape = false
+                } else if ch == "\\" {
+                    escape = true
+                } else if ch == "\"" {
+                    inString = false
+                }
+                continue
+            }
+            switch ch {
+            case "\"": inString = true
+            case "{": depth += 1
+            case "}":
+                depth -= 1
+                if depth == 0 { return i + 1 }
+            default: break
+            }
+        }
+        return nil
     }
 }
 

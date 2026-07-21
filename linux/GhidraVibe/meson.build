@@ -6,9 +6,12 @@ gtk = dependency('gtk4', version: '>=4.10')
 adw = dependency('libadwaita-1', version: '>=1.4')
 json = dependency('json-glib-1.0')
 soup = dependency('libsoup-3.0', required: false)
+webkit = dependency('webkitgtk-6.0', required: false)
 
-conf = configuration_data()
-conf.set_quoted('GHIDRA_VIBE_DATADIR', get_option('prefix') / get_option('datadir') / 'ghidra-vibe')
+help_deps = [gtk, adw, json]
+if webkit.found()
+  help_deps += webkit
+endif
 
 executable('ghidra-vibe',
   sources: [
@@ -18,8 +21,10 @@ executable('ghidra-vibe',
     'src/mcp_client.c',
     'src/stock_tools.c',
     'src/graph_view.c',
+    'src/help_view.c',
   ],
-  dependencies: [gtk, adw, json],
+  dependencies: help_deps,
+  c_args: webkit.found() ? ['-DHAVE_WEBKIT=1'] : [],
   install: true,
 )
 

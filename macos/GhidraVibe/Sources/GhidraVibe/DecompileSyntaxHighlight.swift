@@ -23,11 +23,12 @@ enum DecompileSyntax {
     static func attributed(_ source: String, fontSize: CGFloat = 12) -> AttributedString {
         let mono = NSFont.monospacedSystemFont(ofSize: fontSize, weight: .regular)
         let bold = NSFont.monospacedSystemFont(ofSize: fontSize, weight: .semibold)
+        let palette = ThemeStore.shared.theme
         let ns = NSMutableAttributedString(
             string: source,
             attributes: [
                 .font: mono,
-                .foregroundColor: NSColor.labelColor,
+                .foregroundColor: palette.nsForeground,
             ]
         )
         let full = NSRange(location: 0, length: ns.length)
@@ -42,22 +43,22 @@ enum DecompileSyntax {
             }
         }
 
-        paint(#"/\*[\s\S]*?\*/"#, color: .systemGreen)
-        paint(#"//[^\n]*"#, color: .systemGreen)
-        paint(#""([^"\\]|\\.)*""#, color: .systemRed)
-        paint(#"'([^'\\]|\\.)*'"#, color: .systemRed)
-        paint(#"\b0x[0-9A-Fa-f]+\b"#, color: .systemPurple)
-        paint(#"\b\d+\b"#, color: .systemPurple)
-        paint(#"^\s*#\s*\w+.*"#, color: .systemOrange, options: [.anchorsMatchLines])
+        paint(#"/\*[\s\S]*?\*/"#, color: palette.nsBase03Color)
+        paint(#"//[^\n]*"#, color: palette.nsBase03Color)
+        paint(#""([^"\\]|\\.)*""#, color: palette.nsBase0BColor)
+        paint(#"'([^'\\]|\\.)*'"#, color: palette.nsBase0BColor)
+        paint(#"\b0x[0-9A-Fa-f]+\b"#, color: palette.nsBase09Color)
+        paint(#"\b\d+\b"#, color: palette.nsBase09Color)
+        paint(#"^\s*#\s*\w+.*"#, color: palette.nsBase0AColor, options: [.anchorsMatchLines])
 
         if let idRe = try? NSRegularExpression(pattern: #"\b[A-Za-z_][A-Za-z0-9_]*\b"#) {
             for m in idRe.matches(in: source, range: full) {
                 let word = (source as NSString).substring(with: m.range)
                 if keywords.contains(word) {
-                    ns.addAttribute(.foregroundColor, value: NSColor.systemPink, range: m.range)
+                    ns.addAttribute(.foregroundColor, value: palette.nsBase0EColor, range: m.range)
                     ns.addAttribute(.font, value: bold, range: m.range)
                 } else if types.contains(word) {
-                    ns.addAttribute(.foregroundColor, value: NSColor.systemTeal, range: m.range)
+                    ns.addAttribute(.foregroundColor, value: palette.nsBase0CColor, range: m.range)
                 }
             }
         }
@@ -98,6 +99,7 @@ struct SyntaxHighlightedCodeView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(8)
         }
+        .vibeDocumentPane()
     }
 }
 
@@ -118,10 +120,13 @@ struct SyntaxCodeEditor: View {
                 TextEditor(text: $text)
                     .font(.system(.caption, design: .monospaced))
                     .frame(minHeight: 72, maxHeight: 100)
+                    .vibeThemedEditor()
             } else {
                 TextEditor(text: $text)
                     .font(.system(.body, design: .monospaced))
+                    .vibeThemedEditor()
             }
         }
+        .background(Color.vibeContent)
     }
 }

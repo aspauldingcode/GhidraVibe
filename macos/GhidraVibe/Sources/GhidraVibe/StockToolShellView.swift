@@ -29,17 +29,89 @@ struct StockToolShellView: View {
     var body: some View {
         @Bindable var model = model
         let chrome = StockToolChrome.shared(for: chromeName)
-        return VStack(spacing: 0) {
-            toolToolbar(chrome)
-            Divider()
-            HSplitView {
-                providerList(chrome)
-                    .frame(minWidth: 180, idealWidth: 220, maxWidth: 320)
-                providerDetail(chrome)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+        return HSplitView {
+            providerList(chrome)
+                .frame(minWidth: 180, idealWidth: 220, maxWidth: 320)
+            providerDetail(chrome)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .a11yContainerCatalog(a11yRoot)
+        .vibeContainer(radius: VibeChrome.Radius.shell)
+        .toolbar {
+            // Narrow windows (macOS 26): trailing More… mirrors every toolbar action.
+            ToolbarItemGroup(placement: .navigation) {
+                UnifiedToolbarButton(
+                    id: "ghidra.vibe.\(toolSlug).back_project",
+                    systemImage: "building.columns",
+                    label: "Project Window"
+                ) {
+                    model.enterProjectWindow()
+                }
+                UnifiedToolbarButton(
+                    id: "ghidra.vibe.\(toolSlug).open_codebrowser",
+                    systemImage: "flame.fill",
+                    label: "CodeBrowser"
+                ) {
+                    model.openCodeBrowser()
+                }
+            }
+
+            ToolbarSpacer(.fixed, placement: .navigation)
+
+            ToolbarItemGroup(placement: .navigation) {
+                ForEach(chrome.toolbarGroups, id: \.self) { group in
+                    let id = chrome.toolbarId(group, toolSlug: toolSlug)
+                    UnifiedToolbarButton(
+                        id: id,
+                        systemImage: UnifiedToolbars.stockToolSymbol(for: group),
+                        label: group
+                    ) {
+                        model.stockToolAction(tool: toolMode, toolbar: group)
+                    }
+                }
+            }
+
+            ToolbarSpacer(.fixed, placement: .primaryAction)
+
+            ToolbarItemGroup(placement: .primaryAction) {
+                Menu {
+                    Button("Project Window") { model.enterProjectWindow() }
+                    Button("CodeBrowser") { model.openCodeBrowser() }
+                    Divider()
+                    ForEach(chrome.toolbarGroups, id: \.self) { group in
+                        Button(group) { model.stockToolAction(tool: toolMode, toolbar: group) }
+                    }
+                    if model.agentEnabled {
+                        Divider()
+                        Button(
+                            model.dockLayout.agentSidebarVisible
+                                ? "Hide Agent sidebar"
+                                : "Show Agent sidebar"
+                        ) {
+                            model.toggleAgentSidebar()
+                        }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+                .help("More \(toolMode.rawValue) tools (includes actions clipped on narrow windows)")
+                .accessibilityIdentifier("ghidra.vibe.\(toolSlug).toolbar.more")
+
+                if model.agentEnabled {
+                    Button {
+                        model.toggleAgentSidebar()
+                    } label: {
+                        Image(systemName: "sidebar.trailing")
+                    }
+                    .help(
+                        model.dockLayout.agentSidebarVisible
+                            ? "Hide Agent sidebar"
+                            : "Show Agent sidebar"
+                    )
+                    .a11yCatalog("ghidra.vibe.toolbar.agent_sidebar")
+                }
+            }
+        }
         .onAppear {
             model.statusMessage = "\(toolMode.rawValue) — stock tool"
             if model.stockToolSelectedProvider.isEmpty {
@@ -53,49 +125,6 @@ struct StockToolShellView: View {
         .onChange(of: model.stockToolSelectedProvider) { _, _ in
             refreshSelectedProvider()
         }
-    }
-
-    private func toolToolbar(_ chrome: StockToolChrome) -> some View {
-        LiquidGlass.Bar(spacing: 6) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    Button("Project Window") { model.enterProjectWindow() }
-                        .buttonStyle(.glass)
-                        .help("Return to Front End / Project Window")
-                        .a11yCatalog("ghidra.vibe.\(toolSlug).back_project")
-                    Button("CodeBrowser") { model.openCodeBrowser() }
-                        .buttonStyle(.glass)
-                        .help("Open CodeBrowser")
-                    Divider().frame(height: 18)
-                    ForEach(chrome.toolbarGroups, id: \.self) { group in
-                        let id = chrome.toolbarId(group, toolSlug: toolSlug)
-                        Button(group) { model.stockToolAction(tool: toolMode, toolbar: group) }
-                            .buttonStyle(.glass)
-                            .font(.caption)
-                            .a11yCatalog(id)
-                            .help(group)
-                    }
-                    Spacer(minLength: 0)
-                    if model.agentEnabled {
-                        Button {
-                            model.toggleAgentSidebar()
-                        } label: {
-                            Image(systemName: "sidebar.trailing")
-                        }
-                        .buttonStyle(.glass)
-                        .help(
-                            model.dockLayout.agentSidebarVisible
-                                ? "Hide Agent sidebar"
-                                : "Show Agent sidebar"
-                        )
-                        .a11yCatalog("ghidra.vibe.toolbar.agent_sidebar")
-                    }
-                }
-                .vibeGlassBarBackground()
-            }
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
     }
 
     private func providerList(_ chrome: StockToolChrome) -> some View {
@@ -112,6 +141,7 @@ struct StockToolShellView: View {
             }
         }
         .listStyle(.sidebar)
+                .vibeThemedList()
     }
 
     @ViewBuilder

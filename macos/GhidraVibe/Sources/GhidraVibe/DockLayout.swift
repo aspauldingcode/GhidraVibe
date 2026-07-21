@@ -2,6 +2,37 @@ import Foundation
 import UniformTypeIdentifiers
 import CoreTransferable
 
+/// Screen edge a modular provider tiles against when dropped on a dock region.
+enum DockTileEdge: String, CaseIterable, Identifiable, Hashable {
+    case top
+    case left
+    case right
+    case bottom
+    case center
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .top: "Top"
+        case .left: "Left"
+        case .right: "Right"
+        case .bottom: "Bottom"
+        case .center: "Center"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .top: "rectangle.topthird.inset.filled"
+        case .left: "sidebar.left"
+        case .right: "sidebar.right"
+        case .bottom: "rectangle.bottomthird.inset.filled"
+        case .center: "rectangle.center.inset.filled"
+        }
+    }
+}
+
 /// Stock CodeBrowser dock regions (SwiftUI stand-in for DockingWindowManager anchors).
 enum DockRegion: String, Codable, CaseIterable, Identifiable, Hashable {
     case header
@@ -26,8 +57,86 @@ enum DockRegion: String, Codable, CaseIterable, Identifiable, Hashable {
         }
     }
 
+    /// Which workspace edge this region tiles against (nil for float).
+    var tileEdge: DockTileEdge? {
+        switch self {
+        case .header: .top
+        case .left: .left
+        case .right: .right
+        case .bottomStrip, .console: .bottom
+        case .center: .center
+        case .floating: nil
+        }
+    }
+
+    /// Short control label: edge first, then region when edges share a side.
+    var dropLabel: String {
+        switch self {
+        case .header: "Top · Header"
+        case .left: "Left"
+        case .center: "Center"
+        case .right: "Right"
+        case .bottomStrip: "Bottom · Strip"
+        case .console: "Bottom · Console"
+        case .floating: "Float"
+        }
+    }
+
+    /// Imperative placement verb shown on hover / drop overlays.
+    var tileVerb: String {
+        switch self {
+        case .header: "Tile top (header)"
+        case .left: "Tile left"
+        case .center: "Stack in center"
+        case .right: "Tile right"
+        case .bottomStrip: "Tile bottom strip"
+        case .console: "Tile bottom console"
+        case .floating: "Float window"
+        }
+    }
+
+    /// SF Symbol for drop-target affordances (CodeBrowser redock HUD).
+    var symbol: String {
+        tileEdge?.symbol ?? "macwindow"
+    }
+
+    /// Live status / banner line while hovering this drop target.
+    func hoverPlacementHint(moving kindTitle: String) -> String {
+        switch self {
+        case .header:
+            return "Will tile TOP — “\(kindTitle)” → header strip"
+        case .left:
+            return "Will tile LEFT — “\(kindTitle)” → left dock"
+        case .right:
+            return "Will tile RIGHT — “\(kindTitle)” → right dock"
+        case .center:
+            return "Will stack CENTER — “\(kindTitle)” → main column"
+        case .bottomStrip:
+            return "Will tile BOTTOM — “\(kindTitle)” → bottom strip"
+        case .console:
+            return "Will tile BOTTOM — “\(kindTitle)” → console stack"
+        case .floating:
+            return "Will FLOAT — “\(kindTitle)” as a separate window"
+        }
+    }
+
+    func dockedStatus(moving kindTitle: String) -> String {
+        switch self {
+        case .header: "Docked \(kindTitle) to top (header)"
+        case .left: "Docked \(kindTitle) to left edge"
+        case .right: "Docked \(kindTitle) to right edge"
+        case .center: "Docked \(kindTitle) to center"
+        case .bottomStrip: "Docked \(kindTitle) to bottom strip"
+        case .console: "Docked \(kindTitle) to bottom console"
+        case .floating: "Floating \(kindTitle)"
+        }
+    }
+
     /// Regions that accept redock drops (not the floating bucket itself).
     static let dropTargets: [DockRegion] = [.left, .center, .right, .bottomStrip, .console, .header]
+
+    /// Primary edge tiles shown in the drag compass (one chip per edge).
+    static let primaryEdgeTargets: [DockRegion] = [.header, .left, .center, .right, .bottomStrip]
 }
 
 /// Serializable CodeBrowser dock layout — seeded from stock CodeBrowser.tool geometry intent.
@@ -45,7 +154,9 @@ struct DockLayoutState: Codable, Equatable {
     var rightWidthRatio: Double
     var consoleHeightRatio: Double
     var bottomStripHeightRatio: Double
-    /// Xcode-style trailing Agent chat column (not a Decompiler tab).
+    /// Leading Modules palette (Window → providers); independent of left dock panes.
+    var leftSidebarVisible: Bool
+    /// Xcode-style trailing Agent chat column (not a dockable provider module).
     var agentSidebarVisible: Bool
     var agentSidebarWidthRatio: Double
 
@@ -54,7 +165,7 @@ struct DockLayoutState: Codable, Equatable {
     enum CodingKeys: String, CodingKey {
         case stacks, active, hidden, floating, home
         case leftWidthRatio, rightWidthRatio, consoleHeightRatio, bottomStripHeightRatio
-        case agentSidebarVisible, agentSidebarWidthRatio
+        case leftSidebarVisible, agentSidebarVisible, agentSidebarWidthRatio
     }
 
     init(from decoder: Decoder) throws {
@@ -68,6 +179,7 @@ struct DockLayoutState: Codable, Equatable {
         rightWidthRatio = try c.decodeIfPresent(Double.self, forKey: .rightWidthRatio) ?? 0.28
         consoleHeightRatio = try c.decodeIfPresent(Double.self, forKey: .consoleHeightRatio) ?? 0.16
         bottomStripHeightRatio = try c.decodeIfPresent(Double.self, forKey: .bottomStripHeightRatio) ?? 0.12
+        leftSidebarVisible = try c.decodeIfPresent(Bool.self, forKey: .leftSidebarVisible) ?? true
         agentSidebarVisible = try c.decodeIfPresent(Bool.self, forKey: .agentSidebarVisible) ?? true
         agentSidebarWidthRatio = try c.decodeIfPresent(Double.self, forKey: .agentSidebarWidthRatio) ?? 0.22
     }
@@ -83,6 +195,7 @@ struct DockLayoutState: Codable, Equatable {
         try c.encode(rightWidthRatio, forKey: .rightWidthRatio)
         try c.encode(consoleHeightRatio, forKey: .consoleHeightRatio)
         try c.encode(bottomStripHeightRatio, forKey: .bottomStripHeightRatio)
+        try c.encode(leftSidebarVisible, forKey: .leftSidebarVisible)
         try c.encode(agentSidebarVisible, forKey: .agentSidebarVisible)
         try c.encode(agentSidebarWidthRatio, forKey: .agentSidebarWidthRatio)
     }
@@ -98,6 +211,7 @@ struct DockLayoutState: Codable, Equatable {
         rightWidthRatio: Double,
         consoleHeightRatio: Double,
         bottomStripHeightRatio: Double,
+        leftSidebarVisible: Bool,
         agentSidebarVisible: Bool,
         agentSidebarWidthRatio: Double
     ) {
@@ -110,6 +224,7 @@ struct DockLayoutState: Codable, Equatable {
         self.rightWidthRatio = rightWidthRatio
         self.consoleHeightRatio = consoleHeightRatio
         self.bottomStripHeightRatio = bottomStripHeightRatio
+        self.leftSidebarVisible = leftSidebarVisible
         self.agentSidebarVisible = agentSidebarVisible
         self.agentSidebarWidthRatio = agentSidebarWidthRatio
     }
@@ -162,6 +277,7 @@ struct DockLayoutState: Codable, Equatable {
             rightWidthRatio: 0.28,
             consoleHeightRatio: 0.16,
             bottomStripHeightRatio: 0.12,
+            leftSidebarVisible: true,
             agentSidebarVisible: true,
             agentSidebarWidthRatio: 0.22
         )
@@ -187,11 +303,15 @@ struct DockLayoutState: Codable, Equatable {
             ProviderKind.defaultDocked.map(\.rawValue)
                 + defaultRightTabs.map(\.rawValue)
         )
-        for kind in ProviderKind.allCases where kind != .versionTracking {
+        for kind in ProviderKind.allCases
+            where kind != .versionTracking && kind.isModularDockProvider
+        {
             if !alwaysVisible.contains(kind.rawValue) {
                 hidden.insert(kind.rawValue)
             }
         }
+        // Agent is trailing-sidebar only — never a modular dock tab.
+        hidden.insert(ProviderKind.agent.rawValue)
         return Array(hidden)
     }
 
@@ -406,6 +526,13 @@ struct DockLayoutState: Codable, Equatable {
         }
         copy.hidden.removeAll { $0 == classes }
         copy.home[classes] = DockRegion.left.rawValue
+        // Agent is never a dockable module — strip legacy stack/float entries.
+        copy.removeFromAllStacks(.agent)
+        copy.floating.removeAll { $0 == ProviderKind.agent.rawValue }
+        if !copy.hidden.contains(ProviderKind.agent.rawValue) {
+            copy.hidden.append(ProviderKind.agent.rawValue)
+        }
+        copy.home.removeValue(forKey: ProviderKind.agent.rawValue)
         return copy
     }
 }
