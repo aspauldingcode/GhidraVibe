@@ -5,16 +5,16 @@ This branch only tracks the latest channel metadata.
 
 {
   "name": "GhidraVibe",
-  "version": "0.1.0-67b987f",
-  "sha": "67b987f",
-  "dmg": "GhidraVibe-0.1.0-67b987f.dmg",
+  "version": "0.1.0-e7e481d",
+  "sha": "e7e481d",
+  "dmg": "GhidraVibe-0.1.0-e7e481d.dmg",
   "dmg_latest": "GhidraVibe-latest.dmg",
   "app": "GhidraVibe.app",
-  "generated_at": "2026-07-21T09:03:44Z",
+  "generated_at": "2026-07-21T09:13:40Z",
   "channel": "beta",
   "tag": "beta",
   "release_url": "https://github.com/aspauldingcode/GhidraVibe/releases/tag/beta",
-  "dmg_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-0.1.0-67b987f.dmg",
+  "dmg_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-0.1.0-e7e481d.dmg",
   "dmg_latest_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-latest.dmg"
 }
 
@@ -22,14 +22,14 @@ This branch only tracks the latest channel metadata.
 
 ## GhidraVibe Beta
 
-Rolling prerelease from `master` (`67b987f`).
+Rolling prerelease from `master` (`e7e481d`).
 
-- **Commit:** `67b987fe7d78b17a617d03d204bac7050562e330`
-- **Range:** `HEAD`
+- **Commit:** `e7e481d1c4537849daaee45fb04495fe03fdc02f`
+- **Range:** `beta..HEAD`
 
 ### Changes
 
-- Initial packaging commit
+- fix(linux): Port GTK3-only API calls to GTK4 (e7e481d)
 
 ### Install
 

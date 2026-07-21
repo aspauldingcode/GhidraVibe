@@ -1,14 +1,14 @@
 {
   "name": "GhidraVibe",
-  "version": "0.1.0-67b987f",
-  "sha": "67b987f",
-  "dmg": "GhidraVibe-0.1.0-67b987f.dmg",
+  "version": "0.1.0-e7e481d",
+  "sha": "e7e481d",
+  "dmg": "GhidraVibe-0.1.0-e7e481d.dmg",
   "dmg_latest": "GhidraVibe-latest.dmg",
   "app": "GhidraVibe.app",
-  "generated_at": "2026-07-21T09:03:44Z",
+  "generated_at": "2026-07-21T09:13:40Z",
   "channel": "beta",
   "tag": "beta",
   "release_url": "https://github.com/aspauldingcode/GhidraVibe/releases/tag/beta",
-  "dmg_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-0.1.0-67b987f.dmg",
+  "dmg_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-0.1.0-e7e481d.dmg",
   "dmg_latest_url": "https://github.com/aspauldingcode/GhidraVibe/releases/download/beta/GhidraVibe-latest.dmg"
 }
