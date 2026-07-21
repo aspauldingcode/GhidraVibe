@@ -148,6 +148,14 @@ jobs:
             git tag -f beta "${GITHUB_SHA}"
             git push origin refs/tags/beta --force
             if gh release view beta >/dev/null 2>&1; then
+              SHORT_SHA="$(git rev-parse --short HEAD)"
+              # Drop stale per-commit .AppImage assets from previous beta runs so
+              # the rolling release doesn't accumulate one AppImage per push forever.
+              gh release view beta --json assets --jq '.assets[].name' | while read -r name; do
+                if [[ "$name" == GhidraVibe-*.AppImage && "$name" != *"$SHORT_SHA"* && "$name" != GhidraVibe-latest-*.AppImage ]]; then
+                  gh release delete-asset beta "$name" -y || true
+                fi
+              done
               gh release upload beta dist/*.AppImage dist/*.json --clobber
               gh release edit beta --notes-file "$NOTES" --prerelease --title "GhidraVibe Beta"
             else
