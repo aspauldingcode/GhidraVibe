@@ -61,34 +61,55 @@
 
           extractDyld = pkgs.writeShellScriptBin "extract" ''
             set -euo pipefail
-            if [[ "$(uname)" != "Darwin" ]]; then
-              echo "dyld extraction is macOS-only. Prefer on-device DSC via ghidra-vibe-dyld."
-              exit 1
-            fi
-            # Generic: extract <install-path> [outdir]
-            # Discouraged vs Window → Shared Cache (DyldCacheFileSystem + Apple symbols).
+            # Platform-specific behavior:
+            # macOS: optional extract from on-device cache (discouraged)
+            # Linux: extract tool for ipsw setup (normal workflow)
+            
             IMAGE="''${1:-}"
             if [[ -z "$IMAGE" || "$IMAGE" == "-h" || "$IMAGE" == "--help" ]]; then
-              echo "Usage: extract <dyld-image-install-path> [outdir]"
+              if [[ "$(uname)" == "Darwin" ]]; then
+                echo "Usage: extract <dyld-image-install-path> [outdir]"
+                echo "macOS: Prefer ghidra-vibe-dyld import --image <name|path>"
+                echo "This uses on-device DyldCacheFileSystem (IDA-like)."
+              else
+                echo "Usage: extract <ipsw-file> [outdir]"
+                echo "Linux: Extract dyld cache from iOS IPSW."
+                echo "Or use: ghidra-vibe-dyld setup-ipsw"
+              fi
+              exit 1
+            fi
+            
+            if [[ "$(uname)" == "Darwin" ]]; then
+              # macOS: on-device extraction (discouraged)
+              echo "WARNING: on-device extraction is discouraged on macOS."
               echo "Prefer: ghidra-vibe-dyld import --image <name|path>"
-              exit 1
+              
+              for c in \
+                "/System/Volumes/Preboot/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_arm64e" \
+                "/System/Library/dyld/dyld_shared_cache_arm64e" \
+                "/System/Volumes/Preboot/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_x86_64" \
+                "/System/Library/dyld/dyld_shared_cache_x86_64"; do
+                if [[ -f "$c" ]]; then DYLD_CACHE="$c"; break; fi
+              done
+              if [[ -z "''${DYLD_CACHE:-}" ]]; then
+                echo "Could not find a dyld shared cache."
+                exit 1
+              fi
+              BASE="$(basename "$IMAGE")"
+              OUT_DIR="''${2:-$PWD/dyld-extracted/$BASE}"
+              mkdir -p "$OUT_DIR"
+              nix shell nixpkgs#ipsw -c ipsw dyld extract "$DYLD_CACHE" "$IMAGE" -o "$OUT_DIR" --force
+              echo "output: $OUT_DIR"
+            else
+              # Linux: extract from IPSW file
+              IPSW_FILE="$IMAGE"
+              OUT_DIR="''${2:-$HOME/.local/share/ghidra-vibe/ipsw-cache}"
+              mkdir -p "$OUT_DIR"
+              echo "Extracting dyld cache from IPSW..."
+              nix shell nixpkgs#ipsw -c ipsw dyld extract "$IPSW_FILE" --output "$OUT_DIR"
+              echo "SUCCESS: dyld cache extracted to $OUT_DIR"
+              echo "Set: export GHIDRA_VIBE_IPSW_CACHE=$OUT_DIR/dyld_shared_cache_arm64e"
             fi
-            for c in \
-              "/System/Volumes/Preboot/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_arm64e" \
-              "/System/Library/dyld/dyld_shared_cache_arm64e" \
-              "/System/Volumes/Preboot/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_x86_64" \
-              "/System/Library/dyld/dyld_shared_cache_x86_64"; do
-              if [[ -f "$c" ]]; then DYLD_CACHE="$c"; break; fi
-            done
-            if [[ -z "''${DYLD_CACHE:-}" ]]; then
-              echo "Could not find a dyld shared cache."
-              exit 1
-            fi
-            BASE="$(basename "$IMAGE")"
-            OUT_DIR="''${2:-$PWD/dyld-extracted/$BASE}"
-            mkdir -p "$OUT_DIR"
-            nix shell nixpkgs#ipsw -c ipsw dyld extract "$DYLD_CACHE" "$IMAGE" -o "$OUT_DIR" --force
-            echo "output: $OUT_DIR"
           '';
 
           ghidraVibeGtk =

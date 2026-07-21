@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """On-device dyld shared cache image index (IDA-like DSC Index, no extract).
 
+Platform support:
+  - macOS: on-device cache at /System/Library/dyld/
+  - Linux: ipsw-extracted cache (via GHIDRA_VIBE_IPSW_CACHE)
+
 Parses the system cache header / sibling .map file. Never shells out to ipsw.
 """
 from __future__ import annotations
 
 import argparse
 import os
+import platform
 import struct
 import sys
 from pathlib import Path
 
-CACHE_CANDIDATES = (
+# macOS on-device cache locations
+CACHE_CANDIDATES_MACOS = (
     "/System/Volumes/Preboot/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_arm64e",
     "/System/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_arm64e",
     "/System/Library/dyld/dyld_shared_cache_arm64e",
@@ -27,11 +33,42 @@ IMAGES_OFFSET_OLD_OFF = 0x18
 
 
 def find_cache() -> Path:
-    for c in CACHE_CANDIDATES:
+    """Locate dyld shared cache: on-device (macOS) or ipsw-extracted (Linux)."""
+    system = platform.system()
+    
+    if system == "Linux":
+        # Linux: check ipsw-extracted cache locations
+        ipsw_cache = os.environ.get("GHIDRA_VIBE_IPSW_CACHE")
+        if ipsw_cache:
+            p = Path(ipsw_cache)
+            if p.is_file():
+                return p
+        
+        # Check default Linux locations
+        home = Path.home()
+        xdg_data = Path(os.environ.get("XDG_DATA_HOME", home / ".local" / "share"))
+        linux_candidates = [
+            home / ".local" / "share" / "ghidra-vibe" / "ipsw-cache" / "dyld_shared_cache_arm64e",
+            home / "Documents" / "GhidraVibe" / "ipsw-cache" / "dyld_shared_cache_arm64e",
+            xdg_data / "ghidra-vibe" / "ipsw-cache" / "dyld_shared_cache_arm64e",
+        ]
+        for c in linux_candidates:
+            if c.is_file():
+                return c
+        
+        raise FileNotFoundError(
+            "No ipsw cache found on Linux. Run: ghidra-vibe-dyld setup-ipsw\n"
+            "Or set GHIDRA_VIBE_IPSW_CACHE to your extracted cache path."
+        )
+    
+    # macOS: on-device cache
+    for c in CACHE_CANDIDATES_MACOS:
         p = Path(c)
         if p.is_file():
             return p
+    
     raise FileNotFoundError("No on-device dyld shared cache found")
+
 
 
 def _read_cstring(data: bytes, off: int) -> str:

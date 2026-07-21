@@ -3,6 +3,14 @@
 Opening a macOS/iOS framework from the system shared cache is a **built-in File /
 toolbar / Tool Chest action** — not an MCP addon pane you have to discover.
 
+## Platform Support
+
+### macOS (on-device)
+Uses the native system dyld shared cache at `/System/Library/dyld/dyld_shared_cache_*`. No extraction needed.
+
+### Linux (ipsw-extracted)
+Uses iOS IPSW-extracted dyld shared cache. Setup required via `ghidra-vibe-dyld setup-ipsw` or manual extraction.
+
 ## How IDA does it (what we mirror)
 
 | IDA 9.4 | GhidraVibe |
@@ -75,5 +83,30 @@ demangler analyzers. Set `=0` only when debugging the loader.
 ## What we do **not** do by default
 
 - Whole-cache load as one program
-- `ipsw dyld extract` (only if both `GHIDRA_VIBE_ALLOW_IPSW=1` and
+- `ipsw dyld extract` on macOS (only if both `GHIDRA_VIBE_ALLOW_IPSW=1` and
   `GHIDRA_VIBE_FORCE_EXTRACT=1`)
+
+## Linux IPSW Cache Setup
+
+**Linux requires an ipsw-extracted dyld shared cache (macOS uses on-device):**
+
+Default locations checked:
+1. `~/.local/share/ghidra-vibe/ipsw-cache/dyld_shared_cache_arm64e`
+2. `~/Documents/GhidraVibe/ipsw-cache/dyld_shared_cache_arm64e`
+3. `$XDG_DATA_HOME/ghidra-vibe/ipsw-cache/dyld_shared_cache_arm64e`
+
+Or set `GHIDRA_VIBE_IPSW_CACHE` to point to your extracted cache.
+
+### Quick Setup
+
+```bash
+# Auto setup (downloads latest iOS support files)
+ghidra-vibe-dyld setup-ipsw
+
+# Or manual extraction from IPSW
+# 1. Download iOS IPSW from https://ipsw.me
+# 2. Extract cache
+nix shell nixpkgs#ipsw -c ipsw dyld extract <ipsw-file> --output ~/.local/share/ghidra-vibe/ipsw-cache
+# 3. Set environment
+export GHIDRA_VIBE_IPSW_CACHE=~/.local/share/ghidra-vibe/ipsw-cache/dyld_shared_cache_arm64e
+```
