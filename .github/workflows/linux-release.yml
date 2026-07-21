@@ -21,7 +21,61 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check-skip:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.release-skip.outputs.skip }}
+      source_hash: ${{ steps.release-skip.outputs.source_hash }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Skip if release source hash unchanged
+        id: release-skip
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-source-hash.sh
+          HASH="$(./scripts/release-source-hash.sh linux)"
+          echo "source_hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "Release source hash: $HASH"
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "workflow_dispatch  -  force build"
+            exit 0
+          fi
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "tag release  -  never skip"
+            exit 0
+          fi
+
+          PREV=""
+          # Prefer x86_64 metadata; fall back to aarch64.
+          for meta in latest-x86_64.json latest-aarch64.json; do
+            if PREV_JSON="$(curl -fsSL "https://github.com/${GITHUB_REPOSITORY}/releases/download/beta/${meta}" 2>/dev/null)"; then
+              PREV="$(printf '%s' "$PREV_JSON" | python3 -c 'import sys,json
+try:
+  print(json.load(sys.stdin).get("source_hash") or "")
+except Exception:
+  print("")')"
+              [[ -n "$PREV" ]] && break
+            fi
+          done
+
+          if [[ -n "$PREV" && "$PREV" == "$HASH" ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Release skipped::source_hash matches published beta ($HASH)"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "source_hash changed (was ${PREV:-none}, now $HASH)"
+          fi
+
   package-appimage:
+    needs: check-skip
+    if: needs.check-skip.outputs.skip != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -55,6 +109,7 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "SHA=$SHA" >> "$GITHUB_ENV"
+          echo "SOURCE_HASH=${{ needs.check-skip.outputs.source_hash }}" >> "$GITHUB_ENV"
 
       - name: Build portable AppImage with nix bundle
         run: |
@@ -79,6 +134,7 @@ jobs:
             "arch": "${{ matrix.arch }}",
             "platform": "linux",
             "sha": "${SHA}",
+            "source_hash": "${SOURCE_HASH}",
             "appimage": "GhidraVibe-${VERSION}-${{ matrix.arch }}.AppImage",
             "built_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           }
@@ -95,7 +151,8 @@ jobs:
           retention-days: 14
 
   publish-release:
-    needs: package-appimage
+    needs: [check-skip, package-appimage]
+    if: needs.check-skip.outputs.skip != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -17,6 +17,11 @@ Both workflows run automatically on every push to `master`/`main` (publishing
 the rolling `beta` prerelease) and on `v*` tags (publishing a dedicated
 release).
 
+Beta builds are skipped when the release **source hash** matches the hash
+already published in `latest.json` / `latest-*.json` (docs-only or other
+non-packaging changes). Tags and `workflow_dispatch` always build.
+`scripts/release-source-hash.sh` computes the hash.
+
 ## Release Artifacts
 
 When releases are created, they include:
