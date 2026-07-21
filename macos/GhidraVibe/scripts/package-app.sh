@@ -32,32 +32,40 @@ chmod -R u+w "$OUT" 2>/dev/null || true
 rm -rf "$OUT"
 mkdir -p "$OUT/Contents/MacOS" "$RES"
 
-# If using a pre-built app, just copy it
+# If using a pre-built app, copy it as the base
 if [[ "${SKIP_SWIFT_BUILD:-}" == "1" && -f "$ROOT/.build/GhidraVibe.app/Contents/MacOS/GhidraVibe" ]]; then
   # Copy and make writable (Nix store files are read-only)
+  echo "Using pre-built app from $ROOT/.build/GhidraVibe.app"
   cp -R "$ROOT/.build/GhidraVibe.app/." "$OUT/"
   chmod -R u+w "$OUT"
-else
-  # Otherwise use the freshly built binary
+  # Pre-built app already has basic resources, skip to runtime.env generation
+  # But we still need to add help and other runtime-specific files below
+elif [[ -f "$BIN_DIR/GhidraVibe" ]]; then
+  # Use the freshly Swift-built binary
+  echo "Using freshly built binary from $BIN_DIR/GhidraVibe"
   cp "$BIN_DIR/GhidraVibe" "$APP_BIN"
   chmod +x "$APP_BIN"
+  
+  # Add resources for fresh build
+  # Official Ghidra dragon icon + UI catalogs (read via Bundle.main / file paths)
+  if [[ -f "$REPO/native-ui/icons/AppIcon.icns" ]]; then
+    cp "$REPO/native-ui/icons/AppIcon.icns" "$RES/AppIcon.icns"
+  elif [[ -f "$ROOT/Resources/AppIcon.icns" ]]; then
+    cp "$ROOT/Resources/AppIcon.icns" "$RES/AppIcon.icns"
+  fi
+  cp -f "$REPO/native-ui/icons/png/GhidraIcon256.png" "$RES/"
+  cp -f "$REPO/native-ui/a11y/catalog.json" \
+        "$REPO/native-ui/menus/actions.json" \
+        "$REPO/native-ui/layout/CodeBrowser.tool.json" \
+        "$REPO/native-ui/parity/CodeBrowser.chrome.json" \
+        "$REPO/native-ui/parity/Debugger.chrome.json" \
+        "$REPO/native-ui/parity/Emulator.chrome.json" \
+        "$REPO/native-ui/parity/VersionTracking.chrome.json" \
+        "$RES/"
+else
+  echo "ERROR: No GhidraVibe binary found. Either build with Swift or provide pre-built app." >&2
+  exit 1
 fi
-
-# Official Ghidra dragon icon + UI catalogs (read via Bundle.main / file paths)
-if [[ -f "$REPO/native-ui/icons/AppIcon.icns" ]]; then
-  cp "$REPO/native-ui/icons/AppIcon.icns" "$RES/AppIcon.icns"
-elif [[ -f "$ROOT/Resources/AppIcon.icns" ]]; then
-  cp "$ROOT/Resources/AppIcon.icns" "$RES/AppIcon.icns"
-fi
-cp -f "$REPO/native-ui/icons/png/GhidraIcon256.png" "$RES/"
-cp -f "$REPO/native-ui/a11y/catalog.json" \
-      "$REPO/native-ui/menus/actions.json" \
-      "$REPO/native-ui/layout/CodeBrowser.tool.json" \
-      "$REPO/native-ui/parity/CodeBrowser.chrome.json" \
-      "$REPO/native-ui/parity/Debugger.chrome.json" \
-      "$REPO/native-ui/parity/Emulator.chrome.json" \
-      "$REPO/native-ui/parity/VersionTracking.chrome.json" \
-      "$RES/"
 
 # Stock JavaHelp corpus → Contents/Resources/help (package-time extract).
 HELP_OUT="$REPO/native-ui/help"
