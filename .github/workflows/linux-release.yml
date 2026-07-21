@@ -3,6 +3,10 @@ name: linux-release
 # Package GhidraVibe AppImages for Linux (x86_64 and aarch64)
 # - push to master/main → rolling GitHub Release "beta" (prerelease)
 # - tag v* → dedicated GitHub Release for that tag
+#
+# Uses `nix bundle` with the ralismark/nix-appimage bundler, which produces a
+# genuinely portable AppImage (statically-linked musl runtime, no dependency
+# on the host's glibc or /nix/store) instead of a raw copy of Nix outputs.
 on:
   push:
     branches: [master, main]
@@ -19,9 +23,14 @@ concurrency:
 jobs:
   package-appimage:
     strategy:
+      fail-fast: false
       matrix:
-        arch: [x86_64, aarch64]
-    runs-on: ubuntu-24.04
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,99 +43,43 @@ jobs:
           extra-conf: |
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
             substituters = https://cache.nixos.org https://nix-community.cachix.org
+            extra-experimental-features = nix-command flakes
 
-      - name: Set up QEMU for cross-compilation
-        if: matrix.arch == 'aarch64'
+      - name: Determine version
         run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-static binfmt-support
-
-      - name: Build GhidraVibe GTK
-        run: |
-          if [ "${{ matrix.arch }}" = "aarch64" ]; then
-            # Cross-compile for aarch64
-            nix build .#packages.aarch64-linux.ghidra-vibe-gtk --print-build-logs
-          else
-            # Native x86_64 build
-            nix build .#ghidra-vibe-gtk --print-build-logs
-          fi
-
-      - name: Install AppImage tools
-        run: |
-          wget -O /tmp/appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-${{ matrix.arch }}.AppImage
-          chmod +x /tmp/appimagetool
-
-      - name: Create AppImage structure
-        run: |
-          VERSION="${GHIDRA_VIBE_VERSION:-}"
           SHA="$(git rev-parse --short HEAD)"
-          
-          if [[ -z "$VERSION" ]]; then
-            if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-              VERSION="${GITHUB_REF_NAME}"
-            else
-              VERSION="0.1.0-${SHA}"
-            fi
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME}"
+          else
+            VERSION="0.1.0-${SHA}"
           fi
-          
-          mkdir -p dist
-          APPDIR="dist/GhidraVibe.AppDir"
-          mkdir -p "$APPDIR/usr/bin" "$APPDIR/usr/lib" "$APPDIR/usr/share"
-          
-          # Copy GhidraVibe installation
-          if [ -d "result" ]; then
-            cp -r result/* "$APPDIR/usr/"
-          fi
-          
-          # Create AppRun script
-          cat > "$APPDIR/AppRun" <<'EOF'
-          #!/bin/bash
-          SELF=$(readlink -f "$0")
-          HERE=${SELF%/*}
-          export PATH="${HERE}/usr/bin:${PATH}"
-          export LD_LIBRARY_PATH="${HERE}/usr/lib:${LD_LIBRARY_PATH}"
-          export GHIDRA_INSTALL_DIR="${HERE}/usr/lib/ghidra"
-          exec "${HERE}/usr/bin/ghidra-vibe" "$@"
-          EOF
-          chmod +x "$APPDIR/AppRun"
-          
-          # Create desktop file
-          cat > "$APPDIR/ghidravibe.desktop" <<EOF
-          [Desktop Entry]
-          Name=GhidraVibe
-          Exec=ghidra-vibe
-          Icon=ghidravibe
-          Type=Application
-          Categories=Development;
-          Comment=Native UI for Ghidra reverse engineering
-          EOF
-          
-          # Copy icon
-          if [ -f "native-ui/icons/png/GhidraIcon256.png" ]; then
-            cp native-ui/icons/png/GhidraIcon256.png "$APPDIR/ghidravibe.png"
-            ln -s ghidravibe.png "$APPDIR/.DirIcon"
-          fi
-          
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "SHA=$SHA" >> "$GITHUB_ENV"
 
-      - name: Build AppImage
+      - name: Build portable AppImage with nix bundle
         run: |
-          /tmp/appimagetool dist/GhidraVibe.AppDir "dist/GhidraVibe-${{ env.VERSION }}-${{ matrix.arch }}.AppImage"
-          
-          # Create versioned copy
-          cp "dist/GhidraVibe-${{ env.VERSION }}-${{ matrix.arch }}.AppImage" \
-             "dist/GhidraVibe-latest-${{ matrix.arch }}.AppImage"
+          # Native build on GitHub-hosted arch-matched runners (no QEMU emulation).
+          mkdir -p dist
+          nix bundle \
+            --bundler github:ralismark/nix-appimage \
+            -o /tmp/GhidraVibe.AppImage \
+            .#ghidra-vibe-gtk \
+            --print-build-logs
+          cp -L /tmp/GhidraVibe.AppImage "dist/GhidraVibe-${VERSION}-${{ matrix.arch }}.AppImage"
+          chmod +x "dist/GhidraVibe-${VERSION}-${{ matrix.arch }}.AppImage"
+          cp -f "dist/GhidraVibe-${VERSION}-${{ matrix.arch }}.AppImage" \
+                "dist/GhidraVibe-latest-${{ matrix.arch }}.AppImage"
 
       - name: Generate metadata
         run: |
           cat > "dist/latest-${{ matrix.arch }}.json" <<EOF
           {
             "name": "GhidraVibe",
-            "version": "${{ env.VERSION }}",
+            "version": "${VERSION}",
             "arch": "${{ matrix.arch }}",
             "platform": "linux",
-            "sha": "$(git rev-parse --short HEAD)",
-            "appimage": "GhidraVibe-${{ env.VERSION }}-${{ matrix.arch }}.AppImage",
+            "sha": "${SHA}",
+            "appimage": "GhidraVibe-${VERSION}-${{ matrix.arch }}.AppImage",
             "built_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           }
           EOF
@@ -138,6 +91,7 @@ jobs:
           path: |
             dist/*.AppImage
             dist/*.json
+          if-no-files-found: error
           retention-days: 14
 
   publish-release:
@@ -163,6 +117,7 @@ jobs:
 
       - name: Generate release notes
         run: |
+          chmod +x scripts/generate-release-notes.sh
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             ./scripts/generate-release-notes.sh tag > dist/RELEASE_NOTES.md
           else
@@ -175,7 +130,7 @@ jobs:
         run: |
           set -euo pipefail
           NOTES=dist/RELEASE_NOTES.md
-          
+
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             TAG="${GITHUB_REF_NAME}"
             if gh release view "$TAG" >/dev/null 2>&1; then

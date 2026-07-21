@@ -9,6 +9,8 @@ BIN_DIR="$ROOT/.build/release"
 APP_BIN="$OUT/Contents/MacOS/GhidraVibe"
 PLIST="$OUT/Contents/Info.plist"
 RES="$OUT/Contents/Resources"
+# Staged Nix-built app (CI), kept outside $OUT so it survives the rm -rf below.
+PREBUILT_APP="${GHIDRA_VIBE_PREBUILT_APP:-$ROOT/.build/nix-prebuilt/GhidraVibe.app}"
 
 cd "$ROOT"
 # Keep Resources JSON in sync with native-ui
@@ -33,10 +35,10 @@ rm -rf "$OUT"
 mkdir -p "$OUT/Contents/MacOS" "$RES"
 
 # If using a pre-built app, copy it as the base
-if [[ "${SKIP_SWIFT_BUILD:-}" == "1" && -f "$ROOT/.build/GhidraVibe.app/Contents/MacOS/GhidraVibe" ]]; then
+if [[ "${SKIP_SWIFT_BUILD:-}" == "1" && -f "$PREBUILT_APP/Contents/MacOS/GhidraVibe" ]]; then
   # Copy and make writable (Nix store files are read-only)
-  echo "Using pre-built app from $ROOT/.build/GhidraVibe.app"
-  cp -R "$ROOT/.build/GhidraVibe.app/." "$OUT/"
+  echo "Using pre-built app from $PREBUILT_APP"
+  cp -R "$PREBUILT_APP/." "$OUT/"
   chmod -R u+w "$OUT"
   # Pre-built app already has basic resources, skip to runtime.env generation
   # But we still need to add help and other runtime-specific files below

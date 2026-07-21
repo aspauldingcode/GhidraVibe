@@ -1,3 +1,6 @@
+/* popen/pclose are POSIX extensions; -std=c11 alone hides them from stdio.h. */
+#define _POSIX_C_SOURCE 200809L
+
 #include "mcp_client.h"
 
 #include <stdio.h>

@@ -71,9 +71,11 @@ jobs:
           echo "GHIDRA_INSTALL_DIR=$PWD/result/lib/ghidra" >> "$GITHUB_ENV"
           # Also build the macOS app
           nix build .#ghidra-vibe-app --print-build-logs -o result-app
-          # Copy the pre-built app for packaging
-          mkdir -p macos/GhidraVibe/.build
-          cp -R result-app/Applications/GhidraVibe.app macos/GhidraVibe/.build/GhidraVibe.app
+          # Stage the pre-built app in a path distinct from package-app.sh's
+          # output dir (.build/GhidraVibe.app) so it isn't deleted before use.
+          mkdir -p macos/GhidraVibe/.build/nix-prebuilt
+          cp -R result-app/Applications/GhidraVibe.app macos/GhidraVibe/.build/nix-prebuilt/GhidraVibe.app
+          chmod -R u+w macos/GhidraVibe/.build/nix-prebuilt/GhidraVibe.app
 
       - name: Setup Java
         if: steps.swift-check.outputs.swift_62_available == 'true'
