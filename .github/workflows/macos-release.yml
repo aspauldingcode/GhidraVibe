@@ -18,33 +18,37 @@ concurrency:
 
 jobs:
   package-dmg:
-    runs-on: [self-hosted, macOS, tahoe, apple-silicon]
+    runs-on: macos-14
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+            substituters = https://cache.nixos.org https://nix-community.cachix.org
+
+      - name: Build GhidraVibe with Nix
+        run: |
+          nix build .#ghidra-vibe --print-build-logs
+          echo "GHIDRA_INSTALL_DIR=$PWD/result/lib/ghidra" >> "$GITHUB_ENV"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
       - name: Resolve Ghidra install (for Help extract + runtime.env)
         run: |
           set -euo pipefail
-          if [[ -z "${GHIDRA_INSTALL_DIR:-}" ]]; then
-            if [[ -d result/lib/ghidra ]]; then
-              export GHIDRA_INSTALL_DIR="$PWD/result/lib/ghidra"
-            elif command -v nix >/dev/null 2>&1; then
-              export GHIDRA_INSTALL_DIR="$(nix build .#ghidra-vibe --no-link --print-out-paths | head -1)/lib/ghidra"
-            else
-              cand="$(ls -dt /nix/store/*-ghidra-vibe-*+native-*/lib/ghidra 2>/dev/null | head -1 || true)"
-              [[ -n "$cand" ]] && export GHIDRA_INSTALL_DIR="$cand"
-            fi
-          fi
-          echo "GHIDRA_INSTALL_DIR=${GHIDRA_INSTALL_DIR:-}"
-          echo "GHIDRA_INSTALL_DIR=${GHIDRA_INSTALL_DIR:-}" >>"$GITHUB_ENV"
-          if [[ -z "${JAVA_HOME:-}" && -x /usr/libexec/java_home ]]; then
-            JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home)"
-            export JAVA_HOME
-            echo "JAVA_HOME=$JAVA_HOME" >>"$GITHUB_ENV"
-          fi
+          # Nix build already set GHIDRA_INSTALL_DIR
+          echo "GHIDRA_INSTALL_DIR=$GHIDRA_INSTALL_DIR"
+          echo "JAVA_HOME=$JAVA_HOME"
 
       - name: Package DMG
         run: |
