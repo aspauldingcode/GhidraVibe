@@ -26,7 +26,7 @@ typedef struct {
   int insn_count;
   double x, y, h;
   int level;
-} GNode;
+} VibeGNode;
 
 typedef struct {
   char from[64];
@@ -35,7 +35,7 @@ typedef struct {
 } GEdge;
 
 typedef struct {
-  GNode nodes[MAX_NODES];
+  VibeGNode nodes[MAX_NODES];
   int n_nodes;
   GEdge edges[MAX_EDGES];
   int n_edges;
@@ -188,7 +188,7 @@ static gboolean parse_cfg_json(GraphState *st, const char *json) {
     if (!n) {
       continue;
     }
-    GNode *gn = &st->nodes[st->n_nodes];
+    VibeGNode *gn = &st->nodes[st->n_nodes];
     memset(gn, 0, sizeof *gn);
     const char *id = json_object_get_string_member_with_default(n, "id", "");
     const char *addr = json_object_get_string_member_with_default(n, "addr", id);
@@ -290,8 +290,8 @@ static void draw_graph(GtkDrawingArea *area, cairo_t *cr, int width, int height,
     if (a < 0 || b < 0) {
       continue;
     }
-    GNode *na = &st->nodes[a];
-    GNode *nb = &st->nodes[b];
+    VibeGNode *na = &st->nodes[a];
+    VibeGNode *nb = &st->nodes[b];
     double ax = na->x + NODE_W / 2, ay = na->y + na->h / 2;
     double bx = nb->x + NODE_W / 2, by = nb->y + nb->h / 2;
     double ddx = bx - ax, ddy = by - ay;
@@ -350,7 +350,7 @@ static void draw_graph(GtkDrawingArea *area, cairo_t *cr, int width, int height,
       if (i == a || i == b) {
         continue;
       }
-      GNode *o = &st->nodes[i];
+      VibeGNode *o = &st->nodes[i];
       double ox0 = o->x - clear, oy0 = o->y - clear;
       double ox1 = o->x + NODE_W + clear, oy1 = o->y + o->h + clear;
       if (ox1 < band_x0 || ox0 > band_x1 || oy1 < band_y0 || oy0 > band_y1) {
@@ -496,7 +496,7 @@ static void draw_graph(GtkDrawingArea *area, cairo_t *cr, int width, int height,
 
   // Nodes
   for (int i = 0; i < st->n_nodes; i++) {
-    GNode *n = &st->nodes[i];
+    VibeGNode *n = &st->nodes[i];
     if (strcmp(n->kind, "entry") == 0) {
       cairo_set_source_rgba(cr, 0.2, 0.4, 0.8, 0.25);
     } else {
@@ -577,7 +577,7 @@ static void on_drag_begin(GtkGestureDrag *gesture, double x, double y, gpointer 
   st->drag_node = -1;
   st->selected = -1;
   for (int i = st->n_nodes - 1; i >= 0; i--) {
-    GNode *n = &st->nodes[i];
+    VibeGNode *n = &st->nodes[i];
     if (cx >= n->x && cx <= n->x + NODE_W && cy >= n->y && cy <= n->y + n->h) {
       st->selected = i;
       st->drag_node = i;
@@ -600,7 +600,7 @@ static void on_drag_update(GtkGestureDrag *gesture, double offset_x, double offs
     double y = st->drag_start_y + offset_y;
     double cx = (x - st->pan_x) / st->zoom;
     double cy = (y - st->pan_y) / st->zoom;
-    GNode *n = &st->nodes[st->drag_node];
+    VibeGNode *n = &st->nodes[st->drag_node];
     n->x = cx - st->drag_grab_x;
     n->y = cy - st->drag_grab_y;
     if (n->x < 4) {

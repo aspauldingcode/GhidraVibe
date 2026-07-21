@@ -56,6 +56,19 @@ static void mark_agreement_accepted(void) {
   g_free(file);
 }
 
+typedef struct {
+  GMainLoop *loop;
+  int response;
+} DialogRunData;
+
+static void on_dialog_response(GtkDialog *dialog, int response_id, gpointer user_data) {
+  (void)dialog;
+  DialogRunData *data = user_data;
+  data->response = response_id;
+  if (g_main_loop_is_running(data->loop))
+    g_main_loop_quit(data->loop);
+}
+
 gboolean vibe_show_agreement_if_needed(GtkWindow *parent) {
   if (has_accepted_agreement()) {
     return TRUE;
@@ -68,8 +81,15 @@ gboolean vibe_show_agreement_if_needed(GtkWindow *parent) {
   gtk_dialog_add_button(GTK_DIALOG(dialog), "_Decline", GTK_RESPONSE_REJECT);
   gtk_dialog_add_button(GTK_DIALOG(dialog), "_Accept", GTK_RESPONSE_ACCEPT);
 
-  int response = gtk_dialog_run(GTK_DIALOG(dialog));
-  gtk_widget_destroy(dialog);
+  /* GTK4 dropped gtk_dialog_run(); block on a nested main loop until "response". */
+  DialogRunData run_data = {g_main_loop_new(NULL, FALSE), GTK_RESPONSE_REJECT};
+  g_signal_connect(dialog, "response", G_CALLBACK(on_dialog_response), &run_data);
+  gtk_window_present(GTK_WINDOW(dialog));
+  g_main_loop_run(run_data.loop);
+  g_main_loop_unref(run_data.loop);
+
+  int response = run_data.response;
+  gtk_window_destroy(GTK_WINDOW(dialog));
 
   if (response == GTK_RESPONSE_ACCEPT) {
     mark_agreement_accepted();
@@ -79,31 +99,36 @@ gboolean vibe_show_agreement_if_needed(GtkWindow *parent) {
 }
 
 GtkWidget *vibe_splash_create(void) {
-  GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  GtkWidget *window = gtk_window_new();
   gtk_window_set_title(GTK_WINDOW(window), "GhidraVibe");
   gtk_window_set_default_size(GTK_WINDOW(window), 400, 200);
-  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
   gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
 
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-  gtk_container_set_border_width(GTK_CONTAINER(box), 24);
-  gtk_container_add(GTK_CONTAINER(window), box);
+  gtk_widget_set_margin_start(box, 24);
+  gtk_widget_set_margin_end(box, 24);
+  gtk_widget_set_margin_top(box, 24);
+  gtk_widget_set_margin_bottom(box, 24);
+  gtk_window_set_child(GTK_WINDOW(window), box);
 
   GtkWidget *logo = gtk_label_new(NULL);
   gtk_label_set_markup(GTK_LABEL(logo),
                        "<span size='xx-large' weight='bold'>🐉 GhidraVibe</span>");
-  gtk_box_pack_start(GTK_BOX(box), logo, FALSE, FALSE, 0);
+  gtk_box_append(GTK_BOX(box), logo);
 
   GtkWidget *subtitle = gtk_label_new("Native UI for Ghidra");
-  gtk_box_pack_start(GTK_BOX(box), subtitle, FALSE, FALSE, 0);
+  gtk_box_append(GTK_BOX(box), subtitle);
 
   GtkWidget *progress = gtk_progress_bar_new();
   gtk_progress_bar_set_show_text(GTK_PROGRESS_BAR(progress), TRUE);
-  gtk_box_pack_end(GTK_BOX(box), progress, FALSE, FALSE, 0);
+  gtk_widget_set_vexpand(progress, FALSE);
+  gtk_widget_set_valign(progress, GTK_ALIGN_END);
+  gtk_box_append(GTK_BOX(box), progress);
 
   g_object_set_data(G_OBJECT(window), "progress", progress);
 
-  gtk_widget_show_all(window);
+  gtk_widget_set_visible(window, TRUE);
+  gtk_window_present(GTK_WINDOW(window));
   return window;
 }
 
@@ -115,14 +140,14 @@ void vibe_splash_set_progress(GtkWidget *splash, const char *message, double fra
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), fraction);
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress), message);
   }
-  // Process events to update UI
-  while (gtk_events_pending()) {
-    gtk_main_iteration();
+  /* GTK4 dropped gtk_events_pending()/gtk_main_iteration(); drain via GLib directly. */
+  while (g_main_context_pending(NULL)) {
+    g_main_context_iteration(NULL, FALSE);
   }
 }
 
 void vibe_splash_destroy(GtkWidget *splash) {
   if (splash) {
-    gtk_widget_destroy(splash);
+    gtk_window_destroy(GTK_WINDOW(splash));
   }
 }

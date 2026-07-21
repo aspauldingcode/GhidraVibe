@@ -2,13 +2,17 @@ project('ghidra-vibe', 'c',
   version: '0.1.0',
   default_options: ['warning_level=2', 'c_std=c11'])
 
+cc = meson.get_compiler('c')
+
 gtk = dependency('gtk4', version: '>=4.10')
 adw = dependency('libadwaita-1', version: '>=1.4')
 json = dependency('json-glib-1.0')
 soup = dependency('libsoup-3.0', required: false)
 webkit = dependency('webkitgtk-6.0', required: false)
+# graph_view.c uses hypot()/sqrt(); glibc splits these into libm.
+libm = cc.find_library('m', required: false)
 
-help_deps = [gtk, adw, json]
+help_deps = [gtk, adw, json, libm]
 if webkit.found()
   help_deps += webkit
 endif

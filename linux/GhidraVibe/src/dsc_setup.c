@@ -52,7 +52,7 @@ gboolean vibe_dsc_is_cache_available(void) {
 
 char *vibe_dsc_get_cache_path(void) { return check_cache_locations(); }
 
-static void run_setup_script_async(GtkWidget *dialog, GtkWidget *progress_bar, GtkWidget *status_label) {
+static void run_setup_script_async(GtkWidget *progress_bar, GtkWidget *status_label) {
   gtk_label_set_text(GTK_LABEL(status_label), "Running ghidra-vibe-dyld setup-ipsw...");
   gtk_progress_bar_pulse(GTK_PROGRESS_BAR(progress_bar));
 
@@ -67,17 +67,44 @@ static void run_setup_script_async(GtkWidget *dialog, GtkWidget *progress_bar, G
                      "Setup script launched in terminal. Please follow the instructions.");
 }
 
+typedef struct {
+  GtkWidget *progress_bar;
+  GtkWidget *status_label;
+} AutoSetupCtx;
+
+static void on_auto_setup_clicked(GtkButton *button, gpointer user_data) {
+  (void)button;
+  AutoSetupCtx *ctx = user_data;
+  run_setup_script_async(ctx->progress_bar, ctx->status_label);
+}
+
+typedef struct {
+  GMainLoop *loop;
+} DialogRunData;
+
+static void on_setup_dialog_response(GtkDialog *dialog, int response_id, gpointer user_data) {
+  (void)dialog;
+  (void)response_id;
+  DialogRunData *data = user_data;
+  if (g_main_loop_is_running(data->loop))
+    g_main_loop_quit(data->loop);
+}
+
 void vibe_dsc_show_setup_dialog(GtkWindow *parent) {
   GtkWidget *dialog = gtk_dialog_new_with_buttons(
       "DSC/IPSW Setup", parent, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, "_Close",
       GTK_RESPONSE_CLOSE, NULL);
   gtk_window_set_default_size(GTK_WINDOW(dialog), 500, 350);
 
+  /* In GTK4, GtkDialog's content area is itself a GtkBox — append to it directly. */
   GtkWidget *content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-  gtk_container_set_border_width(GTK_CONTAINER(content), 16);
+  gtk_widget_set_margin_start(content, 16);
+  gtk_widget_set_margin_end(content, 16);
+  gtk_widget_set_margin_top(content, 16);
+  gtk_widget_set_margin_bottom(content, 16);
 
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-  gtk_container_add(GTK_CONTAINER(content), box);
+  gtk_box_append(GTK_BOX(content), box);
 
   // Header
   GtkWidget *header = gtk_label_new(NULL);
@@ -85,7 +112,7 @@ void vibe_dsc_show_setup_dialog(GtkWindow *parent) {
       GTK_LABEL(header),
       "<span size='large' weight='bold'>iOS Dyld Shared Cache Setup</span>");
   gtk_label_set_xalign(GTK_LABEL(header), 0.0);
-  gtk_box_pack_start(GTK_BOX(box), header, FALSE, FALSE, 0);
+  gtk_box_append(GTK_BOX(box), header);
 
   // Check current status
   char *cache_path = check_cache_locations();
@@ -93,16 +120,16 @@ void vibe_dsc_show_setup_dialog(GtkWindow *parent) {
     GtkWidget *status = gtk_label_new(NULL);
     char *markup = g_strdup_printf("<span color='green'>✓ Cache found:</span> %s", cache_path);
     gtk_label_set_markup(GTK_LABEL(status), markup);
-    gtk_label_set_line_wrap(GTK_LABEL(status), TRUE);
+    gtk_label_set_wrap(GTK_LABEL(status), TRUE);
     gtk_label_set_xalign(GTK_LABEL(status), 0.0);
-    gtk_box_pack_start(GTK_BOX(box), status, FALSE, FALSE, 0);
+    gtk_box_append(GTK_BOX(box), status);
     g_free(markup);
     g_free(cache_path);
   } else {
     GtkWidget *status = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(status), "<span color='red'>✗ No cache found</span>");
     gtk_label_set_xalign(GTK_LABEL(status), 0.0);
-    gtk_box_pack_start(GTK_BOX(box), status, FALSE, FALSE, 0);
+    gtk_box_append(GTK_BOX(box), status);
   }
 
   // Instructions
@@ -117,37 +144,44 @@ void vibe_dsc_show_setup_dialog(GtkWindow *parent) {
       "    --output ~/.local/share/ghidra-vibe/ipsw-cache\n\n"
       "Or set environment variable:\n"
       "  export GHIDRA_VIBE_IPSW_CACHE=<path-to-cache>");
-  gtk_label_set_line_wrap(GTK_LABEL(instructions), TRUE);
+  gtk_label_set_wrap(GTK_LABEL(instructions), TRUE);
   gtk_label_set_xalign(GTK_LABEL(instructions), 0.0);
   gtk_label_set_selectable(GTK_LABEL(instructions), TRUE);
-  gtk_box_pack_start(GTK_BOX(box), instructions, TRUE, TRUE, 0);
+  gtk_widget_set_vexpand(instructions, TRUE);
+  gtk_box_append(GTK_BOX(box), instructions);
 
   // Progress area
   GtkWidget *progress_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
   GtkWidget *progress_bar = gtk_progress_bar_new();
   GtkWidget *status_label = gtk_label_new("");
   gtk_label_set_xalign(GTK_LABEL(status_label), 0.0);
-  gtk_box_pack_start(GTK_BOX(progress_box), status_label, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(progress_box), progress_bar, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(box), progress_box, FALSE, FALSE, 0);
+  gtk_box_append(GTK_BOX(progress_box), status_label);
+  gtk_box_append(GTK_BOX(progress_box), progress_bar);
+  gtk_box_append(GTK_BOX(box), progress_box);
 
-  // Buttons
-  GtkWidget *button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-  gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_START);
-  gtk_box_set_spacing(GTK_BOX(button_box), 8);
+  // Buttons — GtkButtonBox was removed in GTK4; use a plain start-aligned GtkBox.
+  GtkWidget *button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+  gtk_widget_set_halign(button_box, GTK_ALIGN_START);
 
   GtkWidget *auto_btn = gtk_button_new_with_label("Auto Setup");
   GtkWidget *manual_btn = gtk_button_new_with_label("Manual Instructions");
 
-  g_signal_connect_swapped(auto_btn, "clicked", G_CALLBACK(run_setup_script_async),
-                            g_object_new(G_TYPE_OBJECT, "dialog", dialog, "progress", progress_bar, "status",
-                                         status_label, NULL));
+  AutoSetupCtx *auto_ctx = g_new0(AutoSetupCtx, 1);
+  auto_ctx->progress_bar = progress_bar;
+  auto_ctx->status_label = status_label;
+  g_signal_connect_data(auto_btn, "clicked", G_CALLBACK(on_auto_setup_clicked), auto_ctx,
+                        (GClosureNotify)g_free, 0);
 
-  gtk_container_add(GTK_CONTAINER(button_box), auto_btn);
-  gtk_container_add(GTK_CONTAINER(button_box), manual_btn);
-  gtk_box_pack_start(GTK_BOX(box), button_box, FALSE, FALSE, 0);
+  gtk_box_append(GTK_BOX(button_box), auto_btn);
+  gtk_box_append(GTK_BOX(button_box), manual_btn);
+  gtk_box_append(GTK_BOX(box), button_box);
 
-  gtk_widget_show_all(dialog);
-  gtk_dialog_run(GTK_DIALOG(dialog));
-  gtk_widget_destroy(dialog);
+  /* GTK4 dropped gtk_dialog_run(); block on a nested main loop until "response". */
+  DialogRunData run_data = {g_main_loop_new(NULL, FALSE)};
+  g_signal_connect(dialog, "response", G_CALLBACK(on_setup_dialog_response), &run_data);
+  gtk_window_present(GTK_WINDOW(dialog));
+  g_main_loop_run(run_data.loop);
+  g_main_loop_unref(run_data.loop);
+
+  gtk_window_destroy(GTK_WINDOW(dialog));
 }

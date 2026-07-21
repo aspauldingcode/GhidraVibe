@@ -15,7 +15,7 @@ static void append_provider_row(GtkWidget *list, const char *a11y_id, const char
   gtk_widget_set_margin_end(row, 4);
   gtk_widget_set_margin_top(row, 2);
   gtk_widget_set_margin_bottom(row, 2);
-  vibe_a11y_set(row, a11y_id);
+  vibe_a11y_bind(row, a11y_id);
   gtk_list_box_append(GTK_LIST_BOX(list), row);
 }
 
@@ -27,7 +27,7 @@ static GtkWidget *make_tool_page(const char *title, const char *a11y_root, const
   gtk_widget_set_margin_end(box, 12);
   gtk_widget_set_margin_top(box, 12);
   gtk_widget_set_margin_bottom(box, 12);
-  vibe_a11y_set(box, a11y_root);
+  vibe_a11y_bind(box, a11y_root);
 
   GtkWidget *hdr = gtk_label_new(title);
   gtk_widget_add_css_class(hdr, "title-2");

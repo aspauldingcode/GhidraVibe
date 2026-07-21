@@ -105,20 +105,36 @@ static void on_theme_changed(GtkComboBox *combo, gpointer data) {
   vibe_theme_set_mode(mode);
 }
 
+typedef struct {
+  GMainLoop *loop;
+} ThemeDialogRunData;
+
+static void on_theme_dialog_response(GtkDialog *dialog, int response_id, gpointer user_data) {
+  (void)dialog;
+  (void)response_id;
+  ThemeDialogRunData *data = user_data;
+  if (g_main_loop_is_running(data->loop))
+    g_main_loop_quit(data->loop);
+}
+
 void vibe_theme_show_picker(GtkWindow *parent) {
   GtkWidget *dialog =
       gtk_dialog_new_with_buttons("Theme Settings", parent, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
                                    "_Cancel", GTK_RESPONSE_CANCEL, "_Apply", GTK_RESPONSE_ACCEPT, NULL);
 
+  /* In GTK4, GtkDialog's content area is itself a GtkBox — append to it directly. */
   GtkWidget *content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-  gtk_container_set_border_width(GTK_CONTAINER(content), 12);
+  gtk_widget_set_margin_start(content, 12);
+  gtk_widget_set_margin_end(content, 12);
+  gtk_widget_set_margin_top(content, 12);
+  gtk_widget_set_margin_bottom(content, 12);
 
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
-  gtk_container_add(GTK_CONTAINER(content), box);
+  gtk_box_append(GTK_BOX(content), box);
 
   GtkWidget *label = gtk_label_new("Choose appearance:");
   gtk_label_set_xalign(GTK_LABEL(label), 0.0);
-  gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
+  gtk_box_append(GTK_BOX(box), label);
 
   GtkWidget *combo = gtk_combo_box_text_new();
   gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "Light");
@@ -134,17 +150,22 @@ void vibe_theme_show_picker(GtkWindow *parent) {
 
   g_signal_connect(combo, "changed", G_CALLBACK(on_theme_changed), NULL);
 
-  gtk_box_pack_start(GTK_BOX(box), combo, FALSE, FALSE, 0);
+  gtk_box_append(GTK_BOX(box), combo);
 
   GtkWidget *info = gtk_label_new("Changes apply immediately to all GhidraVibe windows.");
-  gtk_label_set_line_wrap(GTK_LABEL(info), TRUE);
+  gtk_label_set_wrap(GTK_LABEL(info), TRUE);
   gtk_label_set_xalign(GTK_LABEL(info), 0.0);
-  gtk_box_pack_start(GTK_BOX(box), info, FALSE, FALSE, 8);
+  gtk_widget_set_margin_top(info, 8);
+  gtk_box_append(GTK_BOX(box), info);
 
-  gtk_widget_show_all(dialog);
+  /* GTK4 dropped gtk_dialog_run(); block on a nested main loop until "response". */
+  ThemeDialogRunData run_data = {g_main_loop_new(NULL, FALSE)};
+  g_signal_connect(dialog, "response", G_CALLBACK(on_theme_dialog_response), &run_data);
+  gtk_window_present(GTK_WINDOW(dialog));
+  g_main_loop_run(run_data.loop);
+  g_main_loop_unref(run_data.loop);
 
-  gtk_dialog_run(GTK_DIALOG(dialog));
-  gtk_widget_destroy(dialog);
+  gtk_window_destroy(GTK_WINDOW(dialog));
 }
 
 void vibe_theme_apply_to_widget(GtkWidget *widget) {
