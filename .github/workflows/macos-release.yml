@@ -69,13 +69,8 @@ jobs:
         run: |
           nix build .#ghidra-vibe --print-build-logs
           echo "GHIDRA_INSTALL_DIR=$PWD/result/lib/ghidra" >> "$GITHUB_ENV"
-          # Also build the macOS app. --option sandbox false works around a
-          # known macOS Nix sandbox issue: Xcode's on-demand Metal toolchain
-          # download mounts a read-only DMG under
-          # $HOME/Library/Developer/DVTDownloads/MetalToolchain/mounts/, and
-          # the sandboxed build's post-build cleanup can't unlink files on
-          # it, intermittently failing even though the build itself succeeds.
-          nix build .#ghidra-vibe-app --print-build-logs -o result-app --option sandbox false
+          # Also build the macOS app
+          nix build .#ghidra-vibe-app --print-build-logs -o result-app
           # Stage the pre-built app in a path distinct from package-app.sh's
           # output dir (.build/GhidraVibe.app) so it isn't deleted before use.
           mkdir -p macos/GhidraVibe/.build/nix-prebuilt

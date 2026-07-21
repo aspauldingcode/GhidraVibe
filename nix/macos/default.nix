@@ -221,6 +221,21 @@ EOF
     runHook postBuild
   '';
 
+  # Xcode auto-downloads & mounts the Metal toolchain DMG under $HOME
+  # (which is $NIX_BUILD_TOP/home here) the first time `swift build` needs
+  # it. If that mount is still attached when the derivation finishes, Nix's
+  # recursive cleanup of $NIX_BUILD_TOP can't unlink files on the read-only
+  # mount and the whole build fails with "cannot unlink ...: Read-only file
+  # system" — even though the actual Swift build already succeeded. Detach
+  # any such mounts before handing control back to Nix.
+  postBuild = ''
+    if [ -d "$HOME/Library/Developer/DVTDownloads/MetalToolchain/mounts" ]; then
+      for mnt in "$HOME"/Library/Developer/DVTDownloads/MetalToolchain/mounts/*; do
+        [ -d "$mnt" ] && /usr/bin/hdiutil detach "$mnt" -force >/dev/null 2>&1 || true
+      done
+    fi
+  '';
+
   installPhase = ''
     runHook preInstall
     BIN="$(/usr/bin/xcrun swift build -c release --product GhidraVibe --show-bin-path --disable-sandbox)"
@@ -282,6 +297,16 @@ EOF
 
     ln -s GhidraVibe "$out/bin/ghidra-vibe-gui"
     runHook postInstall
+  '';
+
+  # Belt-and-suspenders: installPhase re-invokes `swift build --show-bin-path`,
+  # which could re-attach the Metal toolchain mount. Detach again before exit.
+  postInstall = ''
+    if [ -d "$HOME/Library/Developer/DVTDownloads/MetalToolchain/mounts" ]; then
+      for mnt in "$HOME"/Library/Developer/DVTDownloads/MetalToolchain/mounts/*; do
+        [ -d "$mnt" ] && /usr/bin/hdiutil detach "$mnt" -force >/dev/null 2>&1 || true
+      done
+    fi
   '';
 
   meta = with lib; {
