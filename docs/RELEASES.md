@@ -2,50 +2,20 @@
 
 ## Current Status
 
-**macOS Releases**: ⚠️ **In Progress**
-- Using `macos-26` runners with Swift 6.2+
-- Workflow configured and tested
-- Currently queued for runner capacity
+**macOS Releases**: ✅ **Working**
+- Runs on GitHub-hosted `macos-26` runners (ship Swift 6.2+)
+- Builds the app via `nix build .#ghidra-vibe-app`, packages it into a `.dmg`
 
-**Linux Releases**: ✅ **Configured**
-- AppImage builds for x86_64 and aarch64
-- Native GTK UI included
-- Cross-compilation via QEMU for ARM
+**Linux Releases**: ✅ **Working**
+- Runs on GitHub-hosted `ubuntu-24.04` (x86_64) and `ubuntu-24.04-arm` (aarch64) —
+  true native builds, no QEMU emulation
+- Packaged with `nix bundle --bundler github:ralismark/nix-appimage`, which
+  produces a genuinely portable, statically-linked AppImage (no dependency on
+  the host's glibc or `/nix/store`)
 
-## Creating Releases
-
-### Option 1: Wait for GitHub Runner Update
-
-GitHub will eventually update their macOS runners to include Swift 6.2+. When this happens, the automated workflow will work automatically.
-
-### Option 2: Build Locally with Nix
-
-If you have a Mac with Swift 6.2+ (or Nix installed), you can build the release locally:
-
-```bash
-# Build the macOS app
-nix build .#ghidra-vibe-app -o result-app
-
-# Build GhidraVibe headless/engine
-nix build .#ghidra-vibe
-
-# Package into DMG
-export GHIDRA_INSTALL_DIR="$PWD/result/lib/ghidra"
-./macos/GhidraVibe/scripts/package-dmg.sh
-
-# The DMG will be in dist/
-ls -lh dist/*.dmg
-```
-
-### Option 3: Self-Hosted Runner
-
-Set up a self-hosted macOS runner with Swift 6.2+ and the required labels:
-
-1. Go to repository Settings → Actions → Runners
-2. Add a self-hosted runner
-3. Install Swift 6.2+ on the runner machine
-4. Add labels: `macOS`, `tahoe`, `apple-silicon` (or update workflow)
-5. The workflow will automatically use the self-hosted runner
+Both workflows run automatically on every push to `master`/`main` (publishing
+the rolling `beta` prerelease) and on `v*` tags (publishing a dedicated
+release).
 
 ## Release Artifacts
 
@@ -73,7 +43,6 @@ Beta releases are created on every push to `master`:
 
 - Tag: `beta` (lightweight, force-pushed)
 - GitHub Release: marked as "prerelease"
-- Updates `releases` branch with metadata
 
 ## Stable Releases
 
@@ -87,66 +56,74 @@ git push origin v1.0.0
 This creates:
 - Tag: `v1.0.0` (permanent)
 - GitHub Release: marked as "latest"
-- Updates `releases` branch with metadata
+
+## Building Locally
+
+### macOS
+
+```bash
+nix build .#ghidra-vibe-app -o result-app
+nix build .#ghidra-vibe
+export GHIDRA_INSTALL_DIR="$PWD/result/lib/ghidra"
+SKIP_SWIFT_BUILD=1 GHIDRA_VIBE_PREBUILT_APP="$PWD/result-app/Applications/GhidraVibe.app" \
+  ./macos/GhidraVibe/scripts/package-dmg.sh
+ls -lh dist/*.dmg
+```
+
+Or, to build fresh from source instead of the Nix output (requires Swift 6.2+):
+
+```bash
+./macos/GhidraVibe/scripts/package-dmg.sh
+```
+
+### Linux
+
+```bash
+nix bundle --bundler github:ralismark/nix-appimage .#ghidra-vibe-gtk
+```
 
 ## Workflow Details
 
 ### macOS Release (`macos-release.yml`)
-- Runs on: `macos-26` (Apple Silicon)
-- Builds with: Nix + Swift 6.2+
+- Runs on: `macos-26` (GitHub-hosted, Apple Silicon)
+- Builds with: Nix (`ghidra-vibe` engine + `ghidra-vibe-app` SwiftUI app)
 - Produces: `.dmg` installer
-- See `.github/workflows/macos-release.yml` for full workflow
+- The Nix-built `.app` is staged at `.build/nix-prebuilt/GhidraVibe.app`
+  (kept separate from `package-app.sh`'s output path so it isn't deleted
+  during cleanup) and copied into place via `SKIP_SWIFT_BUILD=1`
+- See `.github/workflows/macos-release.yml` for the full workflow
 
 ### Linux Release (`linux-release.yml`)
-- Runs on: `ubuntu-24.04`
-- Architectures: x86_64, aarch64 (via QEMU cross-compilation)
-- Builds with: Nix + GTK 4
+- Runs on: `ubuntu-24.04` (x86_64) and `ubuntu-24.04-arm` (aarch64) — both
+  native GitHub-hosted runners, no cross-compilation/emulation
+- Builds with: Nix + GTK 4, bundled via `nix bundle --bundler
+  github:ralismark/nix-appimage`
 - Produces: `.AppImage` bundles
-- See `.github/workflows/linux-release.yml` for full workflow
-
-### Swift Version Check (macOS only)
-
-The workflow includes a Swift version check at the beginning:
-
-```yaml
-- name: Check Swift version
-  id: swift-check
-  run: |
-    # Check if Swift 6.2+ is available
-    if xcrun swift --version 2>/dev/null | grep -q "Swift version 6\.[2-9]"; then
-      echo "swift_62_available=true" >> "$GITHUB_OUTPUT"
-    else
-      echo "swift_62_available=false" >> "$GITHUB_OUTPUT"
-    fi
-```
-
-All subsequent build steps are conditional on `swift_62_available == 'true'`.
+- See `.github/workflows/linux-release.yml` for the full workflow
 
 ## CI Status
 
 Release workflows:
 
-- ⏳ `macos-release` - Building on macos-26 runners (queued for capacity)
-- ✅ `linux-release` - Configured for x86_64 and aarch64 AppImages
+- ✅ `macos-release` - Publishing `.dmg` via macos-26 runners
+- ✅ `linux-release` - Publishing x86_64 and aarch64 AppImages
 
-Other CI workflows continue to function normally:
+Other CI workflows:
 
 - ✅ `ci` - Nix flake checks
-- ✅ `Multi-platform CI` - Cross-platform builds
-- ✅ `dsc-acceptance` - DSC workflow tests
-- ✅ `gui-smoke` - GUI smoke tests
+- ✅ `Multi-platform CI` - Cross-platform builds (uses the actual `ghidra-vibe*`
+  flake output names — the older `ghidraVibe*` camelCase names never matched
+  any exposed attribute)
+- ⏳ `dsc-acceptance` / `gui-smoke` - Require a self-hosted
+  `[self-hosted, macOS, tahoe, apple-silicon]` runner; queued indefinitely
+  when no such runner is online. Not part of the GitHub-hosted release path.
 - ✅ `device-agent-tests` - Device agent CLI tests
-
-## Future Improvements
-
-1. **Conditional macOS builds**: Once Swift 6.2 is available on GitHub runners, releases will be fully automated
-2. **Pre-built binary caching**: Cache Nix-built binaries to speed up DMG packaging
-3. **Cross-compilation**: Explore building macOS binaries on Linux with appropriate toolchains
-4. **Linux releases**: Add similar release automation for Linux GTK builds
 
 ## Questions?
 
 For questions about the release process, see:
-- GitHub Actions workflow: `.github/workflows/macos-release.yml`
-- DMG packaging scripts: `macos/GhidraVibe/scripts/package-dmg.sh`
+- GitHub Actions workflows: `.github/workflows/macos-release.yml`,
+  `.github/workflows/linux-release.yml`
+- DMG packaging scripts: `macos/GhidraVibe/scripts/package-dmg.sh`,
+  `macos/GhidraVibe/scripts/package-app.sh`
 - Release notes generation: `scripts/generate-release-notes.sh`
