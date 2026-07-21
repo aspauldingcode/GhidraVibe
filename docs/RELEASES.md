@@ -2,9 +2,15 @@
 
 ## Current Status
 
-**macOS Releases**: ⚠️ **Currently Not Automated**
+**macOS Releases**: ⚠️ **In Progress**
+- Using `macos-26` runners with Swift 6.2+
+- Workflow configured and tested
+- Currently queued for runner capacity
 
-GitHub-hosted `macos-14` runners have Swift 5.10, but GhidraVibe requires Swift 6.2+ for building the native macOS app. The `macos-release` workflow will check for Swift 6.2 availability and skip the build with a clear warning if not available.
+**Linux Releases**: ✅ **Configured**
+- AppImage builds for x86_64 and aarch64
+- Native GTK UI included
+- Cross-compilation via QEMU for ARM
 
 ## Creating Releases
 
@@ -45,9 +51,20 @@ Set up a self-hosted macOS runner with Swift 6.2+ and the required labels:
 
 When releases are created, they include:
 
+### macOS
 - `GhidraVibe-{version}.dmg` - The main application bundle
 - `GhidraVibe-latest.dmg` - Stable link to the latest version
 - `latest.json` - Metadata for update checks
+
+### Linux
+- `GhidraVibe-{version}-x86_64.AppImage` - Intel/AMD 64-bit AppImage
+- `GhidraVibe-{version}-aarch64.AppImage` - ARM 64-bit AppImage
+- `GhidraVibe-latest-x86_64.AppImage` - Stable link for x86_64
+- `GhidraVibe-latest-aarch64.AppImage` - Stable link for aarch64
+- `latest-x86_64.json` - Metadata for x86_64
+- `latest-aarch64.json` - Metadata for aarch64
+
+### Common
 - `RELEASE_NOTES.md` - Auto-generated release notes
 
 ## Beta Releases
@@ -74,9 +91,20 @@ This creates:
 
 ## Workflow Details
 
-See `.github/workflows/macos-release.yml` for the full workflow definition.
+### macOS Release (`macos-release.yml`)
+- Runs on: `macos-26` (Apple Silicon)
+- Builds with: Nix + Swift 6.2+
+- Produces: `.dmg` installer
+- See `.github/workflows/macos-release.yml` for full workflow
 
-### Swift Version Check
+### Linux Release (`linux-release.yml`)
+- Runs on: `ubuntu-24.04`
+- Architectures: x86_64, aarch64 (via QEMU cross-compilation)
+- Builds with: Nix + GTK 4
+- Produces: `.AppImage` bundles
+- See `.github/workflows/linux-release.yml` for full workflow
+
+### Swift Version Check (macOS only)
 
 The workflow includes a Swift version check at the beginning:
 
@@ -96,6 +124,11 @@ All subsequent build steps are conditional on `swift_62_available == 'true'`.
 
 ## CI Status
 
+Release workflows:
+
+- ⏳ `macos-release` - Building on macos-26 runners (queued for capacity)
+- ✅ `linux-release` - Configured for x86_64 and aarch64 AppImages
+
 Other CI workflows continue to function normally:
 
 - ✅ `ci` - Nix flake checks
@@ -103,7 +136,6 @@ Other CI workflows continue to function normally:
 - ✅ `dsc-acceptance` - DSC workflow tests
 - ✅ `gui-smoke` - GUI smoke tests
 - ✅ `device-agent-tests` - Device agent CLI tests
-- ⚠️ `macos-release` - Waiting for Swift 6.2+ on runners
 
 ## Future Improvements
 
