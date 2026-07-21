@@ -1,10 +1,14 @@
 //! On-device dyld shared cache image index (IDA-like DSC Index, no extract).
+//! Platform support:
+//!   - macOS: on-device cache at /System/Library/dyld/
+//!   - Linux: ipsw-extracted cache (via GHIDRA_VIBE_IPSW_CACHE)
 use anyhow::{bail, Context, Result};
 use clap::{Parser, Subcommand};
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
+#[cfg(target_os = "macos")]
 const CACHE_CANDIDATES: &[&str] = &[
     "/System/Volumes/Preboot/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_arm64e",
     "/System/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_arm64e",
@@ -12,6 +16,11 @@ const CACHE_CANDIDATES: &[&str] = &[
     "/System/Volumes/Preboot/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_x86_64",
     "/System/Cryptexes/OS/System/Library/dyld/dyld_shared_cache_x86_64",
     "/System/Library/dyld/dyld_shared_cache_x86_64",
+];
+
+#[cfg(target_os = "linux")]
+const CACHE_CANDIDATES: &[&str] = &[
+    // Linux uses ipsw-extracted cache, paths checked in order
 ];
 
 const IMAGES_OFFSET_OFF: usize = 0x1C0;
@@ -48,13 +57,47 @@ enum Cmd {
 }
 
 fn find_cache() -> Result<PathBuf> {
-    for c in CACHE_CANDIDATES {
-        let p = PathBuf::from(c);
-        if p.is_file() {
-            return Ok(p);
+    // On Linux, check environment variable first for ipsw-extracted cache
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(ipsw_cache) = std::env::var("GHIDRA_VIBE_IPSW_CACHE") {
+            let p = PathBuf::from(&ipsw_cache);
+            if p.is_file() {
+                return Ok(p);
+            }
         }
+        // Check default Linux locations
+        let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
+        let xdg_data = std::env::var("XDG_DATA_HOME")
+            .unwrap_or_else(|_| format!("{}/.local/share", home));
+        let linux_candidates = [
+            format!("{}/.local/share/ghidra-vibe/ipsw-cache/dyld_shared_cache_arm64e", home),
+            format!("{}/Documents/GhidraVibe/ipsw-cache/dyld_shared_cache_arm64e", home),
+            format!("{}/ghidra-vibe/ipsw-cache/dyld_shared_cache_arm64e", xdg_data),
+        ];
+        for c in &linux_candidates {
+            let p = PathBuf::from(c);
+            if p.is_file() {
+                return Ok(p);
+            }
+        }
+        bail!("No ipsw cache found on Linux. Run: ghidra-vibe-dyld setup-ipsw");
     }
-    bail!("No on-device dyld shared cache found");
+    
+    // macOS: on-device cache
+    #[cfg(target_os = "macos")]
+    {
+        for c in CACHE_CANDIDATES {
+            let p = PathBuf::from(c);
+            if p.is_file() {
+                return Ok(p);
+            }
+        }
+        bail!("No on-device dyld shared cache found");
+    }
+    
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+    bail!("Unsupported platform");
 }
 
 fn read_cstring(data: &[u8], off: usize) -> String {

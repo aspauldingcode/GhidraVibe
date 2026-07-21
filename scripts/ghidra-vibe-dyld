@@ -1,18 +1,31 @@
 #!/usr/bin/env bash
-# IDA-like dyld shared cache workflow (on-device, no ipsw extract by default).
+# IDA-like dyld shared cache workflow.
 #
-#   find-cache  → locate system DSC
+# Platform-specific behavior:
+#   macOS: on-device DSC at /System/Library/dyld/ (no ipsw extract by default)
+#   Linux: ipsw-extracted DSC (requires GHIDRA_VIBE_IPSW_CACHE or auto-download)
+#
+#   find-cache  → locate system DSC (macOS) or ipsw cache (Linux)
 #   list        → DSC Index (all install paths; fast header parse)
 #   resolve     → short name / substring → full image path
-#   open        → alias for list (cache is always "open" on-device)
+#   open        → alias for list (cache is always "open" on-device/ipsw)
 #   import      → Ghidra DyldCacheFileSystem → AutoImporter (local Apple symbols)
 #   accept-appkit-skylight → north-star gate
 #
-# Extract via ipsw is NOT used unless GHIDRA_VIBE_ALLOW_IPSW=1 (discouraged).
+# Extract via ipsw is NOT used on macOS unless GHIDRA_VIBE_ALLOW_IPSW=1 (discouraged).
+# On Linux, ipsw extraction is the ONLY supported method.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Platform detection
+IS_LINUX=0
+IS_MACOS=0
+case "$(uname -s)" in
+  Linux*)  IS_LINUX=1 ;;
+  Darwin*) IS_MACOS=1 ;;
+esac
 
 # Nix packages this script as a lone store file → ROOT becomes /nix (wrong).
 # Prefer an explicit env path, then layouts that actually contain ImportDyldCacheImage.java.
@@ -71,19 +84,30 @@ Usage:
                            [--project DIR] [--project-name NAME] [--program NAME]
                            [--analyze 0|1 | --no-analyze]
   ghidra-vibe-dyld accept-appkit-skylight [--project DIR]
+  ghidra-vibe-dyld setup-ipsw [--version VER] [--output DIR]
 
-IDA-like flow:
+Platform-specific workflows:
+
+macOS (on-device):
   1) find-cache / open   — use on-device dyld_shared_cache_* (always present on macOS)
   2) list / filter       — DSC Index of every framework/dylib
   3) import --image …    — load selected module via Ghidra DyldCacheFileSystem
   4) Apple symbols ON    — DSC local symbols + DWARF/ObjC analyzers (default)
+
+Linux (ipsw-extracted):
+  1) setup-ipsw          — download and extract iOS IPSW dyld shared cache
+  2) find-cache          — locate extracted cache (from GHIDRA_VIBE_IPSW_CACHE or default)
+  3) list / filter       — DSC Index of every framework/dylib (same as macOS)
+  4) import --image …    — load selected module via Ghidra DyldCacheFileSystem
+  5) Apple symbols ON    — DSC local symbols + DWARF/ObjC analyzers (default)
 
 Environment:
   GHIDRA_VIBE_HEADLESS         ghidra-analyzeHeadless
   GHIDRA_VIBE_APPLE_SYMBOLS=1  enable DWARF/ObjC/demangler (default on)
   GHIDRA_VIBE_ANALYZE=1        run auto-analysis after import (default on)
   GHIDRA_VIBE_NOANALYSIS=1     skip analysis (sets ANALYZE=0)
-  GHIDRA_VIBE_ALLOW_IPSW=1     last-resort extract (NOT the default path)
+  GHIDRA_VIBE_IPSW_CACHE       path to extracted ipsw cache (Linux auto-setup)
+  GHIDRA_VIBE_ALLOW_IPSW=1     last-resort extract on macOS (NOT the default path)
   GHIDRA_VIBE_MAXMEM / MAXMEM  JVM heap (auto from RAM unless set; slide fixups are large)
 EOF
 }
@@ -116,7 +140,33 @@ find_headless() {
 
 cmd_find_cache() {
   need_index
-  "$INDEX_BIN" find-cache
+  if [[ $IS_LINUX -eq 1 ]]; then
+    # Linux: use ipsw-extracted cache
+    local cache="${GHIDRA_VIBE_IPSW_CACHE:-}"
+    if [[ -z "$cache" ]]; then
+      # Check default locations
+      local default_locs=(
+        "${HOME}/.local/share/ghidra-vibe/ipsw-cache/dyld_shared_cache_arm64e"
+        "${HOME}/Documents/GhidraVibe/ipsw-cache/dyld_shared_cache_arm64e"
+        "${XDG_DATA_HOME:-$HOME/.local/share}/ghidra-vibe/ipsw-cache/dyld_shared_cache_arm64e"
+      )
+      for loc in "${default_locs[@]}"; do
+        if [[ -f "$loc" ]]; then
+          cache="$loc"
+          break
+        fi
+      done
+    fi
+    if [[ -z "$cache" || ! -f "$cache" ]]; then
+      echo "ERROR: No ipsw cache found on Linux. Run: ghidra-vibe-dyld setup-ipsw" >&2
+      echo "Or set GHIDRA_VIBE_IPSW_CACHE to your extracted cache path." >&2
+      exit 1
+    fi
+    echo "$cache"
+  else
+    # macOS: on-device cache
+    "$INDEX_BIN" find-cache
+  fi
 }
 
 cmd_list() {
@@ -353,6 +403,60 @@ cmd_accept() {
   echo "ACCEPT_IMPORT_OK project=$project"
 }
 
+cmd_setup_ipsw() {
+  # Linux-only: Download and extract iOS IPSW dyld shared cache
+  if [[ $IS_LINUX -ne 1 ]]; then
+    echo "setup-ipsw is only needed on Linux. macOS uses on-device cache." >&2
+    exit 1
+  fi
+  
+  if ! command -v ipsw >/dev/null 2>&1; then
+    echo "ERROR: ipsw tool not found. Install it first:" >&2
+    echo "  nix shell nixpkgs#ipsw" >&2
+    echo "  or from: https://github.com/blacktop/ipsw" >&2
+    exit 1
+  fi
+  
+  local version="${GHIDRA_VIBE_IOS_VERSION:-latest}"
+  local output_dir="${GHIDRA_VIBE_IPSW_CACHE_DIR:-${HOME}/.local/share/ghidra-vibe/ipsw-cache}"
+  
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --version) version="$2"; shift 2 ;;
+      --output) output_dir="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  
+  mkdir -p "$output_dir"
+  
+  echo "Setting up ipsw dyld shared cache for Linux..."
+  echo "Output directory: $output_dir"
+  echo "iOS version: $version"
+  
+  # Download device support files or extract from IPSW
+  if [[ "$version" == "latest" ]]; then
+    echo "Downloading latest iOS device support files..."
+    # Use ipsw to download and extract dyld cache
+    if ipsw download dev --platform ios --output "$output_dir/ipsw.zip" 2>/dev/null; then
+      echo "Extracting dyld shared cache..."
+      cd "$output_dir"
+      if ipsw dyld extract ipsw.zip --output . 2>/dev/null; then
+        echo "SUCCESS: dyld shared cache extracted to $output_dir"
+        echo "Set GHIDRA_VIBE_IPSW_CACHE=$output_dir/dyld_shared_cache_arm64e"
+        rm -f ipsw.zip
+        exit 0
+      fi
+    fi
+  fi
+  
+  echo "ERROR: Failed to setup ipsw cache. Manual steps:" >&2
+  echo "  1. Download iOS IPSW from https://ipsw.me" >&2
+  echo "  2. Extract: ipsw dyld extract <ipsw-file> --output $output_dir" >&2
+  echo "  3. Set: export GHIDRA_VIBE_IPSW_CACHE=$output_dir/dyld_shared_cache_arm64e" >&2
+  exit 1
+}
+
 CMD="${1:-}"
 shift || true
 
@@ -363,6 +467,7 @@ case "$CMD" in
   open) cmd_list "$@" ;;
   import) cmd_import "$@" ;;
   accept-appkit-skylight) cmd_accept "$@" ;;
+  setup-ipsw) cmd_setup_ipsw "$@" ;;
   -h|--help|help|"") usage ;;
   *)
     echo "Unknown command: $CMD" >&2

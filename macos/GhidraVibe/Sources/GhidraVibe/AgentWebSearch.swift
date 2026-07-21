@@ -49,24 +49,19 @@ enum AgentWebSearch {
             """
         }
 
-        let payload: [String: Any] = [
-            "ok": true,
-            "query": q,
-            "sandbox": sandbox,
-            "hits": hits.prefix(cap).map { h -> [String: String] in
-                [
-                    "title": h.title,
-                    "url": h.url,
-                    "snippet": String(h.snippet.prefix(280)),
-                ]
-            },
-        ]
-        guard let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
-              let text = String(data: data, encoding: .utf8)
-        else {
-            return #"{"ok":false,"error":"encode failed"}"#
-        }
-        return text
+        // Build JSON manually to avoid NSJSONSerialization exceptions with malformed data
+        let hitsJSON = hits.prefix(cap).map { h -> String in
+            let title = jsonString(h.title)
+            let url = jsonString(h.url)
+            let snippet = jsonString(String(h.snippet.prefix(280)))
+            return """
+            {"title":\(title),"url":\(url),"snippet":\(snippet)}
+            """
+        }.joined(separator: ",")
+        
+        return """
+        {"ok":true,"query":\(jsonString(q)),"sandbox":\(sandbox ? "true" : "false"),"hits":[\(hitsJSON)]}
+        """
     }
 
     // MARK: - Providers
@@ -217,9 +212,15 @@ enum AgentWebSearch {
     }
 
     private static func jsonString(_ s: String) -> String {
-        guard let data = try? JSONSerialization.data(withJSONObject: s),
-              let out = String(data: data, encoding: .utf8)
-        else { return "\"\"" }
-        return out
+        // Manual JSON string escaping to avoid NSJSONSerialization exceptions
+        var escaped = s
+        escaped = escaped.replacingOccurrences(of: "\\", with: "\\\\")
+        escaped = escaped.replacingOccurrences(of: "\"", with: "\\\"")
+        escaped = escaped.replacingOccurrences(of: "\n", with: "\\n")
+        escaped = escaped.replacingOccurrences(of: "\r", with: "\\r")
+        escaped = escaped.replacingOccurrences(of: "\t", with: "\\t")
+        // Remove any control characters that could break JSON
+        escaped = escaped.filter { $0.unicodeScalars.allSatisfy { $0.value >= 0x20 || $0.value == 0x09 } }
+        return "\"\(escaped)\""
     }
 }

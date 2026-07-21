@@ -1,9 +1,12 @@
 /* GhidraVibe GTK — CodeBrowser / Project Window docking shell (native, not Swing). */
 #include "a11y.h"
 #include "dock.h"
+#include "dsc_setup.h"
 #include "help_view.h"
 #include "mcp_client.h"
+#include "splash.h"
 #include "stock_tools.h"
+#include "theme.h"
 
 #include <adwaita.h>
 #include <gtk/gtk.h>
@@ -124,6 +127,32 @@ static void on_show_help(GSimpleAction *a, GVariant *p, gpointer data) {
   vibe_help_show(win);
 }
 
+static void on_show_theme_picker(GSimpleAction *a, GVariant *p, gpointer data) {
+  (void)a;
+  (void)p;
+  AppState *st = data;
+  GtkWindow *win = NULL;
+  if (st && st->stack) {
+    GtkRoot *root = gtk_widget_get_root(st->stack);
+    if (GTK_IS_WINDOW(root))
+      win = GTK_WINDOW(root);
+  }
+  vibe_theme_show_picker(win);
+}
+
+static void on_show_dsc_setup(GSimpleAction *a, GVariant *p, gpointer data) {
+  (void)a;
+  (void)p;
+  AppState *st = data;
+  GtkWindow *win = NULL;
+  if (st && st->stack) {
+    GtkRoot *root = gtk_widget_get_root(st->stack);
+    if (GTK_IS_WINDOW(root))
+      win = GTK_WINDOW(root);
+  }
+  vibe_dsc_show_setup_dialog(win);
+}
+
 static void add_menu(GtkApplication *app, AppState *st) {
   const GActionEntry entries[] = {
       {"show_project", on_show_project, NULL, NULL, NULL, {0}},
@@ -163,6 +192,8 @@ static void add_menu(GtkApplication *app, AppState *st) {
       {"show_code_editor", on_show_code_editor, NULL, NULL, NULL, {0}},
       {"mcp_health", on_mcp_health, NULL, NULL, NULL, {0}},
       {"show_help", on_show_help, NULL, NULL, NULL, {0}},
+      {"show_theme_picker", on_show_theme_picker, NULL, NULL, NULL, {0}},
+      {"show_dsc_setup", on_show_dsc_setup, NULL, NULL, NULL, {0}},
   };
   g_action_map_add_action_entries(G_ACTION_MAP(app), entries, G_N_ELEMENTS(entries), st);
 
@@ -218,6 +249,8 @@ static void add_menu(GtkApplication *app, AppState *st) {
   g_menu_append(tools, "Debugger", "app.show_debugger");
   g_menu_append(tools, "Emulator", "app.show_emulator");
   g_menu_append(tools, "Version Tracking", "app.show_version_tracking");
+  g_menu_append(tools, "DSC/IPSW Setup…", "app.show_dsc_setup");
+  g_menu_append(tools, "Theme Settings…", "app.show_theme_picker");
   g_menu_append_submenu(menubar, "Tools", G_MENU_MODEL(tools));
 
   GMenu *window = g_menu_new();
@@ -296,10 +329,26 @@ static GtkWidget *vibe_panel(const char *title, const char *id) {
 
 static void activate(GtkApplication *app, gpointer user_data) {
   (void)user_data;
+  
+  // Show splash screen
+  GtkWidget *splash = vibe_splash_create();
+  vibe_splash_set_progress(splash, "Initializing GhidraVibe...", 0.1);
+  
+  // Check user agreement
+  if (!vibe_show_agreement_if_needed(NULL)) {
+    // User declined agreement
+    vibe_splash_destroy(splash);
+    g_application_quit(G_APPLICATION(app));
+    return;
+  }
+  
+  vibe_splash_set_progress(splash, "Loading application...", 0.3);
+  
   AppState *st = g_new0(AppState, 1);
   st->mcp_url = g_strdup(g_getenv("GHIDRA_MCP_URL") ? g_getenv("GHIDRA_MCP_URL")
                                                     : "http://127.0.0.1:8089");
 
+  vibe_splash_set_progress(splash, "Loading accessibility catalog...", 0.4);
   char *catalog = find_data_file("a11y/catalog.json");
   if (!catalog)
     catalog = find_data_file("catalog.json");
@@ -308,6 +357,15 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_free(catalog);
   }
 
+  vibe_splash_set_progress(splash, "Checking DSC cache...", 0.5);
+#ifdef __linux__
+  if (!vibe_dsc_is_cache_available()) {
+    // DSC cache not found, will show setup dialog later if needed
+  }
+#endif
+
+  vibe_splash_set_progress(splash, "Creating main window...", 0.7);
+  
   GtkWidget *win = adw_application_window_new(app);
   gtk_window_set_title(GTK_WINDOW(win), "GhidraVibe");
   gtk_window_set_default_size(GTK_WINDOW(win), 1280, 840);
@@ -385,11 +443,18 @@ static void activate(GtkApplication *app, gpointer user_data) {
   gtk_box_append(GTK_BOX(outer), status_bar);
 
   add_menu(app, st);
+  
+  vibe_splash_set_progress(splash, "Ready!", 1.0);
+  vibe_splash_destroy(splash);
+  
   gtk_window_present(GTK_WINDOW(win));
   show_page(st, "project");
 }
 
 int main(int argc, char **argv) {
+  // Initialize theme system before creating any widgets
+  vibe_theme_init();
+  
   AdwApplication *app =
       adw_application_new("dev.ghidravibe.app", G_APPLICATION_DEFAULT_FLAGS);
   g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
