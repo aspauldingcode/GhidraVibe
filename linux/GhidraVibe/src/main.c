@@ -329,7 +329,11 @@ static GtkWidget *vibe_panel(const char *title, const char *id) {
 
 static void activate(GtkApplication *app, gpointer user_data) {
   (void)user_data;
-  
+
+  // Initialize theme system now that a display/GtkSettings is available
+  // (gtk_settings_get_default() returns NULL if called before startup).
+  vibe_theme_init();
+
   // Show splash screen
   GtkWidget *splash = vibe_splash_create();
   vibe_splash_set_progress(splash, "Initializing GhidraVibe...", 0.1);
@@ -452,9 +456,6 @@ static void activate(GtkApplication *app, gpointer user_data) {
 }
 
 int main(int argc, char **argv) {
-  // Initialize theme system before creating any widgets
-  vibe_theme_init();
-  
   AdwApplication *app =
       adw_application_new("dev.ghidravibe.app", G_APPLICATION_DEFAULT_FLAGS);
   g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);

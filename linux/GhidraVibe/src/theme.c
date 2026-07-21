@@ -1,10 +1,10 @@
 /* GhidraVibe GTK — Theme picker and appearance settings */
 #include "theme.h"
+#include <adwaita.h>
 #include <stdlib.h>
 #include <string.h>
 
 static VibeThemeMode current_mode = VIBE_THEME_SYSTEM;
-static GtkSettings *gtk_settings = NULL;
 
 static char *get_config_file(void) {
   const char *xdg_config = g_getenv("XDG_CONFIG_HOME");
@@ -61,21 +61,20 @@ static void load_theme_config(void) {
 }
 
 static void apply_theme_mode(void) {
-  if (!gtk_settings) {
-    gtk_settings = gtk_settings_get_default();
-  }
+  /* GtkSettings:gtk-application-prefer-dark-theme is unsupported under
+   * libadwaita; use AdwStyleManager's color-scheme instead. */
+  AdwStyleManager *style_manager = adw_style_manager_get_default();
 
-  gboolean prefer_dark = FALSE;
+  AdwColorScheme scheme = ADW_COLOR_SCHEME_PREFER_LIGHT;
   if (current_mode == VIBE_THEME_DARK) {
-    prefer_dark = TRUE;
+    scheme = ADW_COLOR_SCHEME_FORCE_DARK;
   } else if (current_mode == VIBE_THEME_LIGHT) {
-    prefer_dark = FALSE;
+    scheme = ADW_COLOR_SCHEME_FORCE_LIGHT;
   } else {
-    // SYSTEM: check if system prefers dark theme
-    g_object_get(gtk_settings, "gtk-application-prefer-dark-theme", &prefer_dark, NULL);
+    scheme = ADW_COLOR_SCHEME_DEFAULT; // SYSTEM: follow the desktop preference
   }
 
-  g_object_set(gtk_settings, "gtk-application-prefer-dark-theme", prefer_dark, NULL);
+  adw_style_manager_set_color_scheme(style_manager, scheme);
 }
 
 void vibe_theme_init(void) {
