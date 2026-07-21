@@ -377,10 +377,11 @@
                 pkgs.bash
                 pkgs.coreutils
                 pkgs.gnugrep
+                pkgs.python3
               ];
               src = srcRoot;
             } ''
-              export PATH="${pkgs.ripgrep}/bin:${pkgs.bash}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:$PATH"
+              export PATH="${pkgs.ripgrep}/bin:${pkgs.bash}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.python3}/bin:$PATH"
               export CHECK_A11Y_ROOT="$src"
               export CHECK_A11Y_OUTDIR="$TMPDIR"
               bash "$src/scripts/check-a11y-ids.sh"
