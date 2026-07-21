@@ -27,12 +27,16 @@ if [[ "${SKIP_SWIFT_BUILD:-}" != "1" ]]; then
   xcrun swift build -c release --product GhidraVibe
 fi
 
+# Remove old build, handling read-only files from Nix store
+chmod -R u+w "$OUT" 2>/dev/null || true
 rm -rf "$OUT"
 mkdir -p "$OUT/Contents/MacOS" "$RES"
 
 # If using a pre-built app, just copy it
 if [[ "${SKIP_SWIFT_BUILD:-}" == "1" && -f "$ROOT/.build/GhidraVibe.app/Contents/MacOS/GhidraVibe" ]]; then
+  # Copy and make writable (Nix store files are read-only)
   cp -R "$ROOT/.build/GhidraVibe.app/." "$OUT/"
+  chmod -R u+w "$OUT"
 else
   # Otherwise use the freshly built binary
   cp "$BIN_DIR/GhidraVibe" "$APP_BIN"
