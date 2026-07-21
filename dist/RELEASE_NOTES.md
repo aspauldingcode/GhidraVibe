@@ -1,13 +1,13 @@
 ## GhidraVibe Beta
 
-Rolling prerelease from `master` (`e7e481d`).
+Rolling prerelease from `master` (`db13160`).
 
-- **Commit:** `e7e481d1c4537849daaee45fb04495fe03fdc02f`
+- **Commit:** `db1316031e65873259feedc2b04f2efdb55108a3`
 - **Range:** `beta..HEAD`
 
 ### Changes
 
-- fix(linux): Port GTK3-only API calls to GTK4 (e7e481d)
+- fix(ci): Correct flake attribute names and test-recorder import (db13160)
 
 ### Install
 
