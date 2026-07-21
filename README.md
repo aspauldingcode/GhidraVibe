@@ -2,6 +2,10 @@
 
 Ghidra built from source with a native GUI (SwiftUI on macOS, GTK on Linux) instead of Swing.
 
+<p align="center">
+  <img src="media/preview.png" alt="GhidraVibe preview" width="100%" />
+</p>
+
 ## Run with Nix
 
 ```bash
