@@ -1,0 +1,338 @@
+#!/usr/bin/env python3
+"""
+GhidraVibe GUI Test Recorder/Player
+Records and plays back GUI test scenarios.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+import time
+from pathlib import Path
+from typing import Any
+
+# Import the device agent
+sys.path.insert(0, str(Path(__file__).parent))
+from ghidra_vibe_device_agent import DeviceAgent
+
+
+class TestRecorder:
+    """Records GUI interactions as replayable test scripts."""
+
+    def __init__(self, agent: DeviceAgent):
+        self.agent = agent
+        self.actions: list[dict[str, Any]] = []
+        self.start_time = time.time()
+
+    def record_action(self, action_type: str, params: dict, result: dict) -> None:
+        """Record an action with its parameters and result."""
+        self.actions.append({
+            "type": action_type,
+            "params": params,
+            "timestamp": time.time() - self.start_time,
+            "expected_ok": result.get("ok", False),
+        })
+
+    def save(self, filepath: str) -> None:
+        """Save recorded actions to file."""
+        test_data = {
+            "version": "1.0",
+            "created": time.time(),
+            "actions": self.actions,
+        }
+        with open(filepath, "w") as f:
+            json.dump(test_data, f, indent=2)
+        print(f"✅ Saved {len(self.actions)} actions to {filepath}")
+
+
+class TestPlayer:
+    """Plays back recorded GUI test scenarios."""
+
+    def __init__(self, agent: DeviceAgent, strict: bool = False):
+        self.agent = agent
+        self.strict = strict
+        self.results: list[dict[str, Any]] = []
+
+    def load(self, filepath: str) -> dict:
+        """Load test scenario from file."""
+        with open(filepath) as f:
+            return json.load(f)
+
+    def play_action(self, action: dict) -> bool:
+        """Play a single action and verify result."""
+        action_type = action["type"]
+        params = action["params"]
+        expected_ok = action.get("expected_ok", True)
+
+        # Execute the action based on type
+        if action_type == "health":
+            result = {"ok": self.agent.health_check()}
+        elif action_type == "state":
+            result = self.agent.get_state()
+        elif action_type == "navigate":
+            result = self.agent.navigate(params.get("pane", ""))
+        elif action_type == "search":
+            result = self.agent.search(params.get("query", ""))
+        elif action_type == "select_function":
+            result = self.agent.select_function(**params)
+        elif action_type == "action":
+            result = self.agent.action(params.get("action_id", ""))
+        elif action_type == "dyld_list_caches":
+            result = self.agent.dyld_list_caches()
+        elif action_type == "dyld_list_images":
+            result = self.agent.dyld_list_images(params.get("query", ""))
+        elif action_type == "dyld_open_image":
+            result = self.agent.dyld_open_image(params.get("image", ""))
+        elif action_type == "agent_send":
+            result = self.agent.agent_send(params.get("text", ""))
+        elif action_type == "agent_status":
+            result = self.agent.agent_status()
+        elif action_type == "wait":
+            self.agent.wait(params.get("seconds", 1))
+            result = {"ok": True}
+        else:
+            result = {"ok": False, "error": f"Unknown action type: {action_type}"}
+
+        actual_ok = result.get("ok", False)
+        passed = actual_ok == expected_ok
+
+        self.results.append({
+            "action": action_type,
+            "params": params,
+            "expected_ok": expected_ok,
+            "actual_ok": actual_ok,
+            "passed": passed,
+            "result": result,
+        })
+
+        status = "✅" if passed else "❌"
+        print(f"{status} {action_type}({params}) -> {actual_ok}")
+
+        return passed
+
+    def play(self, test_data: dict) -> dict:
+        """Play entire test scenario."""
+        actions = test_data.get("actions", [])
+        print(f"\n=== Playing {len(actions)} actions ===\n")
+
+        for i, action in enumerate(actions, 1):
+            print(f"[{i}/{len(actions)}] ", end="")
+            passed = self.play_action(action)
+
+            if not passed and self.strict:
+                print(f"\n❌ Test failed at action {i}, stopping (strict mode)")
+                break
+
+            # Respect timing from recording
+            if i < len(actions):
+                delay = actions[i].get("timestamp", 0) - action.get("timestamp", 0)
+                if delay > 0:
+                    time.sleep(min(delay, 2.0))  # Cap at 2s
+
+        # Summary
+        total = len(self.results)
+        passed = sum(1 for r in self.results if r["passed"])
+        failed = total - passed
+
+        summary = {
+            "total": total,
+            "passed": passed,
+            "failed": failed,
+            "success_rate": (passed / total * 100) if total > 0 else 0,
+            "results": self.results,
+        }
+
+        print(f"\n=== Summary ===")
+        print(f"Total: {total}, Passed: {passed}, Failed: {failed}")
+        print(f"Success Rate: {summary['success_rate']:.1f}%")
+
+        return summary
+
+
+def cmd_record(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Interactive test recording mode."""
+    recorder = TestRecorder(agent)
+    print("🎬 Test Recording Mode")
+    print("Commands: health, state, navigate <pane>, search <query>, action <id>, wait <sec>, save, quit")
+
+    while True:
+        try:
+            line = input("\n> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nRecording interrupted")
+            break
+
+        if not line:
+            continue
+
+        parts = line.split(maxsplit=1)
+        cmd = parts[0].lower()
+        arg = parts[1] if len(parts) > 1 else ""
+
+        if cmd == "quit" or cmd == "q":
+            break
+        elif cmd == "save":
+            if not arg:
+                print("Usage: save <filepath>")
+                continue
+            recorder.save(arg)
+        elif cmd == "health":
+            result = {"ok": agent.health_check()}
+            recorder.record_action("health", {}, result)
+            print(f"Result: {result}")
+        elif cmd == "state":
+            result = agent.get_state()
+            recorder.record_action("state", {}, result)
+            print(f"Result: {result.get('ok')}")
+        elif cmd == "navigate":
+            if not arg:
+                print("Usage: navigate <pane>")
+                continue
+            result = agent.navigate(arg)
+            recorder.record_action("navigate", {"pane": arg}, result)
+            print(f"Result: {result}")
+        elif cmd == "search":
+            if not arg:
+                print("Usage: search <query>")
+                continue
+            result = agent.search(arg)
+            recorder.record_action("search", {"query": arg}, result)
+            print(f"Result: {result}")
+        elif cmd == "action":
+            if not arg:
+                print("Usage: action <action_id>")
+                continue
+            result = agent.action(arg)
+            recorder.record_action("action", {"action_id": arg}, result)
+            print(f"Result: {result}")
+        elif cmd == "wait":
+            seconds = float(arg) if arg else 1.0
+            agent.wait(seconds)
+            recorder.record_action("wait", {"seconds": seconds}, {"ok": True})
+        else:
+            print(f"Unknown command: {cmd}")
+
+    print(f"\nRecorded {len(recorder.actions)} actions")
+    return 0
+
+
+def cmd_play(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Play recorded test scenario."""
+    player = TestPlayer(agent, strict=args.strict)
+
+    try:
+        test_data = player.load(args.file)
+    except Exception as e:
+        print(f"❌ Failed to load test file: {e}")
+        return 1
+
+    summary = player.play(test_data)
+
+    # Save results if requested
+    if args.output:
+        with open(args.output, "w") as f:
+            json.dump(summary, f, indent=2)
+        print(f"\n✅ Results saved to {args.output}")
+
+    return 0 if summary["failed"] == 0 else 1
+
+
+def cmd_create(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Create a test scenario from template."""
+    templates = {
+        "smoke": {
+            "version": "1.0",
+            "created": time.time(),
+            "actions": [
+                {"type": "health", "params": {}, "timestamp": 0, "expected_ok": True},
+                {"type": "state", "params": {}, "timestamp": 0.5, "expected_ok": True},
+                {"type": "action", "params": {"action_id": "mcp_health"}, "timestamp": 1.0, "expected_ok": True},
+            ],
+        },
+        "dyld": {
+            "version": "1.0",
+            "created": time.time(),
+            "actions": [
+                {"type": "dyld_list_caches", "params": {}, "timestamp": 0, "expected_ok": True},
+                {"type": "dyld_list_images", "params": {"query": "AppKit"}, "timestamp": 1.0, "expected_ok": True},
+                {"type": "search", "params": {"query": "Foundation"}, "timestamp": 2.0, "expected_ok": True},
+            ],
+        },
+        "navigation": {
+            "version": "1.0",
+            "created": time.time(),
+            "actions": [
+                {"type": "navigate", "params": {"pane": "functions"}, "timestamp": 0, "expected_ok": True},
+                {"type": "wait", "params": {"seconds": 0.5}, "timestamp": 0.5, "expected_ok": True},
+                {"type": "navigate", "params": {"pane": "decompiler"}, "timestamp": 1.0, "expected_ok": True},
+                {"type": "wait", "params": {"seconds": 0.5}, "timestamp": 1.5, "expected_ok": True},
+                {"type": "navigate", "params": {"pane": "listing"}, "timestamp": 2.0, "expected_ok": True},
+            ],
+        },
+    }
+
+    template = templates.get(args.template)
+    if not template:
+        print(f"❌ Unknown template: {args.template}")
+        print(f"Available templates: {', '.join(templates.keys())}")
+        return 1
+
+    with open(args.output, "w") as f:
+        json.dump(template, f, indent=2)
+
+    print(f"✅ Created {args.template} test scenario: {args.output}")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="GhidraVibe GUI Test Recorder/Player"
+    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")
+    parser.add_argument("--url", help="GUI server URL")
+
+    subparsers = parser.add_subparsers(dest="command", help="Command to run")
+
+    # Record command
+    subparsers.add_parser("record", help="Record test scenario interactively")
+
+    # Play command
+    play_parser = subparsers.add_parser("play", help="Play recorded test scenario")
+    play_parser.add_argument("file", help="Test scenario file")
+    play_parser.add_argument("--strict", action="store_true", help="Stop on first failure")
+    play_parser.add_argument("--output", help="Save results to JSON file")
+
+    # Create command
+    create_parser = subparsers.add_parser("create", help="Create test from template")
+    create_parser.add_argument(
+        "template",
+        choices=["smoke", "dyld", "navigation"],
+        help="Template name",
+    )
+    create_parser.add_argument("output", help="Output file path")
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        return 1
+
+    agent = DeviceAgent(base_url=args.url or "", verbose=args.verbose)
+
+    commands = {
+        "record": cmd_record,
+        "play": cmd_play,
+        "create": cmd_create,
+    }
+
+    handler = commands.get(args.command)
+    if handler:
+        return handler(agent, args)
+
+    print(f"Unknown command: {args.command}")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

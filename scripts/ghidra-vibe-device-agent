@@ -1,0 +1,407 @@
+#!/usr/bin/env python3
+"""
+GhidraVibe Device Agent CLI - Reproducible GUI Testing
+Automates GUI interactions via MCP for CI/CD integration.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import time
+import urllib.error
+import urllib.request
+from typing import Any
+
+GUI_URL = os.environ.get("GHIDRA_VIBE_GUI_URL", "http://127.0.0.1:8091").rstrip("/")
+
+
+class DeviceAgent:
+    """Device agent for GUI automation and testing."""
+
+    def __init__(self, base_url: str = GUI_URL, verbose: bool = False):
+        self.base_url = base_url
+        self.verbose = verbose
+        self.test_results: list[dict[str, Any]] = []
+
+    def log(self, msg: str) -> None:
+        """Log message if verbose mode is enabled."""
+        if self.verbose:
+            print(f"[DeviceAgent] {msg}", file=sys.stderr)
+
+    def http(self, method: str, path: str, body: dict | None = None) -> dict:
+        """Make HTTP request to GUI server."""
+        data = None if body is None else json.dumps(body).encode()
+        req = urllib.request.Request(
+            f"{self.base_url}{path}",
+            data=data,
+            method=method,
+            headers={"Content-Type": "application/json"} if data else {},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                raw = resp.read().decode()
+                result = json.loads(raw) if raw else {"ok": True}
+                self.log(f"{method} {path} -> {result.get('ok', False)}")
+                return result
+        except urllib.error.HTTPError as e:
+            error_msg = e.read().decode() or str(e)
+            self.log(f"{method} {path} -> ERROR: {error_msg}")
+            return {"ok": False, "error": error_msg}
+        except Exception as e:  # noqa: BLE001
+            self.log(f"{method} {path} -> ERROR: {str(e)}")
+            return {"ok": False, "error": str(e)}
+
+    def health_check(self) -> bool:
+        """Check if GUI server is responsive."""
+        result = self.http("GET", "/health")
+        return result.get("ok", False)
+
+    def wait_for_ready(self, timeout: int = 30) -> bool:
+        """Wait for GUI server to be ready."""
+        start = time.time()
+        while time.time() - start < timeout:
+            if self.health_check():
+                self.log("GUI server is ready")
+                return True
+            time.sleep(1)
+        self.log(f"GUI server not ready after {timeout}s")
+        return False
+
+    def get_state(self) -> dict:
+        """Get current GUI state."""
+        return self.http("GET", "/state")
+
+    def navigate(self, pane: str) -> dict:
+        """Navigate to a sidebar pane."""
+        return self.http("POST", "/navigate", {"pane": pane})
+
+    def search(self, query: str) -> dict:
+        """Set function search query."""
+        return self.http("POST", "/search", {"query": query})
+
+    def select_function(self, name: str = "", address: str = "", id: str = "") -> dict:
+        """Select a function by name, address, or id."""
+        return self.http("POST", "/select_function", {
+            "name": name,
+            "address": address,
+            "id": id,
+        })
+
+    def action(self, action_id: str) -> dict:
+        """Run a toolbar/action by ID."""
+        return self.http("POST", "/action", {"id": action_id})
+
+    def dyld_list_caches(self) -> dict:
+        """List detected dyld shared cache paths."""
+        return self.http("GET", "/dyld/caches")
+
+    def dyld_list_images(self, query: str = "") -> dict:
+        """List/filter images in dyld shared cache."""
+        return self.http("POST", "/dyld/list", {"query": query})
+
+    def dyld_open_image(self, image: str) -> dict:
+        """Import and analyze an image from dyld shared cache."""
+        return self.http("POST", "/dyld/open", {"image": image})
+
+    def agent_send(self, text: str) -> dict:
+        """Send a message to the Agent sidebar."""
+        return self.http("POST", "/agent/send", {"text": text})
+
+    def agent_status(self) -> dict:
+        """Get Agent sidebar status."""
+        return self.http("GET", "/agent/status")
+
+    def wait(self, seconds: float) -> None:
+        """Wait for specified seconds."""
+        self.log(f"Waiting {seconds}s")
+        time.sleep(seconds)
+
+    def assert_state(self, expected: dict) -> bool:
+        """Assert GUI state matches expected values."""
+        state = self.get_state()
+        if not state.get("ok"):
+            self.log(f"State check failed: {state.get('error')}")
+            return False
+
+        for key, value in expected.items():
+            actual = state.get(key)
+            if actual != value:
+                self.log(f"Assertion failed: {key}={actual}, expected={value}")
+                return False
+        return True
+
+    def record_result(self, test_name: str, passed: bool, message: str = "") -> None:
+        """Record test result."""
+        self.test_results.append({
+            "test": test_name,
+            "passed": passed,
+            "message": message,
+            "timestamp": time.time(),
+        })
+        status = "✅ PASS" if passed else "❌ FAIL"
+        print(f"{status}: {test_name}" + (f" - {message}" if message else ""))
+
+    def get_summary(self) -> dict:
+        """Get test results summary."""
+        total = len(self.test_results)
+        passed = sum(1 for r in self.test_results if r["passed"])
+        failed = total - passed
+        return {
+            "total": total,
+            "passed": passed,
+            "failed": failed,
+            "success_rate": (passed / total * 100) if total > 0 else 0,
+            "results": self.test_results,
+        }
+
+
+def cmd_health(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Check GUI server health."""
+    if not agent.health_check():
+        print("❌ GUI server not healthy")
+        return 1
+    print("✅ GUI server healthy")
+    return 0
+
+
+def cmd_state(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Get and display GUI state."""
+    state = agent.get_state()
+    print(json.dumps(state, indent=2))
+    return 0 if state.get("ok") else 1
+
+
+def cmd_navigate(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Navigate to a pane."""
+    result = agent.navigate(args.pane)
+    if not result.get("ok"):
+        print(f"❌ Navigate failed: {result.get('error')}")
+        return 1
+    print(f"✅ Navigated to {args.pane}")
+    return 0
+
+
+def cmd_search(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Search for functions."""
+    result = agent.search(args.query)
+    if not result.get("ok"):
+        print(f"❌ Search failed: {result.get('error')}")
+        return 1
+    print(f"✅ Search set to: {args.query}")
+    return 0
+
+
+def cmd_action(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Run an action."""
+    result = agent.action(args.action_id)
+    if not result.get("ok"):
+        print(f"❌ Action failed: {result.get('error')}")
+        return 1
+    print(f"✅ Action {args.action_id} executed")
+    return 0
+
+
+def cmd_dyld_list(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """List dyld caches or images."""
+    if args.images:
+        result = agent.dyld_list_images(args.query or "")
+        if not result.get("ok"):
+            print(f"❌ List images failed: {result.get('error')}")
+            return 1
+        images = result.get("images", [])
+        print(f"Found {len(images)} images:")
+        for img in images[:20]:  # Show first 20
+            print(f"  - {img}")
+        if len(images) > 20:
+            print(f"  ... and {len(images) - 20} more")
+    else:
+        result = agent.dyld_list_caches()
+        if not result.get("ok"):
+            print(f"❌ List caches failed: {result.get('error')}")
+            return 1
+        caches = result.get("caches", [])
+        print(f"Found {len(caches)} cache(s):")
+        for cache in caches:
+            print(f"  - {cache}")
+    return 0
+
+
+def cmd_dyld_open(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Open a dyld image."""
+    result = agent.dyld_open_image(args.image)
+    if not result.get("ok"):
+        print(f"❌ Open image failed: {result.get('error')}")
+        return 1
+    print(f"✅ Opened image: {args.image}")
+    return 0
+
+
+def cmd_test(agent: DeviceAgent, args: argparse.Namespace) -> int:
+    """Run test scenario."""
+    if not agent.wait_for_ready():
+        print("❌ GUI server not ready")
+        return 1
+
+    if args.scenario == "smoke":
+        return run_smoke_test(agent)
+    elif args.scenario == "dyld":
+        return run_dyld_test(agent)
+    elif args.scenario == "navigation":
+        return run_navigation_test(agent)
+    elif args.scenario == "all":
+        return run_all_tests(agent)
+    else:
+        print(f"❌ Unknown scenario: {args.scenario}")
+        return 1
+
+
+def run_smoke_test(agent: DeviceAgent) -> int:
+    """Run basic smoke test."""
+    print("\n=== Smoke Test ===\n")
+
+    # Test 1: Health check
+    agent.record_result("health_check", agent.health_check())
+
+    # Test 2: Get state
+    state = agent.get_state()
+    agent.record_result("get_state", state.get("ok", False))
+
+    # Test 3: MCP health action
+    result = agent.action("mcp_health")
+    agent.record_result("mcp_health_action", result.get("ok", False))
+
+    summary = agent.get_summary()
+    print(f"\n=== Summary ===")
+    print(f"Total: {summary['total']}, Passed: {summary['passed']}, Failed: {summary['failed']}")
+    print(f"Success Rate: {summary['success_rate']:.1f}%")
+
+    return 0 if summary["failed"] == 0 else 1
+
+
+def run_dyld_test(agent: DeviceAgent) -> int:
+    """Run dyld workflow test."""
+    print("\n=== dyld Shared Cache Test ===\n")
+
+    # Test 1: List caches
+    caches = agent.dyld_list_caches()
+    agent.record_result("dyld_list_caches", caches.get("ok", False))
+
+    # Test 2: List images
+    images = agent.dyld_list_images("AppKit")
+    agent.record_result("dyld_list_images", images.get("ok", False) and len(images.get("images", [])) > 0)
+
+    # Test 3: Search for Foundation
+    search_result = agent.search("Foundation")
+    agent.record_result("search_foundation", search_result.get("ok", False))
+
+    summary = agent.get_summary()
+    print(f"\n=== Summary ===")
+    print(f"Total: {summary['total']}, Passed: {summary['passed']}, Failed: {summary['failed']}")
+    print(f"Success Rate: {summary['success_rate']:.1f}%")
+
+    return 0 if summary["failed"] == 0 else 1
+
+
+def run_navigation_test(agent: DeviceAgent) -> int:
+    """Run navigation test."""
+    print("\n=== Navigation Test ===\n")
+
+    panes = ["functions", "decompiler", "listing", "symbol_tree", "memory_map"]
+
+    for pane in panes:
+        result = agent.navigate(pane)
+        agent.record_result(f"navigate_{pane}", result.get("ok", False))
+        agent.wait(0.5)
+
+    summary = agent.get_summary()
+    print(f"\n=== Summary ===")
+    print(f"Total: {summary['total']}, Passed: {summary['passed']}, Failed: {summary['failed']}")
+    print(f"Success Rate: {summary['success_rate']:.1f}%")
+
+    return 0 if summary["failed"] == 0 else 1
+
+
+def run_all_tests(agent: DeviceAgent) -> int:
+    """Run all test scenarios."""
+    exit_codes = [
+        run_smoke_test(agent),
+        run_dyld_test(agent),
+        run_navigation_test(agent),
+    ]
+    return max(exit_codes)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="GhidraVibe Device Agent CLI - Reproducible GUI Testing"
+    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")
+    parser.add_argument("--url", default=GUI_URL, help="GUI server URL")
+
+    subparsers = parser.add_subparsers(dest="command", help="Command to run")
+
+    # Health command
+    subparsers.add_parser("health", help="Check GUI server health")
+
+    # State command
+    subparsers.add_parser("state", help="Get GUI state")
+
+    # Navigate command
+    nav_parser = subparsers.add_parser("navigate", help="Navigate to pane")
+    nav_parser.add_argument("pane", help="Pane name (functions, decompiler, listing, etc.)")
+
+    # Search command
+    search_parser = subparsers.add_parser("search", help="Search for functions")
+    search_parser.add_argument("query", help="Search query")
+
+    # Action command
+    action_parser = subparsers.add_parser("action", help="Run an action")
+    action_parser.add_argument("action_id", help="Action ID")
+
+    # dyld commands
+    dyld_parser = subparsers.add_parser("dyld-list", help="List dyld caches or images")
+    dyld_parser.add_argument("--images", action="store_true", help="List images instead of caches")
+    dyld_parser.add_argument("--query", help="Filter query for images")
+
+    dyld_open_parser = subparsers.add_parser("dyld-open", help="Open dyld image")
+    dyld_open_parser.add_argument("image", help="Image name (e.g., AppKit)")
+
+    # Test command
+    test_parser = subparsers.add_parser("test", help="Run test scenario")
+    test_parser.add_argument(
+        "scenario",
+        choices=["smoke", "dyld", "navigation", "all"],
+        help="Test scenario to run",
+    )
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        return 1
+
+    agent = DeviceAgent(base_url=args.url, verbose=args.verbose)
+
+    commands = {
+        "health": cmd_health,
+        "state": cmd_state,
+        "navigate": cmd_navigate,
+        "search": cmd_search,
+        "action": cmd_action,
+        "dyld-list": cmd_dyld_list,
+        "dyld-open": cmd_dyld_open,
+        "test": cmd_test,
+    }
+
+    handler = commands.get(args.command)
+    if handler:
+        return handler(agent, args)
+
+    print(f"Unknown command: {args.command}")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

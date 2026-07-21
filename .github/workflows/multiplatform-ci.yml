@@ -135,3 +135,29 @@ jobs:
           if [ -f gui-tests/test-dyld-decompile-mcp.sh ]; then
             echo "✓ Dyld MCP decompilation test script exists"
           fi
+  
+  # Device Agent CLI Tests
+  device-agent-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test device agent CLI help
+        run: |
+          ./scripts/ghidra-vibe-device-agent --help
+          echo "✓ Device agent CLI executable"
+      - name: Test test recorder CLI help
+        run: |
+          ./scripts/ghidra-vibe-test-recorder --help
+          echo "✓ Test recorder CLI executable"
+      - name: Validate test scenarios
+        run: |
+          for scenario in gui-tests/scenarios/*.json; do
+            if [ -f "$scenario" ]; then
+              echo "Validating $scenario"
+              python3 -m json.tool "$scenario" > /dev/null
+            fi
+          done
+      - name: List test scenarios
+        run: |
+          echo "Available test scenarios:"
+          ls -1 gui-tests/scenarios/*.json | xargs -n1 basename

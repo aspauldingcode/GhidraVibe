@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "name": "Smoke Test - Basic GUI Health",
+  "description": "Verifies basic GUI server functionality",
+  "created": 1721545200,
+  "actions": [
+    {
+      "type": "health",
+      "params": {},
+      "timestamp": 0,
+      "expected_ok": true,
+      "description": "Check GUI server health"
+    },
+    {
+      "type": "state",
+      "params": {},
+      "timestamp": 0.5,
+      "expected_ok": true,
+      "description": "Get current GUI state"
+    },
+    {
+      "type": "action",
+      "params": {"action_id": "mcp_health"},
+      "timestamp": 1.0,
+      "expected_ok": true,
+      "description": "Check MCP connection"
+    },
+    {
+      "type": "action",
+      "params": {"action_id": "fetch_functions"},
+      "timestamp": 2.0,
+      "expected_ok": true,
+      "description": "Fetch functions list"
+    }
+  ]
+}

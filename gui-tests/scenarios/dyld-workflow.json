@@ -1,0 +1,62 @@
+{
+  "version": "1.0",
+  "name": "dyld Shared Cache Workflow",
+  "description": "Complete dyld shared cache workflow from discovery to framework selection",
+  "created": 1721545200,
+  "actions": [
+    {
+      "type": "dyld_list_caches",
+      "params": {},
+      "timestamp": 0,
+      "expected_ok": true,
+      "description": "List available dyld shared caches"
+    },
+    {
+      "type": "wait",
+      "params": {"seconds": 1.0},
+      "timestamp": 1.0,
+      "expected_ok": true
+    },
+    {
+      "type": "dyld_list_images",
+      "params": {"query": ""},
+      "timestamp": 2.0,
+      "expected_ok": true,
+      "description": "List all images in cache"
+    },
+    {
+      "type": "wait",
+      "params": {"seconds": 0.5},
+      "timestamp": 2.5,
+      "expected_ok": true
+    },
+    {
+      "type": "dyld_list_images",
+      "params": {"query": "AppKit"},
+      "timestamp": 3.0,
+      "expected_ok": true,
+      "description": "Search for AppKit framework"
+    },
+    {
+      "type": "dyld_list_images",
+      "params": {"query": "Foundation"},
+      "timestamp": 4.0,
+      "expected_ok": true,
+      "description": "Search for Foundation framework"
+    },
+    {
+      "type": "search",
+      "params": {"query": "NSWindow"},
+      "timestamp": 5.0,
+      "expected_ok": true,
+      "description": "Search for NSWindow function"
+    },
+    {
+      "type": "action",
+      "params": {"action_id": "open_shared_cache"},
+      "timestamp": 6.0,
+      "expected_ok": true,
+      "description": "Open shared cache dialog"
+    }
+  ]
+}

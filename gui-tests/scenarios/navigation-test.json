@@ -1,0 +1,87 @@
+{
+  "version": "1.0",
+  "name": "UI Navigation Test",
+  "description": "Tests navigation between different UI panes",
+  "created": 1721545200,
+  "actions": [
+    {
+      "type": "navigate",
+      "params": {"pane": "functions"},
+      "timestamp": 0,
+      "expected_ok": true,
+      "description": "Navigate to functions pane"
+    },
+    {
+      "type": "wait",
+      "params": {"seconds": 0.5},
+      "timestamp": 0.5,
+      "expected_ok": true
+    },
+    {
+      "type": "navigate",
+      "params": {"pane": "decompiler"},
+      "timestamp": 1.0,
+      "expected_ok": true,
+      "description": "Navigate to decompiler pane"
+    },
+    {
+      "type": "wait",
+      "params": {"seconds": 0.5},
+      "timestamp": 1.5,
+      "expected_ok": true
+    },
+    {
+      "type": "navigate",
+      "params": {"pane": "listing"},
+      "timestamp": 2.0,
+      "expected_ok": true,
+      "description": "Navigate to listing pane"
+    },
+    {
+      "type": "wait",
+      "params": {"seconds": 0.5},
+      "timestamp": 2.5,
+      "expected_ok": true
+    },
+    {
+      "type": "navigate",
+      "params": {"pane": "symbol_tree"},
+      "timestamp": 3.0,
+      "expected_ok": true,
+      "description": "Navigate to symbol tree pane"
+    },
+    {
+      "type": "wait",
+      "params": {"seconds": 0.5},
+      "timestamp": 3.5,
+      "expected_ok": true
+    },
+    {
+      "type": "navigate",
+      "params": {"pane": "memory_map"},
+      "timestamp": 4.0,
+      "expected_ok": true,
+      "description": "Navigate to memory map pane"
+    },
+    {
+      "type": "wait",
+      "params": {"seconds": 0.5},
+      "timestamp": 4.5,
+      "expected_ok": true
+    },
+    {
+      "type": "navigate",
+      "params": {"pane": "data_types"},
+      "timestamp": 5.0,
+      "expected_ok": true,
+      "description": "Navigate to data types pane"
+    },
+    {
+      "type": "state",
+      "params": {},
+      "timestamp": 5.5,
+      "expected_ok": true,
+      "description": "Verify final state"
+    }
+  ]
+}
