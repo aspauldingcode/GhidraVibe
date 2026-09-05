@@ -52,6 +52,14 @@ stdenvNoCC.mkDerivation {
     cp -a ${../../scripts/lib/malimite}/. "$out/share/ghidra-vibe/lib/malimite/"
     cp -a ${../../scripts/lib/vibe_mcp}/. "$out/share/ghidra-vibe/lib/vibe_mcp/"
     cp ${../../scripts/lib/dsc_index.py} "$out/share/ghidra-vibe/lib/dsc_index.py"
+    cp ${../../scripts/lib/macho_slice.py} "$out/share/ghidra-vibe/lib/macho_slice.py"
+    cp ${../../scripts/lib/detect-java.sh} "$out/share/ghidra-vibe/lib/detect-java.sh"
+    cp ${../../scripts/lib/macho-native-slice.sh} "$out/share/ghidra-vibe/lib/macho-native-slice.sh"
+    # Overlay headless-compat FastMCP wrapper (stock stays as *_stock.py).
+    if [[ -f "$out/share/ghidra-mcp/bridge_mcp_ghidra.py" && ! -f "$out/share/ghidra-mcp/bridge_mcp_ghidra_stock.py" ]]; then
+      cp "$out/share/ghidra-mcp/bridge_mcp_ghidra.py" "$out/share/ghidra-mcp/bridge_mcp_ghidra_stock.py"
+    fi
+    cp ${../share/bridge_mcp_ghidra.py} "$out/share/ghidra-mcp/bridge_mcp_ghidra.py"
     cp ${../../scripts/ghidra-vibe-dyld} "$out/share/ghidra-vibe/ghidra-vibe-dyld"
     cp ${../../scripts/ghidra-vibe-apple} "$out/share/ghidra-vibe/ghidra-vibe-apple"
     cp ${../../scripts/ghidra-vibe-mcp-ext} "$out/share/ghidra-vibe/ghidra-vibe-mcp-ext"
@@ -186,27 +194,13 @@ EOF
 export GHIDRA_VIBE_JSPACE_BIN="\''${GHIDRA_VIBE_JSPACE_BIN:-$out/bin/ghidra-vibe-jspace}"
 exec "$out/bin/ghidra-vibe-jspace" "\$@"
 EOF
-    # Packaged headless launcher (detect-maxmem + RAM-aware -Xmx)
-    chmod u+w "$out/share/ghidra-vibe/ghidra-vibe-analyzeHeadless"
-    cat > "$out/share/ghidra-vibe/ghidra-vibe-analyzeHeadless" <<'AHEOF'
-#!/usr/bin/env bash
-set -euo pipefail
-HERE="$(cd "$(dirname "$0")" && pwd)"
-# shellcheck disable=SC1091
-source "$HERE/lib/detect-maxmem.sh"
-MEM="$(detect_ghidra_maxmem)"
-VMARG_LIST="''${GHIDRA_VIBE_VMARGS:--XX:ParallelGCThreads=2 -XX:CICompilerCount=2 -Djava.awt.headless=true -Dghidra.vibe.nativeUi=1 }"
-if [[ -n "''${GHIDRA_INSTALL_DIR:-}" && -x "''${GHIDRA_INSTALL_DIR}/support/launch.sh" ]]; then
-  SUPPORT="''${GHIDRA_INSTALL_DIR}/support"
-else
-  echo "Set GHIDRA_INSTALL_DIR" >&2
-  exit 1
-fi
-echo "ghidra-vibe-analyzeHeadless MAXMEM=$MEM support=$SUPPORT" >&2
-exec "$SUPPORT/launch.sh" fg jdk Ghidra-Headless "$MEM" "$VMARG_LIST" \
-  ghidra.app.util.headless.AnalyzeHeadless "$@"
-AHEOF
-    chmod +x "$out/bin/ghidra-vibe-dyld" "$out/share/ghidra-vibe/ghidra-vibe-analyzeHeadless"
+    # Keep the repo analyzeHeadless (detect-java + fat-slice -import). SCRIPT_DIR/lib
+    # resolves to $out/share/ghidra-vibe/lib after the copy above.
+    chmod +x "$out/bin/ghidra-vibe-dyld" \
+      "$out/share/ghidra-vibe/ghidra-vibe-analyzeHeadless" \
+      "$out/share/ghidra-vibe/lib/detect-java.sh" \
+      "$out/share/ghidra-vibe/lib/macho-native-slice.sh" \
+      "$out/share/ghidra-mcp/bridge_mcp_ghidra.py"
 
     cat > "$out/share/ghidra-vibe/runtime.env" <<EOF
 GHIDRA_INSTALL_DIR=$out/lib/ghidra

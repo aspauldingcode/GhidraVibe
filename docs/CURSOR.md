@@ -1,43 +1,63 @@
 # Cursor / IDE MCP
 
-Cursor MCP is **optional** — GhidraVibe runs without it. Wire the same bridges into Claude Desktop, Continue, or any MCP client the same way.
+Cursor MCP is **optional**. GhidraVibe runs without it. Wire the same bins into
+Claude Desktop, Continue, or any MCP client the same way.
 
-**Nix is not required in the client.** Prefer [uv](https://github.com/astral-sh/uv) (`uv run` / `uvx`) against the bridge scripts, matching the [mcp-nixos](https://github.com/utensils/mcp-nixos) install style.
+**Host model matches [mcp-nixos](https://github.com/utensils/mcp-nixos) /
+[wwn-mcp](https://github.com/Wawona/wwn-mcp):** spawn a local nix PATH binary
+over **stdio**. No public URL. `ghidra-vibe-mcp` auto-starts mcp-ext on an
+ephemeral localhost port (no manual `:8092`).
 
-## 1. Start GhidraVibe
+## Recommended: `#ghidra-vibe-mcp`
 
-- **Prebuilt:** [Releases](https://github.com/aspauldingcode/GhidraVibe/releases) DMG → open the app.
-- **Nix:** `nix run github:aspauldingcode/GhidraVibe` (or `nix run` from a checkout).
+```bash
+nix profile install .#ghidra-vibe-mcp
+# or: programs.ghidra-vibe.enable = true; (home-manager)
+```
 
-Leave it running. Defaults:
+```json
+{
+  "mcpServers": {
+    "ghidra": { "command": "ghidra-mcp", "args": [] },
+    "ghidra-vibe": { "command": "ghidra-vibe-mcp", "args": [] },
+    "ghidra-vibe-rag": { "command": "ghidra-vibe-rag-mcp", "args": [] }
+  }
+}
+```
 
-| Service | Env | URL |
+| Binary | Role |
+|---|---|
+| `ghidra-mcp` | Engine tools (UDS discovery; optional `GHIDRA_MCP_URL` if headless already up) |
+| `ghidra-vibe-mcp` | dyld / Malimite / rules / nav (spawns mcp-ext, tears down on exit) |
+| `ghidra-vibe-rag-mcp` | JSpace RAG discover/search/index |
+
+Home Manager writes the same shape to `~/.config/ghidra-vibe/cursor-mcp.json`.
+
+## Analysis HTTP stays up
+
+`ghidra-vibe-analysis-ensure` starts the program-engine API (`:8089`) if it
+is down, and home-manager `mcp.keepAnalysisAlive` (default) installs a
+LaunchAgent with KeepAlive. MCP `vibe_health` / decompile call the same
+ensure. You should not have to start headless by hand.
+
+| Service | Env | Default |
 |---|---|---|
 | Program engine | `GHIDRA_MCP_URL` | `http://127.0.0.1:8089` |
 | GuiControl | `GHIDRA_VIBE_GUI_URL` | `http://127.0.0.1:8091` |
-| Vibe tools (dyld, Malimite, …) | `GHIDRA_VIBE_MCP_EXT_URL` | `http://127.0.0.1:8092` |
 
-Headless (no UI): `ghidra-vibe-mcp-headless --project /path/to/Proj.gpr` then open a program. Stock Swing UI is **not** shipped.
+- **Prebuilt:** [Releases](https://github.com/aspauldingcode/GhidraVibe/releases) DMG
+- **Nix GUI:** `nix run github:aspauldingcode/GhidraVibe`
+- **Headless:** `ghidra-vibe-mcp-headless --project /path/to/Proj.gpr`
 
-## 2. Locate bridge scripts
+## Legacy: raw bridges + fixed ports
+
+Still works if you prefer manual daemons:
 
 ```bash
-nix build github:aspauldingcode/GhidraVibe
+nix build .#ghidra-vibe
 BRIDGES="$(readlink -f result)/share/ghidra-mcp"
+ghidra-vibe-mcp-ext   # :8092
 ```
-
-Local checkout: `nix build .#ghidra-vibe` → `./result/share/ghidra-mcp/`.
-
-| Script | Role |
-|---|---|
-| `bridge_mcp_ghidra.py` | Engine tools (decompile, rename, …) — PEP 723 / needs `mcp` |
-| `bridge_mcp_gui.py` | Native UI (GuiControl) — stdlib |
-| `bridge_mcp_vibe.py` | dyld / Malimite / rules / nav — stdlib |
-| `bridge_mcp_rag.py` | Compat shim → `ghidra-vibe-rag-mcp` |
-
-## 3. Configure the client
-
-### Option 1: uv (Recommended)
 
 ```json
 {
@@ -47,48 +67,18 @@ Local checkout: `nix build .#ghidra-vibe` → `./result/share/ghidra-mcp/`.
       "args": ["run", "/ABS/PATH/TO/result/share/ghidra-mcp/bridge_mcp_ghidra.py"],
       "env": { "GHIDRA_MCP_URL": "http://127.0.0.1:8089" }
     },
-    "ghidra-vibe-gui": {
-      "command": "uv",
-      "args": ["run", "/ABS/PATH/TO/result/share/ghidra-mcp/bridge_mcp_gui.py"],
-      "env": { "GHIDRA_VIBE_GUI_URL": "http://127.0.0.1:8091" }
-    },
-    "ghidra-vibe-rag": {
-      "command": "python3",
-      "args": ["/ABS/PATH/TO/result/share/ghidra-mcp/bridge_mcp_rag.py"],
-      "env": {
-        "GHIDRA_MCP_URL": "http://127.0.0.1:8089",
-        "GHIDRA_VIBE_JSPACE_LIB": "/ABS/PATH/TO/result/share/ghidra-vibe/lib"
-      }
-    },
     "ghidra-vibe": {
-      "command": "uv",
-      "args": ["run", "/ABS/PATH/TO/result/share/ghidra-mcp/bridge_mcp_vibe.py"],
-      "env": {
-        "GHIDRA_MCP_URL": "http://127.0.0.1:8089",
-        "GHIDRA_VIBE_MCP_EXT_URL": "http://127.0.0.1:8092"
-      }
+      "command": "python3",
+      "args": ["/ABS/PATH/TO/result/share/ghidra-mcp/bridge_mcp_vibe.py"],
+      "env": { "GHIDRA_VIBE_MCP_EXT_URL": "http://127.0.0.1:8092" }
     }
   }
 }
 ```
 
-`uvx` equivalent for the engine bridge:
-
-```bash
-uvx --with 'mcp>=1.2.0,<2' python "$BRIDGES/bridge_mcp_ghidra.py"
-```
-
-### Option 2: Nix / Home Manager
-
-Enable `programs.ghidra-vibe` — writes `~/.config/ghidra-vibe/cursor-mcp.json` with store paths filled in ([nix/modules/home-manager.nix](../nix/modules/home-manager.nix)).
-
-### Option 3: `python3`
-
-Works for gui/vibe bridges out of the box. For the engine bridge, install `mcp` (`pip install 'mcp>=1.2.0,<2'`) or use `uv run` as above.
-
 ## Tips
 
-- Start vibe tools HTTP when needed: `ghidra-vibe-mcp-ext`.
-- Prefer `rag_discover` before deep RE questions; `dyld_import_image` + `decompile_function` for Apple frameworks.
+- Prefer `rag_discover` before deep RE questions; `dyld_import_image` +
+  `decompile_function` for Apple frameworks.
 - Tool map: [native-ui/mcp/tool-map.json](../native-ui/mcp/tool-map.json).
 - Usability check: `./gui-tests/cursor-mcp-usability.sh`.

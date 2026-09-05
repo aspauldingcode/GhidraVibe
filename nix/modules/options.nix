@@ -4,26 +4,63 @@
   options.programs.ghidra-vibe = {
     enable = lib.mkEnableOption "Vibe Ghidra (Ghidra + bundled MCP)";
 
+    installEngine = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Install the full GhidraVibe engine package on PATH. Set false to install
+        only stdio MCP binaries (mcp-nixos / wwn-mcp host model).
+      '';
+    };
+
     package = lib.mkOption {
       type = lib.types.package;
       description = "Vibe Ghidra package (Ghidra tree with GhidraMCP prebundled).";
+    };
+
+    mcpPackage = lib.mkOption {
+      type = lib.types.package;
+      description = ''
+        Local stdio MCP host package (`ghidra-mcp`, `ghidra-vibe-mcp`,
+        `ghidra-vibe-rag-mcp`). Same spawn model as mcp-nixos / wwn-mcp.
+      '';
+    };
+
+    analysisPackage = lib.mkOption {
+      type = lib.types.package;
+      description = ''
+        Supervisor that keeps analysis HTTP (:8089) up
+        (`ghidra-vibe-analysis-ensure`). Pins the flake JDK (Semeru on Darwin).
+      '';
     };
 
     mcp = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = true;
-        description = "Expose MCP bridge path / Cursor snippet helpers.";
+        description = "Install stdio MCP binaries on PATH + Cursor snippet helpers.";
       };
       ghidraServer = lib.mkOption {
         type = lib.types.str;
         default = "http://127.0.0.1:8089";
-        description = "Ghidra MCP plugin HTTP URL (GHIDRA_MCP_URL).";
+        description = ''
+          Optional engine URL for shell sessionVariables when headless/GUI is
+          already up. Not required by Cursor mcp.json (UDS discovery).
+        '';
       };
       guiControl = lib.mkOption {
         type = lib.types.str;
         default = "http://127.0.0.1:8091";
         description = "GhidraVibe GuiControlServer URL (GHIDRA_VIBE_GUI_URL).";
+      };
+      keepAnalysisAlive = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          LaunchAgent / user service: start the program-engine API at login and
+          restart it if the JVM dies. Required for `vibe_health` to stay green
+          without a manual `ghidra-vibe-mcp-headless`.
+        '';
       };
     };
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 import urllib.error
@@ -46,6 +47,96 @@ def _json_err(msg: str, **extra: Any) -> dict[str, Any]:
     return {"ok": False, "error": msg, **extra}
 
 
+def _looks_gui_only(resp: Any) -> bool:
+    if isinstance(resp, dict):
+        if resp.get("success") is True:
+            return False
+        if resp.get("ok") is True and not resp.get("error"):
+            return False
+        text = str(resp.get("error") or resp.get("text") or resp)
+    else:
+        text = str(resp)
+    low = text.lower()
+    return (
+        "requires gui" in low
+        or "plugintool not available" in low
+        or "plugin tool not available" in low
+    )
+
+
+def _program_path(raw: str) -> str:
+    s = str(raw or "").strip()
+    if not s:
+        return s
+    return s if s.startswith("/") else f"/{s}"
+
+
+def _http_failed(resp: Any) -> bool:
+    if not isinstance(resp, dict):
+        return True
+    if resp.get("error") or resp.get("ok") is False:
+        return True
+    return False
+
+
+def _analysis_url() -> str:
+    return MCP_URL.rstrip("/")
+
+
+def _analysis_probe() -> bool:
+    try:
+        urllib.request.urlopen(f"{_analysis_url()}/check_connection", timeout=2)
+        return True
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _analysis_ensure_bin() -> str | None:
+    env = os.environ.get("GHIDRA_VIBE_ANALYSIS_ENSURE")
+    if env and Path(env).is_file() and os.access(env, os.X_OK):
+        return env
+    here = Path(__file__).resolve()
+    for cand in (
+        here.parents[2] / "ghidra-vibe-analysis-ensure",  # repo scripts/
+        here.parents[1] / "ghidra-vibe-analysis-ensure",  # packaged share/ghidra-vibe/
+    ):
+        if cand.is_file() and os.access(cand, os.X_OK):
+            return str(cand)
+    return shutil.which("ghidra-vibe-analysis-ensure")
+
+
+def ensure_analysis(timeout: int | None = None) -> dict[str, Any]:
+    """Start the program-engine API if :8089 is down. Idempotent."""
+    if _analysis_probe():
+        return {"ok": True, "ensured": False, "url": _analysis_url()}
+    if os.environ.get("GHIDRA_VIBE_ANALYSIS_AUTOSTART", "1") in {"0", "false", "no"}:
+        return {"ok": False, "error": f"analysis down at {_analysis_url()} (autostart disabled)"}
+    bin_ = _analysis_ensure_bin()
+    if not bin_:
+        return {
+            "ok": False,
+            "error": (
+                f"analysis down at {_analysis_url()} — "
+                "ghidra-vibe-analysis-ensure not found (set GHIDRA_VIBE_ANALYSIS_ENSURE)"
+            ),
+        }
+    wait = int(timeout or os.environ.get("GHIDRA_VIBE_ANALYSIS_TIMEOUT", "180"))
+    try:
+        proc = subprocess.run(
+            [bin_, "--timeout", str(wait)],
+            capture_output=True,
+            text=True,
+            timeout=wait + 15,
+            check=False,
+        )
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": f"analysis ensure failed: {e}"}
+    if _analysis_probe():
+        return {"ok": True, "ensured": True, "url": _analysis_url()}
+    err = (proc.stderr or proc.stdout or "").strip() or f"exit {proc.returncode}"
+    return {"ok": False, "error": f"analysis still down at {_analysis_url()}: {err}"}
+
+
 def analysis_http(method: str, path: str, body: dict | None = None, query: dict | None = None) -> Any:
     url = f"{MCP_URL}/{path.lstrip('/')}"
     if query:
@@ -57,19 +148,29 @@ def analysis_http(method: str, path: str, body: dict | None = None, query: dict 
         method=method,
         headers={"Content-Type": "application/json"} if data else {},
     )
-    try:
-        with urllib.request.urlopen(req, timeout=300) as resp:
-            raw = resp.read().decode()
-            if not raw:
-                return {"ok": True}
-            try:
-                return json.loads(raw)
-            except json.JSONDecodeError:
-                return {"ok": True, "text": raw}
-    except urllib.error.HTTPError as e:
-        return _json_err(e.read().decode() or str(e), status=e.code)
-    except Exception as e:  # noqa: BLE001
-        return _json_err(str(e))
+    last_err: Exception | None = None
+    for attempt in range(2):
+        try:
+            with urllib.request.urlopen(req, timeout=300) as resp:
+                raw = resp.read().decode()
+                if not raw:
+                    return {"ok": True}
+                try:
+                    return json.loads(raw)
+                except json.JSONDecodeError:
+                    return {"ok": True, "text": raw}
+        except urllib.error.HTTPError as e:
+            return _json_err(e.read().decode() or str(e), status=e.code)
+        except Exception as e:  # noqa: BLE001
+            last_err = e
+            refused = "connection refused" in str(e).lower() or isinstance(e, ConnectionError)
+            if attempt == 0 and refused:
+                started = ensure_analysis()
+                if started.get("ok"):
+                    continue
+                return _json_err(str(started.get("error") or e), ensure=started)
+            return _json_err(str(e))
+    return _json_err(str(last_err or "analysis unreachable"))
 
 
 def gui_http(method: str, path: str, body: dict | None = None) -> Any:
@@ -588,14 +689,12 @@ def dyld_import_image(args: dict) -> dict[str, Any]:
         "analyze": analyze,
         "apple_symbols": apple,
     }
-    # Best-effort: open in analysis MCP (bethington: GET /open_program?program=/Name).
+    # Best-effort: open in analysis MCP. Headless GET /open_program is GUI-only;
+    # fall back to POST /load_program_from_project.
     try:
         prog_path = payload["program_path"]
-        opened = analysis_http("GET", "open_program", query={"program": prog_path})
-        payload["loaded"] = bool(
-            isinstance(opened, dict)
-            and (opened.get("success") is True or opened.get("ok") is True)
-        )
+        opened = open_program({"path": prog_path})
+        payload["loaded"] = bool(opened.get("ok"))
         payload["open_result"] = opened
     except Exception:  # noqa: BLE001
         payload["loaded"] = False
@@ -1037,14 +1136,87 @@ def vibe_redo(_args: dict) -> dict[str, Any]:
 
 
 def vibe_health(_args: dict) -> dict[str, Any]:
+    ensured = ensure_analysis()
     core = analysis_http("GET", "check_connection")
     return _json_ok(
         {
             "vibe_mcp": __version__,
             "analysis_mcp": MCP_URL,
             "analysis": core,
+            "ensure": ensured,
         }
     )
+
+
+def import_file(args: dict) -> dict[str, Any]:
+    """Import a binary via headless ``POST /load_program`` (stock tool is GUI-only)."""
+    raw = args.get("file") or args.get("path") or args.get("filename")
+    if not raw:
+        return _json_err("file required")
+    p = Path(str(raw))
+    if p.is_file():
+        try:
+            from macho_slice import thin_macho
+
+            sliced, arch = thin_macho(p)
+        except Exception:  # noqa: BLE001
+            sliced, arch = str(p), None
+        loaded = analysis_http("POST", "load_program", body={"file": sliced})
+        extra = {"file": sliced, "via": "load_program"}
+        if arch:
+            extra["macho_slice"] = arch
+        if _http_failed(loaded) or _looks_gui_only(loaded):
+            return _json_err(
+                str((loaded or {}).get("error") if isinstance(loaded, dict) else loaded),
+                **extra,
+                result=loaded,
+            )
+        return _json_ok(loaded, **extra)
+    # Project-relative path: /Wi-Fi
+    return open_program({"path": str(raw)})
+
+
+def open_program(args: dict) -> dict[str, Any]:
+    """Open a project program. Headless remaps GUI-only GET /open_program."""
+    raw = args.get("path") or args.get("program") or args.get("name") or args.get("program_path")
+    if not raw:
+        return _json_err("path required")
+    p = Path(str(raw))
+    if p.is_file():
+        return import_file({"file": str(p)})
+    prog = _program_path(str(raw))
+    opened = analysis_http("GET", "open_program", query={"program": prog})
+    if not _http_failed(opened) and not _looks_gui_only(opened):
+        return _json_ok(opened, via="open_program", program=prog)
+    loaded = analysis_http("POST", "load_program_from_project", body={"path": prog})
+    if not _http_failed(loaded) and not _looks_gui_only(loaded):
+        return _json_ok(loaded, via="load_program_from_project", program=prog)
+    posted = analysis_http(
+        "POST", "open_program", body={"program": prog, "path": prog, "name": prog}
+    )
+    if not _http_failed(posted) and not _looks_gui_only(posted):
+        return _json_ok(posted, via="open_program_post", program=prog)
+    return _json_err(
+        "could not open program (headless GET /open_program is GUI-only)",
+        program=prog,
+        open_program=opened,
+        load_program_from_project=loaded,
+        open_program_post=posted,
+    )
+
+
+def list_project_files(args: dict) -> dict[str, Any]:
+    """List programs. Stock list_project_files is GUI-only on headless."""
+    for path, method, body, query in (
+        ("list_project_files", "GET", None, {k: v for k, v in args.items() if v is not None} or None),
+        ("list_project_programs", "GET", None, None),
+        ("list_open_programs", "GET", None, None),
+        ("get_current_program", "GET", None, None),
+    ):
+        resp = analysis_http(method, path, body=body, query=query)
+        if not _http_failed(resp) and not _looks_gui_only(resp):
+            return _json_ok(resp, via=path)
+    return _json_err("list_project_files unavailable on this analysis server")
 
 
 # --- Listing write surface (proxy analysis MCP when available; else honest note) ---
@@ -1336,6 +1508,9 @@ def malimite_open_bundle(args: dict) -> dict[str, Any]:
 
 TOOL_HANDLERS: dict[str, Callable[[dict], dict[str, Any]]] = {
     "vibe_health": vibe_health,
+    "import_file": import_file,
+    "open_program": open_program,
+    "list_project_files": list_project_files,
     "malimite_analyze": malimite_analyze,
     "malimite_open_bundle": malimite_open_bundle,
     "malimite_list_bundle_binaries": malimite_list_bundle_binaries,

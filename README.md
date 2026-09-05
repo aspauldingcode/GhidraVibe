@@ -45,7 +45,8 @@ nix develop                    # shell with tooling on PATH
 
 ## Wire MCP into Cursor (or any agent)
 
-Leave **GhidraVibe running**. Defaults:
+Analysis HTTP (`:8089`) is kept up by `ghidra-vibe-analysis-ensure` (MCP
+auto-start + optional LaunchAgent KeepAlive). Defaults:
 
 | Service | URL |
 |---|---|

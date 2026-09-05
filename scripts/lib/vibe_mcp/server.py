@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
@@ -99,10 +100,15 @@ class VibeMCPHandler(BaseHTTPRequestHandler):
 
 def serve(host: str = "127.0.0.1", port: int = 8092) -> None:
     httpd = ThreadingHTTPServer((host, port), VibeMCPHandler)
-    print(f"ghidra-vibe-mcp-ext listening on http://{host}:{port}", flush=True)
-    print(f"schema: http://{host}:{port}/mcp/schema  tools={len(TOOL_SCHEMA)}", flush=True)
+    # Always stderr: stdout is reserved for MCP stdio bridges.
+    print(f"ghidra-vibe-mcp-ext listening on http://{host}:{port}", file=sys.stderr, flush=True)
+    print(
+        f"schema: http://{host}:{port}/mcp/schema  tools={len(TOOL_SCHEMA)}",
+        file=sys.stderr,
+        flush=True,
+    )
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("shutting down", flush=True)
+        print("shutting down", file=sys.stderr, flush=True)
         httpd.shutdown()

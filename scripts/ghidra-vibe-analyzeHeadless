@@ -7,6 +7,17 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=lib/detect-maxmem.sh
 source "${SCRIPT_DIR}/lib/detect-maxmem.sh"
 MEM="$(detect_ghidra_maxmem)"
+if [[ -f "${SCRIPT_DIR}/lib/detect-java.sh" ]]; then
+  # shellcheck source=lib/detect-java.sh
+  source "${SCRIPT_DIR}/lib/detect-java.sh"
+  if jh="$(detect_ghidra_java_home)"; then
+    export JAVA_HOME="$jh"
+  fi
+fi
+if [[ -f "${SCRIPT_DIR}/lib/macho-native-slice.sh" ]]; then
+  # shellcheck source=lib/macho-native-slice.sh
+  source "${SCRIPT_DIR}/lib/macho-native-slice.sh"
+fi
 VMARG_LIST="${GHIDRA_VIBE_VMARGS:--XX:ParallelGCThreads=2 -XX:CICompilerCount=2 -Djava.awt.headless=true -Dghidra.vibe.nativeUi=1 }"
 
 resolve_support_dir() {
@@ -27,6 +38,21 @@ resolve_support_dir() {
 }
 
 SUPPORT="$(resolve_support_dir)"
+# Thin fat Mach-O -import arguments so Ghidra does not default to x86_64.
+hl_args=()
+while [[ $# -gt 0 ]]; do
+  if [[ "$1" == "-import" && $# -ge 2 ]]; then
+    src="$2"
+    if declare -F macho_native_slice >/dev/null; then
+      src="$(macho_native_slice "$2")"
+    fi
+    hl_args+=(-import "$src")
+    shift 2
+  else
+    hl_args+=("$1")
+    shift
+  fi
+done
 echo "ghidra-vibe-analyzeHeadless MAXMEM=$MEM (auto unless GHIDRA_VIBE_MAXMEM set) support=$SUPPORT" >&2
 exec "$SUPPORT/launch.sh" fg jdk Ghidra-Headless "$MEM" "$VMARG_LIST" \
-  ghidra.app.util.headless.AnalyzeHeadless "$@"
+  ghidra.app.util.headless.AnalyzeHeadless ${hl_args[@]+"${hl_args[@]}"}

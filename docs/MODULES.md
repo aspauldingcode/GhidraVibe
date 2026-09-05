@@ -10,6 +10,7 @@ Exports: `nixosModules.default`, `darwinModules.default`, `homeModules.default`.
     package = inputs.ghidra-vibe.packages.${pkgs.system}.ghidra-vibe;
     mcp.ghidraServer = "http://127.0.0.1:8089";
     mcp.guiControl = "http://127.0.0.1:8091";
+    mcp.keepAnalysisAlive = true; # LaunchAgent: :8089 KeepAlive (default)
     agent.enable = true;
     # Opt-in cloud API only — path to a key file, never a raw key string:
     # agent.apiKeyFile = "/run/agenix/openai_api_key";

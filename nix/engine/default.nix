@@ -4,12 +4,11 @@
 {
   lib,
   stdenv,
-  openjdk21,
+  java,
   ghidraVibe,
 }:
 
 let
-  java = openjdk21;
   ghidraHome = "${ghidraVibe}/lib/ghidra";
 in
 stdenv.mkDerivation {
@@ -46,7 +45,10 @@ stdenv.mkDerivation {
       src/dev/ghidravibe/engine/InProcessEngine.java
     jar --create --file build/ghidra-vibe-inprocess.jar -C build/classes .
 
-    JNI_INC="${java}/include"
+    JNI_INC="${java.home}/include"
+    if [[ ! -d "$JNI_INC" ]]; then
+      JNI_INC="${java}/include"
+    fi
     if [[ "$(uname)" == "Darwin" ]]; then
       clang -shared -fPIC -o build/libghidravibe_engine.dylib \
         jni/ghidra_vibe_engine.c \

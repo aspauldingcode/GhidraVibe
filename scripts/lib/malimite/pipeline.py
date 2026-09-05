@@ -75,22 +75,48 @@ def find_bin(app: PathLike) -> Path:
     raise FileNotFoundError(f"Could not find main Mach-O in {app_path}")
 
 
+def _usable_headless(p: Path) -> bool:
+    return p.is_file() and (os.access(p, os.X_OK) or p.suffix in {"", ".sh"})
+
+
 def _resolve_headless(headless: Optional[PathLike]) -> Optional[Path]:
+    candidates: list[Path] = []
     if headless:
-        p = Path(headless)
-        if p.is_file() and os.access(p, os.X_OK):
-            return p
+        candidates.append(Path(headless))
     env = os.environ.get("GHIDRA_VIBE_HEADLESS")
-    if env and Path(env).is_file():
-        return Path(env)
-    which = shutil.which("ghidra-analyzeHeadless")
-    if which:
-        return Path(which)
-    # Repo-relative wrapper
+    if env:
+        candidates.append(Path(env))
+    for name in ("ghidra-vibe-analyzeHeadless", "ghidra-analyzeHeadless"):
+        which = shutil.which(name)
+        if which:
+            candidates.append(Path(which))
     here = Path(__file__).resolve()
-    wrapper = here.parents[2] / "ghidra-vibe-analyzeHeadless"
-    if wrapper.is_file():
-        return wrapper
+    # scripts/lib/malimite → scripts/ghidra-vibe-analyzeHeadless
+    candidates.append(here.parents[2] / "ghidra-vibe-analyzeHeadless")
+    # packaged: share/ghidra-vibe/lib/malimite → share/ghidra-vibe/ghidra-vibe-analyzeHeadless
+    candidates.append(here.parents[1] / "ghidra-vibe-analyzeHeadless")
+    lib = os.environ.get("GHIDRA_VIBE_LIB")
+    if lib:
+        candidates.append(Path(lib).parent / "ghidra-vibe-analyzeHeadless")
+        candidates.append(Path(lib) / ".." / "ghidra-vibe-analyzeHeadless")
+    install = os.environ.get("GHIDRA_INSTALL_DIR")
+    if install:
+        root = Path(install)
+        candidates.append(root / "support" / "analyzeHeadless")
+        # $out/lib/ghidra → $out/share/ghidra-vibe/ghidra-vibe-analyzeHeadless
+        candidates.append(root.parent.parent / "share" / "ghidra-vibe" / "ghidra-vibe-analyzeHeadless")
+    seen: set[str] = set()
+    for p in candidates:
+        try:
+            resolved = p.resolve()
+        except OSError:
+            resolved = p
+        key = str(resolved)
+        if key in seen:
+            continue
+        seen.add(key)
+        if _usable_headless(resolved):
+            return resolved
     return None
 
 
@@ -148,6 +174,15 @@ def analyze(
         binary = find_bin(app)
     except FileNotFoundError:
         binary = None
+    if binary:
+        try:
+            from macho_slice import thin_macho
+
+            sliced, arch = thin_macho(binary)
+            if arch:
+                binary = Path(sliced)
+        except Exception:
+            pass
 
     info_out = {
         "app": str(app),

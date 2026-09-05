@@ -35,7 +35,9 @@
             config.allowUnfree = true;
           };
 
-          java = pkgs.openjdk21;
+          # Darwin HotSpot 17/21/25 SIGBUS in CodeHeap on this host (2026-09).
+          # IBM Semeru / OpenJ9 21 is the working analysis JVM. Linux keeps Temurin.
+          java = if pkgs.stdenv.isDarwin then pkgs.semeru-bin-21 else pkgs.openjdk21;
           # Full Ghidra engine — Gradle from-source (nixpkgs build.nix). Never ghidra-bin.
           # ghidra-src flake input pins the same upstream tree for docs / future patches.
           ghidraFromSource = pkgs.ghidra;
@@ -46,10 +48,15 @@
             ghidra = ghidraFromSource;
             inherit ghidraMcpExtension ghidraVibeTools;
           };
+          # Thin stdio MCP host package (Cursor / Zed). No public URL; no
+          # manual :8092. Same spawn model as mcp-nixos / wwn-mcp.
+          ghidraVibeMcp = pkgs.callPackage ./nix/mcp/default.nix {
+            inherit ghidraMcpExtension ghidraVibeTools;
+          };
 
           # In-process engine (JNI) for the native GUI — not the headless sidecar.
           ghidraVibeEngine = pkgs.callPackage ./nix/engine/default.nix {
-            inherit ghidraVibe;
+            inherit ghidraVibe java;
           };
 
           # macOS SwiftUI shell — Nix-built binary in the store (not `swift run` from source).
@@ -151,7 +158,7 @@
           dyldHelper = pkgs.writeShellScriptBin "ghidra-vibe-dyld" ''
             export GHIDRA_VIBE_SCRIPT_PATH="''${GHIDRA_VIBE_SCRIPT_PATH:-${./ghidra_scripts}}"
             export GHIDRA_VIBE_DSC_INDEX="''${GHIDRA_VIBE_DSC_INDEX:-${ghidraVibe}/bin/ghidra-vibe-dsc-index}"
-            export GHIDRA_VIBE_HEADLESS="''${GHIDRA_VIBE_HEADLESS:-${ghidraVibe}/share/ghidra-vibe/ghidra-vibe-analyzeHeadless}"
+            export GHIDRA_VIBE_HEADLESS="''${GHIDRA_VIBE_HEADLESS:-${./scripts/ghidra-vibe-analyzeHeadless}}"
             export GHIDRA_INSTALL_DIR="''${GHIDRA_INSTALL_DIR:-${ghidraVibe}/lib/ghidra}"
             exec ${./scripts/ghidra-vibe-dyld} "$@"
           '';
@@ -159,7 +166,7 @@
           appleHelper = pkgs.writeShellScriptBin "ghidra-vibe-apple" ''
             export PYTHONPATH="${./scripts/lib}''${PYTHONPATH:+:$PYTHONPATH}"
             export GHIDRA_VIBE_SCRIPT_PATH="''${GHIDRA_VIBE_SCRIPT_PATH:-${./ghidra_scripts}}"
-            export GHIDRA_VIBE_HEADLESS="''${GHIDRA_VIBE_HEADLESS:-${ghidraVibe}/share/ghidra-vibe/ghidra-vibe-analyzeHeadless}"
+            export GHIDRA_VIBE_HEADLESS="''${GHIDRA_VIBE_HEADLESS:-${./scripts/ghidra-vibe-analyzeHeadless}}"
             exec ${./scripts/ghidra-vibe-apple} "$@"
           '';
 
@@ -168,17 +175,36 @@
             export GHIDRA_VIBE_DYLD="''${GHIDRA_VIBE_DYLD:-${dyldHelper}/bin/ghidra-vibe-dyld}"
             export GHIDRA_VIBE_JSPACE="''${GHIDRA_VIBE_JSPACE:-${ghidraVibe}/bin/ghidra-vibe-jspace}"
             export GHIDRA_VIBE_SCRIPT_PATH="''${GHIDRA_VIBE_SCRIPT_PATH:-${./ghidra_scripts}}"
-            export GHIDRA_VIBE_HEADLESS="''${GHIDRA_VIBE_HEADLESS:-${ghidraVibe}/share/ghidra-vibe/ghidra-vibe-analyzeHeadless}"
+            export GHIDRA_VIBE_HEADLESS="''${GHIDRA_VIBE_HEADLESS:-${./scripts/ghidra-vibe-analyzeHeadless}}"
             exec ${./scripts/ghidra-vibe-mcp-ext} "$@"
           '';
 
           mcpHeadlessHelper = pkgs.writeShellScriptBin "ghidra-vibe-mcp-headless" ''
             export GHIDRA_INSTALL_DIR="''${GHIDRA_INSTALL_DIR:-${ghidraVibe}/lib/ghidra}"
-            export JAVA_HOME="''${JAVA_HOME:-${java}}"
-            # Script is a lone store path — point it at packaged lib/detect-maxmem.sh.
-            export GHIDRA_VIBE_LIB="''${GHIDRA_VIBE_LIB:-${ghidraVibe}/share/ghidra-vibe/lib}"
+            # Always the flake JDK — do not inherit a broken shell JAVA_HOME
+            # (Darwin HotSpot / Zulu SIGBUS even on `java -version`).
+            export JAVA_HOME="${java.home}"
+            export GHIDRA_VIBE_JAVA_HOME="${java.home}"
+            export PATH="${java.home}/bin:$PATH"
+            # Repo lib first so detect-java.sh / slice helpers iterate without a Ghidra rebuild.
+            export GHIDRA_VIBE_LIB="''${GHIDRA_VIBE_LIB:-${./scripts/lib}}"
             exec ${./scripts/ghidra-vibe-mcp-headless} "$@"
           '';
+
+          analysisEnsureHelper = pkgs.writeShellApplication {
+            name = "ghidra-vibe-analysis-ensure";
+            runtimeInputs = [ pkgs.python3 ];
+            text = ''
+              export GHIDRA_INSTALL_DIR="''${GHIDRA_INSTALL_DIR:-${ghidraVibe}/lib/ghidra}"
+              export JAVA_HOME="${java.home}"
+              export GHIDRA_VIBE_JAVA_HOME="${java.home}"
+              export PATH="${java.home}/bin:$PATH"
+              export GHIDRA_VIBE_LIB="''${GHIDRA_VIBE_LIB:-${./scripts/lib}}"
+              export GHIDRA_VIBE_MCP_HEADLESS="''${GHIDRA_VIBE_MCP_HEADLESS:-${mcpHeadlessHelper}/bin/ghidra-vibe-mcp-headless}"
+              export GHIDRA_MCP_URL="''${GHIDRA_MCP_URL:-http://127.0.0.1:8089}"
+              exec ${./scripts/ghidra-vibe-analysis-ensure} "$@"
+            '';
+          };
 
           runGhidra =
             let
@@ -321,9 +347,11 @@
             ghidra-vibe = ghidraVibe;
             ghidra-vibe-engine = ghidraVibeEngine;
             ghidra-vibe-tools = ghidraVibeTools;
+            ghidra-vibe-mcp = ghidraVibeMcp;
             extract = extractDyld;
             dyld = dyldHelper;
             mcp-headless = mcpHeadlessHelper;
+            ghidra-vibe-analysis = analysisEnsureHelper;
             ghidra-vibe-agent-ensure-models = agentEnsureModels;
           }
           // pkgs.lib.optionalAttrs (ghidraVibeApp != null) {
@@ -347,7 +375,8 @@
               extractDyld
             ]
             ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [ pkgs.swift ];
-            JAVA_HOME = "${java}";
+            JAVA_HOME = "${java.home}";
+            GHIDRA_VIBE_JAVA_HOME = "${java.home}";
             GHIDRA_INSTALL_DIR = "${ghidraVibe}/lib/ghidra";
           };
 
@@ -361,6 +390,35 @@
               test -x "${ghidraVibe}/bin/ghidra-vibe-dsc-index"
               test -x "${ghidraVibe}/bin/ghidra-vibe-rag-mcp"
               test -f "${ghidraVibe}/share/ghidra-vibe/lib/detect-maxmem.sh"
+              touch $out
+            '';
+
+            ghidraVibeMcpStdio = pkgs.runCommand "check-ghidra-vibe-mcp-stdio" { } ''
+              test -x "${ghidraVibeMcp}/bin/ghidra-mcp"
+              test -x "${ghidraVibeMcp}/bin/ghidra-vibe-mcp"
+              test -x "${ghidraVibeMcp}/bin/ghidra-vibe-rag-mcp"
+              test -f "${ghidraVibeMcp}/share/ghidra-mcp/bridge_mcp_vibe.py"
+              test -f "${ghidraVibeMcp}/share/ghidra-mcp/bridge_mcp_ghidra_stock.py"
+              test -f "${ghidraVibeMcp}/share/ghidra-vibe/lib/detect-java.sh"
+              test -f "${ghidraVibeMcp}/share/ghidra-vibe/lib/macho-native-slice.sh"
+              grep -q load_program "${ghidraVibeMcp}/share/ghidra-mcp/bridge_mcp_ghidra.py"
+              touch $out
+            '';
+
+            ghidraVibeHeadlessHelpers = pkgs.runCommand "check-ghidra-vibe-headless-helpers" { } ''
+              test -x ${./scripts/lib/detect-java.sh}
+              test -x ${./scripts/lib/macho-native-slice.sh}
+              test -f ${./scripts/lib/macho_slice.py}
+              grep -q detect_ghidra_java_home ${./scripts/ghidra-vibe-mcp-headless}
+              grep -q GHIDRA_VIBE_RUNTIME_HOME ${./scripts/ghidra-vibe-mcp-headless}
+              grep -q ghidra-vibe-mcp-headless ${./scripts/ghidra-vibe-analysis-ensure}
+              grep -q _ghidra_java_looks_hotspot ${./scripts/lib/detect-java.sh}
+              grep -q macho_native_slice ${./scripts/ghidra-vibe-analyzeHeadless}
+              grep -q load_program_from_project ${./scripts/lib/vibe_mcp/handlers.py}
+              grep -q ensure_analysis ${./scripts/lib/vibe_mcp/handlers.py}
+              test -f ${./.cursor/rules/analysis-always-on.mdc}
+              grep -q vibe_health ${./.cursor/rules/analysis-always-on.mdc}
+              grep -q ghidra-vibe-analysis-ensure ${./AGENTS.md}
               touch $out
             '';
 
@@ -467,6 +525,8 @@
     // {
       nixosModules.default = import ./nix/modules/nixos.nix;
       darwinModules.default = import ./nix/modules/darwin.nix;
-      homeModules.default = import ./nix/modules/home-manager.nix;
+      # self-passing HM module (package defaults + stdio MCP snippet)
+      homeModules.default = import ./nix/modules/home-manager.nix self;
+      homeModules.ghidra-vibe = self.homeModules.default;
     };
 }

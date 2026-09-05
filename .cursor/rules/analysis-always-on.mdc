@@ -1,0 +1,31 @@
+---
+description: Program engine must be up whenever Cursor MCP is used — auto-start :8089, never skip vibe_health
+alwaysApply: true
+---
+
+# Analysis engine always on
+
+Cursor MCP is useless if `127.0.0.1:8089` is down. Treat a refused analysis
+HTTP as a **bug**, not a normal idle state.
+
+1. First tool in any RE turn: `vibe_health`. It must show `analysis.ok`.
+2. If analysis is down, run `ghidra-vibe-analysis-ensure` (or
+   `ghidra-vibe-mcp-headless`). Do not decompile / import / rename until the
+   probe succeeds.
+3. Do not tell the user to “start Ghidra” by hand. MCP wrappers and the
+   LaunchAgent (`mcp.keepAnalysisAlive`) start the JVM.
+4. Darwin: never inherit Zulu/Temurin `JAVA_HOME`. Flake wrappers pin Semeru
+   / OpenJ9. `detect-java.sh` must refuse HotSpot without executing it.
+
+```text
+// BAD — vibe MCP green, engine dead, guess from strings
+vibe_health → analysis connection refused → keep going
+
+// GOOD
+vibe_health → analysis.ok
+else: ghidra-vibe-analysis-ensure --timeout 180 → re-probe
+```
+
+`ghidra-vibe-mcp` / `ghidra-mcp` must call ensure on spawn. Home-manager
+must ship a KeepAlive LaunchAgent. A checkout-only Python bridge with no
+ensure is unfinished.

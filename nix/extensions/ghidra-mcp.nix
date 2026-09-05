@@ -38,7 +38,9 @@ stdenvNoCC.mkDerivation rec {
         "$props" > "$tmp"
       mv "$tmp" "$props"
     fi
-    cp "$bridge" "$out/share/ghidra-mcp/bridge_mcp_ghidra.py"
+    cp "$bridge" "$out/share/ghidra-mcp/bridge_mcp_ghidra_stock.py"
+    cp ${../share/bridge_mcp_ghidra.py} "$out/share/ghidra-mcp/bridge_mcp_ghidra.py"
+    chmod +x "$out/share/ghidra-mcp/bridge_mcp_ghidra.py"
     runHook postInstall
   '';
 

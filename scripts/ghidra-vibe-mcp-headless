@@ -37,6 +37,14 @@ VIBE_LIB="$(resolve_vibe_lib)"
 # shellcheck source=lib/detect-maxmem.sh
 source "${VIBE_LIB}/detect-maxmem.sh"
 MEM="$(detect_ghidra_maxmem)"
+# Reject inherited HotSpot JAVA_HOME that SIGBUS on this host.
+if [[ -f "${VIBE_LIB}/detect-java.sh" ]]; then
+  # shellcheck source=lib/detect-java.sh
+  source "${VIBE_LIB}/detect-java.sh"
+  if jh="$(detect_ghidra_java_home)"; then
+    export JAVA_HOME="$jh"
+  fi
+fi
 # AWT headless=true: engine JVM has no Swing window (native UI is the GUI).
 VMARG_LIST="${GHIDRA_VIBE_VMARGS:--XX:ParallelGCThreads=2 -XX:CICompilerCount=2 -Djava.awt.headless=true -Dghidra.vibe.nativeUi=1 }"
 
@@ -89,11 +97,28 @@ if [[ -z "${MCP_JAR}" || ! -f "${MCP_JAR}" ]]; then
   exit 1
 fi
 
-RUNTIME="${GHIDRA_VIBE_RUNTIME_HOME:-${TMPDIR:-/tmp}/ghidra-vibe-runtime-$$}"
-if [[ ! -x "${RUNTIME}/support/launch.sh" ]]; then
+# Stable runtime (not /tmp/…-$$). Reuse across restarts; rebuild if the
+# install tree changes. launchd / MCP ensure share this directory.
+if [[ -z "${GHIDRA_VIBE_RUNTIME_HOME:-}" ]]; then
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    GHIDRA_VIBE_RUNTIME_HOME="${HOME}/Library/Caches/ghidra-vibe/runtime"
+  else
+    GHIDRA_VIBE_RUNTIME_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}/ghidra-vibe/runtime"
+  fi
+fi
+RUNTIME="${GHIDRA_VIBE_RUNTIME_HOME}"
+if [[ -f "${RUNTIME}/.ghidra-install" ]]; then
+  prev="$(cat "${RUNTIME}/.ghidra-install" 2>/dev/null || true)"
+  if [[ "$prev" != "${SRC}" ]]; then
+    rm -rf "${RUNTIME}"
+  fi
+fi
+if [[ ! -x "${RUNTIME}/support/launch.sh" && ! -f "${RUNTIME}/support/.launch.sh-wrapped" ]]; then
   rm -rf "${RUNTIME}"
   mkdir -p "${RUNTIME}/Ghidra/patch"
   # Symlink install; materialize patch/ with MCP jar for early classpath.
+  # Materialize support/ as real files so headless can set JAVA_HOME_OVERRIDE
+  # (nix store trees are read-only).
   for name in "${SRC}"/*; do
     base="$(basename "$name")"
     if [[ "$base" == "Ghidra" ]]; then
@@ -105,6 +130,26 @@ if [[ ! -x "${RUNTIME}/support/launch.sh" ]]; then
         else
           ln -sfn "$n2" "${RUNTIME}/Ghidra/${b2}"
         fi
+      done
+    elif [[ "$base" == "support" ]]; then
+      mkdir -p "${RUNTIME}/support"
+      # Prefer bash wrapper over Mach-O trampoline for agent/headless.
+      if [[ -f "${name}/.launch.sh-wrapped" ]]; then
+        cp -f "${name}/.launch.sh-wrapped" "${RUNTIME}/support/launch.sh"
+        chmod +x "${RUNTIME}/support/launch.sh"
+      else
+        cp -f "${name}/launch.sh" "${RUNTIME}/support/launch.sh" 2>/dev/null || \
+          ln -sfn "${name}/launch.sh" "${RUNTIME}/support/launch.sh"
+        chmod +x "${RUNTIME}/support/launch.sh" 2>/dev/null || true
+      fi
+      if [[ -f "${name}/launch.properties" ]]; then
+        cp -f "${name}/launch.properties" "${RUNTIME}/support/launch.properties"
+      fi
+      # Keep other support helpers available via symlink
+      for s in "${name}"/*; do
+        sb="$(basename "$s")"
+        [[ "$sb" == "launch.sh" || "$sb" == "launch.properties" || "$sb" == ".launch.sh-wrapped" ]] && continue
+        ln -sfn "$s" "${RUNTIME}/support/${sb}"
       done
     else
       ln -sfn "$name" "${RUNTIME}/${base}"
@@ -128,9 +173,57 @@ echo "ghidra-vibe-mcp-headless MAXMEM=$MEM runtime=$RUNTIME" >&2
 # Ensure MCP jar is always in patch/ even when RUNTIME is reused.
 mkdir -p "${RUNTIME}/Ghidra/patch"
 cp -f "${MCP_JAR}" "${RUNTIME}/Ghidra/patch/$(basename "${MCP_JAR}")"
+printf '%s\n' "${SRC}" >"${RUNTIME}/.ghidra-install"
+
+# Headless / agent runs have no TTY for LaunchSupport JDK prompts. Force
+# JAVA_HOME_OVERRIDE into the runtime launch.properties (symlink trees are
+# read-only — materialize a writable copy). Also seed java_home.save under
+# application.settingsdir when JAVA_HOME is set.
+if [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/java" ]]; then
+  LP_SRC="${RUNTIME}/support/launch.properties"
+  if [[ -f "$LP_SRC" ]]; then
+    LP_WRITABLE="${RUNTIME}/support/launch.properties.wwn"
+    if [[ -L "$LP_SRC" || ! -w "$LP_SRC" ]]; then
+      cp -f "$LP_SRC" "$LP_WRITABLE"
+      rm -f "$LP_SRC"
+      mv "$LP_WRITABLE" "$LP_SRC"
+    fi
+    if grep -q '^JAVA_HOME_OVERRIDE=' "$LP_SRC" 2>/dev/null; then
+      # portable in-place replace without relying on GNU sed -i
+      awk -v jh="$JAVA_HOME" '
+        BEGIN { done=0 }
+        /^JAVA_HOME_OVERRIDE=/ {
+          print "JAVA_HOME_OVERRIDE=" jh
+          done=1
+          next
+        }
+        { print }
+        END { if (!done) print "JAVA_HOME_OVERRIDE=" jh }
+      ' "$LP_SRC" >"${LP_SRC}.tmp" && mv "${LP_SRC}.tmp" "$LP_SRC"
+    else
+      printf '\nJAVA_HOME_OVERRIDE=%s\n' "$JAVA_HOME" >>"$LP_SRC"
+    fi
+  fi
+  mkdir -p "${VIBE_SETTINGS}/ghidra"
+  for verdir in "${VIBE_SETTINGS}/ghidra"/ghidra_*; do
+    [[ -d "$verdir" ]] || continue
+    printf '%s\n' "$JAVA_HOME" >"${verdir}/java_home.save"
+  done
+  # Common layout when settingsdir is used as application.settingsdir
+  mkdir -p "${VIBE_SETTINGS}/ghidra/ghidra_12.1.2_NIX"
+  printf '%s\n' "$JAVA_HOME" >"${VIBE_SETTINGS}/ghidra/ghidra_12.1.2_NIX/java_home.save"
+fi
+
+# Prefer the bash launch wrapper when the store path ships a Mach-O trampoline
+# that cannot resolve JDK without a TTY.
+LAUNCH="${RUNTIME}/support/launch.sh"
+if [[ -f "${RUNTIME}/support/.launch.sh-wrapped" ]]; then
+  LAUNCH="${RUNTIME}/support/.launch.sh-wrapped"
+fi
+
 # Application name must be a known Ghidra layout ("Ghidra") so patch/ + Extensions
 # land on the launcher classpath. "Ghidra-MCP-Headless" is not a stock app id and
 # yields ClassNotFound for the headless server main.
 # With `set -u`, empty "${args[@]}" is an unbound error — expand only when set.
-exec "${RUNTIME}/support/launch.sh" fg jdk Ghidra "$MEM" "$VMARG_LIST" \
+exec "${LAUNCH}" fg jdk Ghidra "$MEM" "$VMARG_LIST" \
   com.xebyte.headless.GhidraMCPHeadlessServer ${args[@]+"${args[@]}"}

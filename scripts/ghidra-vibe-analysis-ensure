@@ -1,0 +1,197 @@
+#!/usr/bin/env bash
+# Keep GhidraVibe analysis HTTP up (default http://127.0.0.1:8089).
+# Idempotent. Used by MCP (ensure) and launchd ( --supervise ).
+# No host login, uid, or store-hash assumptions.
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: ghidra-vibe-analysis-ensure [--supervise] [--timeout SECONDS] [--port PORT]
+
+Bring the program-engine API up and leave it up.
+  --supervise   exec headless in the foreground (launchd KeepAlive)
+  --timeout N   wait N seconds for /check_connection (default 180)
+  --port N      override GHIDRA_MCP_PORT / URL port (default 8089)
+EOF
+}
+
+SUPERVISE=0
+TIMEOUT="${GHIDRA_VIBE_ANALYSIS_TIMEOUT:-180}"
+PORT="${GHIDRA_MCP_PORT:-}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    --supervise)
+      SUPERVISE=1
+      shift
+      ;;
+    --timeout)
+      TIMEOUT="${2:?}"
+      shift 2
+      ;;
+    --port)
+      PORT="${2:?}"
+      shift 2
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+URL="${GHIDRA_MCP_URL:-${GHIDRA_MCP_SERVER:-http://127.0.0.1:8089}}"
+URL="${URL%/}"
+if [[ -z "$PORT" ]]; then
+  PORT="$(python3 -c 'import os,urllib.parse,sys
+u=urllib.parse.urlparse(sys.argv[1])
+print(u.port or 8089)
+' "$URL" 2>/dev/null || echo 8089)"
+fi
+URL="http://127.0.0.1:${PORT}"
+
+CACHE="${XDG_CACHE_HOME:-${HOME}/Library/Caches}"
+[[ "$(uname -s)" == "Darwin" ]] || CACHE="${XDG_CACHE_HOME:-${HOME}/.cache}"
+STATE="${XDG_STATE_HOME:-${HOME}/Library/Logs/GhidraVibe}"
+[[ "$(uname -s)" == "Darwin" ]] || STATE="${XDG_STATE_HOME:-${HOME}/.local/state/ghidra-vibe}"
+mkdir -p "${CACHE}/ghidra-vibe" "$STATE"
+
+LOCK="${CACHE}/ghidra-vibe/analysis.lock"
+PIDFILE="${CACHE}/ghidra-vibe/analysis.pid"
+LOG="${GHIDRA_VIBE_ANALYSIS_LOG:-${STATE}/analysis.log}"
+export GHIDRA_VIBE_RUNTIME_HOME="${GHIDRA_VIBE_RUNTIME_HOME:-${CACHE}/ghidra-vibe/runtime}"
+
+resolve_vibe_lib() {
+  local d cand
+  if [[ -n "${GHIDRA_VIBE_LIB:-}" && -f "${GHIDRA_VIBE_LIB}/detect-java.sh" ]]; then
+    echo "${GHIDRA_VIBE_LIB}"
+    return 0
+  fi
+  d="$(cd "$(dirname "$0")" && pwd)"
+  for cand in \
+    "${d}/lib/detect-java.sh" \
+    "${d}/../share/ghidra-vibe/lib/detect-java.sh"
+  do
+    if [[ -f "$cand" ]]; then
+      echo "$(cd "$(dirname "$cand")" && pwd)"
+      return 0
+    fi
+  done
+  return 1
+}
+
+if libdir="$(resolve_vibe_lib)"; then
+  # shellcheck source=lib/detect-java.sh
+  source "${libdir}/detect-java.sh"
+  if jh="$(detect_ghidra_java_home)"; then
+    export JAVA_HOME="$jh"
+    export GHIDRA_VIBE_JAVA_HOME="$jh"
+    export PATH="${JAVA_HOME}/bin:${PATH}"
+  fi
+fi
+
+probe() {
+  python3 -c 'import sys,urllib.request
+url=sys.argv[1].rstrip("/")+"/check_connection"
+try:
+    urllib.request.urlopen(url, timeout=2)
+    raise SystemExit(0)
+except Exception:
+    raise SystemExit(1)
+' "$URL"
+}
+
+find_headless() {
+  local c
+  if [[ -n "${GHIDRA_VIBE_MCP_HEADLESS:-}" && -x "${GHIDRA_VIBE_MCP_HEADLESS}" ]]; then
+    echo "${GHIDRA_VIBE_MCP_HEADLESS}"
+    return 0
+  fi
+  c="$(command -v ghidra-vibe-mcp-headless 2>/dev/null || true)"
+  if [[ -n "$c" && -x "$c" ]]; then
+    echo "$c"
+    return 0
+  fi
+  local d
+  d="$(cd "$(dirname "$0")" && pwd)"
+  if [[ -x "${d}/ghidra-vibe-mcp-headless" ]]; then
+    echo "${d}/ghidra-vibe-mcp-headless"
+    return 0
+  fi
+  return 1
+}
+
+wait_healthy() {
+  local i
+  for ((i = 0; i < TIMEOUT; i++)); do
+    if probe; then
+      return 0
+    fi
+    sleep 1
+  done
+  return 1
+}
+
+start_headless() {
+  local bin
+  bin="$(find_headless)" || {
+    echo "ghidra-vibe-mcp-headless not found (set GHIDRA_VIBE_MCP_HEADLESS or GHIDRA_INSTALL_DIR)" >&2
+    return 1
+  }
+  if [[ -z "${GHIDRA_INSTALL_DIR:-}" || ! -x "${GHIDRA_INSTALL_DIR}/support/launch.sh" ]]; then
+    echo "GHIDRA_INSTALL_DIR must point at a vibe Ghidra tree (…/lib/ghidra)" >&2
+    return 1
+  fi
+  mkdir -p "$(dirname "$LOG")"
+  echo "$(date '+%Y-%m-%dT%H:%M:%S') starting analysis on ${URL} java=${JAVA_HOME:-?} install=${GHIDRA_INSTALL_DIR}" >>"$LOG"
+  if [[ "$SUPERVISE" == "1" ]]; then
+    exec "$bin" --port "$PORT" "$@"
+  fi
+  nohup "$bin" --port "$PORT" >>"$LOG" 2>&1 &
+  echo $! >"$PIDFILE"
+}
+
+if probe; then
+  echo "analysis already up at ${URL}" >&2
+  if [[ "$SUPERVISE" == "1" ]]; then
+    # Stay in the foreground so launchd does not respawn a second JVM.
+    while probe; do
+      sleep 5
+    done
+    echo "analysis dropped; restarting" >&2
+    start_headless
+  fi
+  exit 0
+fi
+
+# mkdir is an atomic lock (portable; macOS has no util-linux flock).
+LOCKDIR="${LOCK}.d"
+if ! mkdir "$LOCKDIR" 2>/dev/null; then
+  echo "another ensure is starting analysis; waiting" >&2
+  if wait_healthy; then
+    exit 0
+  fi
+  echo "analysis did not come up at ${URL} (see ${LOG})" >&2
+  exit 1
+fi
+trap 'rmdir "$LOCKDIR" 2>/dev/null || true' EXIT
+
+if probe; then
+  exit 0
+fi
+
+start_headless
+if [[ "$SUPERVISE" == "1" ]]; then
+  exit $?
+fi
+if wait_healthy; then
+  echo "analysis up at ${URL}" >&2
+  exit 0
+fi
+echo "analysis did not come up at ${URL} within ${TIMEOUT}s (see ${LOG})" >&2
+exit 1
